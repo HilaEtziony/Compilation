@@ -33,4 +33,7 @@ public interface TokenNames {
   public static final int INT = 30;
   public static final int STRING = 31;
   public static final int ID = 32;
+  public static final int INT_W_LEADING_Z = 33;
+
+  public static final int ERROR = 33; // TODO needed?!
 }
