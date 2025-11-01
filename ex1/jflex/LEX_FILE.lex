@@ -17,7 +17,7 @@ import java_cup.runtime.*;
 /************************************/
 /* OPTIONS AND DECLARATIONS SECTION */
 /************************************/
-   
+
 /*****************************************************/ 
 /* Lexer is the name of the class JFlex will create. */
 /* The code will be written to the file Lexer.java.  */
@@ -54,6 +54,8 @@ import java_cup.runtime.*;
 	/*********************************************************************************/
 	/* Create a new java_cup.runtime.Symbol with information about the current token */
 	/*********************************************************************************/
+	final int MAX_INT = 32767;
+
 	private Symbol symbol(int type)               {return new Symbol(type, yyline, yycolumn);}
 	private Symbol symbol(int type, Object value) {return new Symbol(type, yyline, yycolumn, value);}
 
@@ -66,6 +68,16 @@ import java_cup.runtime.*;
 	/* Enable token position extraction from main */
 	/**********************************************/
 	public int getTokenStartPosition() { return yycolumn + 1; } 
+
+	private Symbol isIntValid(String given_int){ 
+		long value = Long.parseLong(given_int);
+		
+		if (value > MAX_INT) {
+			return symbol(TokenNames.ERROR);
+		}
+		
+		return symbol(TokenNames.INT, Integer.valueOf(yytext()));
+	}
 %}
 
 /***********************/
@@ -75,8 +87,9 @@ LineTerminator	= \r|\n|\r\n
 WhiteSpace		= {LineTerminator} | [ \t\f]
 KEYWORDS		= class | nil | array | while | int | void | extends | return | new | if | else | string
 INTEGER			= 0 | [1-9][0-9]*
-ID				= [A-Za-z][A-Za-z0-9]*
-LETTER			= [A-Za-z]
+INT_W_LEADING_Z = 0[0-9]+
+ID				= [a-zA-Z][a-zA-Z0-9]*
+LETTERS			= [a-zA-Z]*
 
 /******************************/
 /* DOLLAR DOLLAR - DON'T TOUCH! */
@@ -95,39 +108,58 @@ LETTER			= [A-Za-z]
 /**************************************************************/
 
 <YYINITIAL> {
+"("					{ return symbol(TokenNames.LPAREN); }
+")"					{ return symbol(TokenNames.RPAREN); }
+"["					{ return symbol(TokenNames.LBRACK); }
+"]"					{ return symbol(TokenNames.RBRACK); }
+"{"					{ return symbol(TokenNames.LBRACE); }
+"}"					{ return symbol(TokenNames.RBRACE); }
+"+"					{ return symbol(TokenNames.PLUS); }
+"-"					{ return symbol(TokenNames.MINUS); }
+"*"					{ return symbol(TokenNames.TIMES); }
+"/"					{ return symbol(TokenNames.DIVIDE); }
+","					{ return symbol(TokenNames.COMMA); }
+"."					{ return symbol(TokenNames.DOT); }
+";"					{ return symbol(TokenNames.SEMICOLON); }
+"int"				{ return symbol(TokenNames.TYPE_INT); }
+"string"			{ return symbol(TokenNames.TYPE_STRING); }
+"void"				{ return symbol(TokenNames.TYPE_VOID); }
+":="				{ return symbol(TokenNames.ASSIGN); }
+"="					{ return symbol(TokenNames.EQ); }
+"<"					{ return symbol(TokenNames.LT); }
+">"					{ return symbol(TokenNames.GT); }
+"\""				{ yybegin(INSIDE_QUOTES); } // Enter a special dedicated state
 
-"("					{ return symbol(TokenNames.LPAREN);}
-")"					{ return symbol(TokenNames.RPAREN);}
-"["					{ return symbol(TokenNames.LBRACK);}
-"]"					{ return symbol(TokenNames.RBRACK);}
-"{"					{ return symbol(TokenNames.LBRACE);}
-"}"					{ return symbol(TokenNames.RBRACE);}
-"+"					{ return symbol(TokenNames.PLUS);}
-"-"					{ return symbol(TokenNames.MINUS);}
-"*"					{ return symbol(TokenNames.TIMES);}
-"/"					{ return symbol(TokenNames.DIVIDE);}
-","					{ return symbol(TokenNames.COMMA);}
-"."					{ return symbol(TokenNames.DOT);}
-";"					{ return symbol(TokenNames.SEMICOLON);}
-"int"				{ return symbol(TokenNames.TYPE_INT);}
-"string"			{ return symbol(TokenNames.TYPE_STRING);}
-"void"				{ return symbol(TokenNames.TYPE_VOID);}
-":="				{ return symbol(TokenNames.ASSIGN);}
-"="					{ return symbol(TokenNames.EQ);}
-"<"					{ return symbol(TokenNames.LT);}
-">"					{ return symbol(TokenNames.GT);}
-"array"				{ return symbol(TokenNames.ARRAY);}
-"class"				{ return symbol(TokenNames.CLASS);}
-"return"			{ return symbol(TokenNames.RETURN);}
-"while"				{ return symbol(TokenNames.WHILE);}
-"if"				{ return symbol(TokenNames.IF);}
-"else"				{ return symbol(TokenNames.ELSE);}
-"new"				{ return symbol(TokenNames.NEW);}
-"extends"			{ return symbol(TokenNames.EXTENDS);}
-"nil"				{ return symbol(TokenNames.NIL);}
-{INTEGER}			{ return symbol(TokenNames.INT, Integer.valueOf(yytext()));}
-\"{LETTER}*\"		{ return symbol(TokenNames.STRING, yytext());}
-{ID}				{ return symbol(TokenNames.ID, yytext());}
-{WhiteSpace}		{ /* just skip what was found, do nothing */ }
-<<EOF>>				{ return symbol(TokenNames.EOF);}
+"array"				{ return symbol(TokenNames.ARRAY); }
+"class"				{ return symbol(TokenNames.CLASS); }
+"return"			{ return symbol(TokenNames.RETURN); }
+"while"				{ return symbol(TokenNames.WHILE); }
+"if"				{ return symbol(TokenNames.IF); }
+"else"				{ return symbol(TokenNames.ELSE); }
+"new"				{ return symbol(TokenNames.NEW); }
+"extends"			{ return symbol(TokenNames.EXTENDS); }
+"nil"				{ return symbol(TokenNames.NIL); }
+{INT_W_LEADING_Z} 	{ return symbol(TokenNames.ERROR); } // It's before INTEGER otherwise wouldn't be cought
+{INTEGER}			{ return isIntValid(yytext()); }
+{ID}				{ return symbol(TokenNames.ID, String.valueOf(yytext())); }
+
+{WhiteSpace}		{ /* Just skip what was found, do nothing */ }
+<<EOF>>				{ return symbol(TokenNames.EOF); }
+}
+
+<INSIDE_QUOTES> {
+"\"" 				{ yybegin(YYINITIAL); } // Closed astrics - move back to initial state
+{LETTERS} 			{ return symbol(TokenNames.STRING, String.valueOf(yytext())); }
+.                   { return symbol(TokenNames.ERROR); } // Catch-all: Match any single character that is NOT a quote or a letter
+<<EOF>>				{ return symbol(TokenNames.ERROR); } // = Unclosed string
+}
+
+<INSIDE_QUOTES> {
+[a-zA-Z]* "\""	{ 
+					yybegin(YYINITIAL);  // So it'll no where to return after finishing this action
+					String val = yytext().substring(0, yytext().length() - 1);
+					return symbol(TokenNames.STRING, val); // All this in order to avoid returning the quote character in end
+				}
+<<EOF>>			{ return symbol(TokenNames.ERROR); } 
+.				{ return symbol(TokenNames.ERROR); }
 }
