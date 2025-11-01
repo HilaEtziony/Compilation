@@ -5,6 +5,14 @@ import java_cup.runtime.Symbol;
    
 public class Main
 {
+	private static final String[] TOKEN_NAMES = {
+	"EOF","LPAREN","RPAREN","LBRACK","RBRACK","LBRACE","RBRACE",
+	"PLUS","MINUS","TIMES","DIVIDE","COMMA","DOT","SEMICOLON",
+	"TYPE_INT","TYPE_STRING","TYPE_VOID","ASSIGN","EQ","LT","GT",
+	"ARRAY","CLASS","RETURN","WHILE","IF","ELSE","NEW","EXTENDS",
+	"NIL","INT","STRING","ID"
+	};
+
 	static public void main(String argv[])
 	{
 		Lexer l;
@@ -44,21 +52,20 @@ public class Main
 				/************************/
 				/* [6] Print to console */
 				/************************/
-				System.out.print("[");
-				System.out.print(l.getLine());
-				System.out.print(",");
-				System.out.print(l.getTokenStartPosition());
-				System.out.print("]:");
-				System.out.print(s.value);
-				System.out.print("\n");
+				System.out.print(TOKEN_NAMES[s.sym]);
+				if(s.value != null) {
+				    System.out.print("(" + s.value + ")");
+				}
+				System.out.print("[" + l.getLine() + "," + l.getTokenStartPosition() + "]\n");
 				
 				/*********************/
 				/* [7] Print to file */
 				/*********************/
-				fileWriter.print(l.getLine());
-				fileWriter.print(": ");
-				fileWriter.print(s.value);
-				fileWriter.print("\n");
+				fileWriter.print(TOKEN_NAMES[s.sym]);
+				if(s.value != null) {
+				    fileWriter.print("(" + s.value + ")");
+				}
+				fileWriter.print("[" + l.getLine() + "," + l.getTokenStartPosition() + "]\n");
 				
 				/***********************/
 				/* [8] Read next token */
