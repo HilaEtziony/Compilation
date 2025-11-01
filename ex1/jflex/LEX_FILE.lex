@@ -91,6 +91,8 @@ INT_W_LEADING_Z = 0[0-9]+
 ID				= [a-zA-Z][a-zA-Z0-9]*
 LETTERS			= [a-zA-Z]*
 
+%state INSIDE_QUOTES
+
 /******************************/
 /* DOLLAR DOLLAR - DON'T TOUCH! */
 /******************************/
