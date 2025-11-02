@@ -24,7 +24,8 @@ public class Main
 		String outputFileName = argv[1];
 		
 		// working with queues - writing to file only after all tokens are read
-		Queue<Symbol> tokenQueue = new LinkedList<>();
+		Queue<String> tokenQueue = new LinkedList<>();
+		String line;
 
 		try
 		{
@@ -66,26 +67,28 @@ public class Main
 				/* [6] Print to console */
 				/************************/
 				System.out.print(TOKEN_NAMES[s.sym]);
+				line = TOKEN_NAMES[s.sym];
 				if(s.value != null) {
 				    System.out.print("(" + s.value + ")");
+				    line += "(" + s.value + ")";
 				}
 				System.out.print("[" + l.getLine() + "," + l.getTokenStartPosition() + "]\n");
-				tokenQueue.add(s);
+				line += "[" + l.getLine() + "," + l.getTokenStartPosition() + "]";
+				tokenQueue.add(line);
 				/***********************/
 				/* [8] Read next token */
 				/***********************/
 				s = l.next_token();
 			}
 
-			while((s=tokenQueue.poll()) != null){
+			while((line=tokenQueue.poll()) != null){
 				/*********************/
 				/* [7] Print to file */
 				/*********************/
-				fileWriter.print(TOKEN_NAMES[s.sym]);
-				if(s.value != null) {
-				    fileWriter.print("(" + s.value + ")");
+				fileWriter.print(line);
+				if(tokenQueue.size() > 0){
+					fileWriter.print("\n");
 				}
-				fileWriter.print("[" + l.getLine() + "," + l.getTokenStartPosition() + "]\n");
 			}
 			
 			/******************************/
