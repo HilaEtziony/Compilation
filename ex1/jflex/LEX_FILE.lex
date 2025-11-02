@@ -104,6 +104,7 @@ INTEGER			= 0 | [1-9][0-9]*
 INT_W_LEADING_Z = 0[0-9]+
 ID				= [a-zA-Z][a-zA-Z0-9]*
 LETTERS			= [a-zA-Z]*
+COMMENT_LEGAL_CHAR = [a-zA-Z0-9 \t\[\](){};.?!+-]
 
 %state INSIDE_QUOTES
 
@@ -165,13 +166,14 @@ LETTERS			= [a-zA-Z]*
 
 {WhiteSpace}		{ /* Just skip what was found, do nothing */ }
 <<EOF>>				{ return symbol(TokenNames.EOF); }
+.                   { return symbol(TokenNames.ERROR); } // Catch-all: Match any single character that is NOT a quote or a letter
 }
 
 <INSIDE_QUOTES> {
 "\"" 				{ yybegin(YYINITIAL); } // Closed astrics - move back to initial state
 {LETTERS} 			{ return symbol(TokenNames.STRING, String.valueOf(yytext())); }
-.                   { return symbol(TokenNames.ERROR); } // Catch-all: Match any single character that is NOT a quote or a letter
 <<EOF>>				{ return symbol(TokenNames.ERROR); } // = Unclosed string
+.                   { return symbol(TokenNames.ERROR); } // Catch-all: Match any single character that is NOT a quote or a letter
 }
 
 <INSIDE_QUOTES> {
@@ -185,19 +187,20 @@ LETTERS			= [a-zA-Z]*
 }
 
 <COMMENT_TYPE_1> {
-([a-zA-Z0-9 \t()?!+\-*/.;{}]|"["|"]")* "\n"
-				{ yybegin(YYINITIAL); 
-				  return symbol(TokenNames.COMMENT, "Type 1"); 
-				} 
+({COMMENT_LEGAL_CHAR} | "*" | \/)+
+				{ return symbol(TokenNames.COMMENT); }
+"\n"			{ yybegin(YYINITIAL);
+				  return symbol(TokenNames.COMMENT); }
 <<EOF>>			{ return symbol(TokenNames.EOF); }
 .				{ return symbol(TokenNames.ERROR); }
 }
 
 <COMMENT_TYPE_2> {
-([a-zA-Z0-9 \t(){}?!+\-.;\n]|"*"[^/]|"["|"]")* "*/"
-				{
+"*/"			{
 				  yybegin(YYINITIAL);
-				  return symbol(TokenNames.COMMENT, "Type 2");
+				  return symbol(TokenNames.COMMENT);
 				}
+({COMMENT_LEGAL_CHAR} | "*" | \/ | \n)
+				{ return symbol(TokenNames.COMMENT); }
 .				{ return symbol(TokenNames.ERROR); }
 }

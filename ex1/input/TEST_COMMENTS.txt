@@ -26,3 +26,8 @@ class Test {
     int x;
     /* Comment after code */
 }
+
+/*******************/
+/*   Decorative   **/
+/*******************/
+
