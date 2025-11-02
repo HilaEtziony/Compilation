@@ -1,5 +1,6 @@
 import java.io.*;
 import java.io.PrintWriter;
+import java.util.*;
 
 import java_cup.runtime.Symbol;
    
@@ -10,7 +11,7 @@ public class Main
 	"PLUS","MINUS","TIMES","DIVIDE","COMMA","DOT","SEMICOLON",
 	"TYPE_INT","TYPE_STRING","TYPE_VOID","ASSIGN","EQ","LT","GT",
 	"ARRAY","CLASS","RETURN","WHILE","IF","ELSE","NEW","EXTENDS",
-	"NIL","INT","STRING","ID"
+	"NIL","INT","STRING","ID", "INT_W_LEADING_Z", "COMMENT", "ERROR"
 	};
 
 	static public void main(String argv[])
@@ -22,6 +23,9 @@ public class Main
 		String inputFileName = argv[0];
 		String outputFileName = argv[1];
 		
+		// working with queues - writing to file only after all tokens are read
+		Queue<Symbol> tokenQueue = new LinkedList<>();
+
 		try
 		{
 			/********************************/
@@ -49,6 +53,15 @@ public class Main
 			/********************************/
 			while (s.sym != TokenNames.EOF)
 			{
+				if(s.sym == TokenNames.ERROR){
+					fileWriter.print("ERROR");
+					fileWriter.close();
+					throw new RuntimeException("Lexical Error at line " + l.getLine() + ", position " + l.getTokenStartPosition());
+				}
+				else if (s.sym == TokenNames.COMMENT){
+					s = l.next_token();
+					continue;
+				}
 				/************************/
 				/* [6] Print to console */
 				/************************/
@@ -57,7 +70,14 @@ public class Main
 				    System.out.print("(" + s.value + ")");
 				}
 				System.out.print("[" + l.getLine() + "," + l.getTokenStartPosition() + "]\n");
-				
+				tokenQueue.add(s);
+				/***********************/
+				/* [8] Read next token */
+				/***********************/
+				s = l.next_token();
+			}
+
+			while((s=tokenQueue.poll()) != null){
 				/*********************/
 				/* [7] Print to file */
 				/*********************/
@@ -66,11 +86,6 @@ public class Main
 				    fileWriter.print("(" + s.value + ")");
 				}
 				fileWriter.print("[" + l.getLine() + "," + l.getTokenStartPosition() + "]\n");
-				
-				/***********************/
-				/* [8] Read next token */
-				/***********************/
-				s = l.next_token();
 			}
 			
 			/******************************/

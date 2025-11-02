@@ -1,7 +1,1 @@
-ID(abcd)[1,1]
-CLASS[2,1]
-ID(moish)[3,1]
-INT(77)[3,7]
-INT(999)[3,10]
-ID(zebra)[3,14]
-INT(90)[4,1]
+ERROR

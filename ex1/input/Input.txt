@@ -1,4 +1,9 @@
 abcd 
 class
 moish 77 999 zebra
-90
+90 {} "sasa"
+{} // a comment.
+/*this is also a comment */
+"spring"
+/*Wow Just
+    another = not comment */

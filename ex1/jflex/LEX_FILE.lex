@@ -41,6 +41,20 @@ import java_cup.runtime.*;
 /******************************************************************/
 %cup
 
+/*********************/
+/* LEXICAL STATES    */
+/*********************/
+/* 
+ * Declare additional lexical states used for context-sensitive scanning.
+ * These states allow the lexer to handle different token contexts separately.
+ * YYINITIAL is the default start state.
+ * INSIDE_QUOTES: Used when scanning inside string literals
+ * COMMENT_TYPE_1: Used when scanning inside comment blocks (declare here!)
+ */
+%state INSIDE_QUOTES
+%state COMMENT_TYPE_1
+%state COMMENT_TYPE_2
+
 /****************/
 /* DECLARATIONS */
 /****************/
@@ -141,6 +155,10 @@ LETTERS			= [a-zA-Z]*
 "new"				{ return symbol(TokenNames.NEW); }
 "extends"			{ return symbol(TokenNames.EXTENDS); }
 "nil"				{ return symbol(TokenNames.NIL); }
+
+"//"				{ yybegin(COMMENT_TYPE_1); }
+"/*"				{ yybegin(COMMENT_TYPE_2); }
+
 {INT_W_LEADING_Z} 	{ return symbol(TokenNames.ERROR); } // It's before INTEGER otherwise wouldn't be cought
 {INTEGER}			{ return isIntValid(yytext()); }
 {ID}				{ return symbol(TokenNames.ID, String.valueOf(yytext())); }
@@ -163,5 +181,23 @@ LETTERS			= [a-zA-Z]*
 					return symbol(TokenNames.STRING, val); // All this in order to avoid returning the quote character in end
 				}
 <<EOF>>			{ return symbol(TokenNames.ERROR); } 
+.				{ return symbol(TokenNames.ERROR); }
+}
+
+<COMMENT_TYPE_1> {
+([a-zA-Z0-9 \t()?!+\-*/.;{}]|"["|"]")* "\n"
+				{ yybegin(YYINITIAL); 
+				  return symbol(TokenNames.COMMENT, "Type 1"); 
+				} 
+<<EOF>>			{ return symbol(TokenNames.EOF); }
+.				{ return symbol(TokenNames.ERROR); }
+}
+
+<COMMENT_TYPE_2> {
+([a-zA-Z0-9 \t(){}?!+\-.;\n]|"*"[^/]|"["|"]")* "*/"
+				{
+				  yybegin(YYINITIAL);
+				  return symbol(TokenNames.COMMENT, "Type 2");
+				}
 .				{ return symbol(TokenNames.ERROR); }
 }
