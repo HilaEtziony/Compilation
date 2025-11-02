@@ -1,0 +1,33 @@
+// This is a single line comment [] {}
+
+/* This is a simple block comment */
+/* Multi-line
+comment with allowed
+characters */
+
+/* Comment with (parentheses) and {braces} */
+
+/* Comment with ? and ! marks */
+
+/* Comment with + - operators */
+
+/* Comment with ; semicolon. period */
+
+/* Comment with
+newlines
+and tabs	inside */
+
+/* Nested * asterisk but not closing */
+
+/* Multiple *** asterisks */
+
+class Test {
+    // Comment before code
+    int x;
+    /* Comment after code */
+}
+
+/*******************/
+/*   Decorative   **/
+/*******************/
+

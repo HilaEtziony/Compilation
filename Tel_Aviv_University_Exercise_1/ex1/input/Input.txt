@@ -1,0 +1,14 @@
+abcd 
+class
+moish 77 999 zebra
+90 {} "sasa"
+[] // a comment. [] {} () 
+/*   */
+"spring"
+/***********/
+/*******************/
+/*   Decorative   **/
+/*******************/
+class
+
+/*  */
