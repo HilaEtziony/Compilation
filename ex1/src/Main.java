@@ -86,7 +86,7 @@ public class Main
 				/* [7] Print to file */
 				/*********************/
 				fileWriter.print(line);
-				if(tokenQueue.size() > 0){
+				if(!tokenQueue.isEmpty()){
 					fileWriter.print("\n");
 				}
 			}

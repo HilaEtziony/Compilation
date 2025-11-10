@@ -52,7 +52,6 @@ import java_cup.runtime.*;
  * COMMENT_TYPE_1: Used when scanning inside comment blocks (declare here!)
  */
 %state INSIDE_QUOTES
-%state COMMENT_TYPE_1
 %state COMMENT_TYPE_2
 
 /****************/
@@ -105,6 +104,7 @@ INT_W_LEADING_Z = 0[0-9]+
 ID				= [a-zA-Z][a-zA-Z0-9]*
 LETTERS			= [a-zA-Z]*
 COMMENT_LEGAL_CHAR = [a-zA-Z0-9 \t\[\](){};.?!+-]
+COMMENT_TYPE_ONE = "//" [a-zA-Z0-9 \t\[\](){};.?!\+\-*/]* "\n" 
 
 %state INSIDE_QUOTES
 
@@ -157,7 +157,7 @@ COMMENT_LEGAL_CHAR = [a-zA-Z0-9 \t\[\](){};.?!+-]
 "extends"			{ return symbol(TokenNames.EXTENDS); }
 "nil"				{ return symbol(TokenNames.NIL); }
 
-"//"				{ yybegin(COMMENT_TYPE_1); }
+{COMMENT_TYPE_ONE}	{ return symbol(TokenNames.COMMENT);}
 "/*"				{ yybegin(COMMENT_TYPE_2); }
 
 {INT_W_LEADING_Z} 	{ return symbol(TokenNames.ERROR); } // It's before INTEGER otherwise wouldn't be cought
@@ -186,15 +186,6 @@ COMMENT_LEGAL_CHAR = [a-zA-Z0-9 \t\[\](){};.?!+-]
 .				{ return symbol(TokenNames.ERROR); }
 }
 
-<COMMENT_TYPE_1> {
-({COMMENT_LEGAL_CHAR} | "*" | \/)+
-				{ return symbol(TokenNames.COMMENT); }
-"\n"			{ yybegin(YYINITIAL);
-				  return symbol(TokenNames.COMMENT); }
-<<EOF>>			{ return symbol(TokenNames.EOF); }
-.				{ return symbol(TokenNames.ERROR); }
-}
-
 <COMMENT_TYPE_2> {
 "*/"			{
 				  yybegin(YYINITIAL);
@@ -202,5 +193,6 @@ COMMENT_LEGAL_CHAR = [a-zA-Z0-9 \t\[\](){};.?!+-]
 				}
 ({COMMENT_LEGAL_CHAR} | "*" | \/ | \n)
 				{ return symbol(TokenNames.COMMENT); }
+<<EOF>>			{ return symbol(TokenNames.ERROR); } 
 .				{ return symbol(TokenNames.ERROR); }
 }
