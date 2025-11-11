@@ -1,0 +1,35 @@
+string hello := "hello";
+array strArray = string[];
+class Person{
+
+    strArray str := nil;
+
+    void init(){
+        int i;
+        str := new string[3];
+    }
+
+    void append(int index, string item){
+        str[index] := item;
+    }
+
+    void print(int index){
+        PrintInt(index);
+        PrintString(str[index]);
+    }
+}
+
+
+
+void main() {
+
+    Person x := new Person;
+    x.init();
+    x.append(0, hello);
+    x.append(2, "world");
+    x.print(0);
+    x.print(2);
+
+
+
+}

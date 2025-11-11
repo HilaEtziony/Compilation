@@ -1,0 +1,8 @@
+class Son extends Father
+{
+    int bar;
+}
+class Father
+{
+    void foo() { PrintInt(8); }
+}

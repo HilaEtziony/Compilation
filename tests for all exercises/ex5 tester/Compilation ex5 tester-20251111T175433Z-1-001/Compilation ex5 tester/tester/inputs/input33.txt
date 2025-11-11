@@ -1,0 +1,17 @@
+class x{
+    string z := "abc";
+
+    void foo(){
+        PrintString(z);
+    }
+    int bar(){
+        foo();
+        return 2;
+    }
+}
+
+void main() {
+    x moshe := new x;
+    int y := moshe.bar();
+
+}

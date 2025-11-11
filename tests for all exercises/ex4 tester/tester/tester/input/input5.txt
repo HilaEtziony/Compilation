@@ -1,0 +1,9 @@
+void main() {
+    int loopVar;
+    int i:= 0;
+    while (i < 10) {
+        loopVar := i;
+        i := i + 1;
+    }
+    PrintInt(loopVar);
+}

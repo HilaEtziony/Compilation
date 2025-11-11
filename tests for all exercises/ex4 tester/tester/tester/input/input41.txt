@@ -1,0 +1,12 @@
+int x;
+void main() {
+	int y := 1;
+	while (y > 2) {
+		int z := y;
+		while (1) {
+			int w := z + y + x;
+			y := w;
+		}
+	}
+ 
+}

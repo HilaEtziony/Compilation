@@ -1,0 +1,14 @@
+class Person{int x;}
+array intarr = int[];
+
+void main() {
+    Person b;
+    intarr x;
+    if(b = nil){
+        PrintInt(1);
+    }
+    if(x = nil){
+        PrintInt(2);
+    }
+
+}

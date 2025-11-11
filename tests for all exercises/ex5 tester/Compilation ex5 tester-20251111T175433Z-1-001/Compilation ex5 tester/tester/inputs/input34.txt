@@ -1,0 +1,26 @@
+class x{
+    string z := "abc";
+    int y := 2;
+    void foo(){
+        PrintString(z);
+        PrintInt(y);
+    }
+    int bar(){
+        int y := 3;
+        PrintInt(y);
+        x shlomo := new x;
+        shlomo.foo();
+
+        return 5;
+    }
+}
+
+void main() {
+    x moshe := new x;
+    PrintInt(moshe.y);
+    moshe.y := 4;
+    PrintInt(moshe.y);
+    int y := moshe.bar();
+    PrintInt(moshe.y);
+
+}

@@ -1,0 +1,13 @@
+class Fibo
+{
+	Fibo last;
+	Fibo first;
+	int x := 5;
+}
+
+void main(){
+    Fibo x;
+    x.last.last.last.last.first.x := 6;
+    int y := x.last.last.last.last.first.x;
+    return;
+}

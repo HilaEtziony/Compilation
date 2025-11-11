@@ -1,0 +1,6 @@
+void main() {
+    return;
+    int x;
+    int y := x;
+}
+

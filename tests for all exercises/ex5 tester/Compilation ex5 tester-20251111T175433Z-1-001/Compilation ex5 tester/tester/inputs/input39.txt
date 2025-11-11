@@ -1,0 +1,18 @@
+
+class Son{
+
+    string foo(){
+        return "SonFoo";
+    }
+    string bar := "hello";
+
+}
+void main() {
+    Son b := new Son;
+    if(b.foo() = "SonFoo"){
+        PrintString(b.bar + "world");
+    }
+
+
+
+}

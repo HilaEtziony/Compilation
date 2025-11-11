@@ -1,0 +1,24 @@
+class Grandfather
+{
+	int WALK := 8;
+	string RUN := "RUN";
+}
+
+class Father extends Grandfather
+{
+	Father g := nil;
+}
+
+class Son extends Father
+{
+	Son swim;
+	int iii;
+	void main(){
+	    WALK := 6;
+	}
+}
+Grandfather x := new Son;
+string y := x.RUN
+int z := x.iii;
+
+

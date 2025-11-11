@@ -1,0 +1,15 @@
+
+class Person {
+    Person x := nil;
+    int y := 1;
+}
+
+void main() {
+    Person b := new Person;
+    b.x := new Person;
+    b.x.x := new Person;
+    PrintInt(b.x.x.y);
+    b.x.y := 3;
+    PrintInt(b.x.y);
+    PrintInt(b.x.x.y);
+}

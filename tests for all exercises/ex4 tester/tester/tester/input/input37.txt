@@ -1,0 +1,11 @@
+int x;
+void main() {
+	int y := x;
+	if (1) {
+		int z := y;
+		while (1) {
+			int w := z;
+			y := w;
+		}
+	}
+}

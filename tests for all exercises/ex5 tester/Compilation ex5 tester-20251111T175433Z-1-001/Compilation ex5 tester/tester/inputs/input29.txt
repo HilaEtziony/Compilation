@@ -1,0 +1,12 @@
+int boof() {
+    string x := "hello";
+    string y := "hellos";
+    if(x = y){
+        return 1;
+    }
+    return 0;
+}
+
+void main() {
+    PrintInt(boof());
+}

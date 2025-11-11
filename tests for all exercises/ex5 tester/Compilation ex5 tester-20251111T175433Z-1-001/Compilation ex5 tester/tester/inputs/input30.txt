@@ -1,0 +1,13 @@
+int boof() {
+    string x := "hello";
+    string y := "h";
+    string z := "ello";
+    if( x = y + z){
+        return 1;
+    }
+    return 0;
+}
+
+void main() {
+    PrintInt(boof());
+}

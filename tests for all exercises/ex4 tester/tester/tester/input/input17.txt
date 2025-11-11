@@ -1,0 +1,15 @@
+void main() {
+    int outer;
+    int inner := 1;
+    if (outer = 0) {
+        int inner;
+        if (inner = 2) {
+            outer := 3;
+        }
+    }
+    while (inner < 5) {
+        int temp := outer + 1;
+        inner := inner + 1;
+    }
+    PrintInt(outer);
+}

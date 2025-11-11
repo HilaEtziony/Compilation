@@ -1,0 +1,18 @@
+class Grandfather
+{
+	int WALK := 8;
+	string RUN := "RUN";
+}
+
+class Father extends Grandfather
+{
+	Father g := nil;
+}
+
+class Son extends Father
+{
+	Son swim;
+	int iii;
+	int WALK := 6;
+}
+

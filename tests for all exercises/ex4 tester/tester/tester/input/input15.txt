@@ -1,0 +1,13 @@
+int globalVar;
+void main() {
+    int a;
+    int b := 10;
+    if (a = 0) {
+        int b := a + 1;
+    }
+    while (globalVar < 5) {
+        int c := b + 2;
+        globalVar := globalVar + 1;
+    }
+    PrintInt(a);
+}

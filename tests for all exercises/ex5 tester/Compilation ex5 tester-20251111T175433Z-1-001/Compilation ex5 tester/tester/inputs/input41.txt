@@ -1,0 +1,23 @@
+
+
+class Person{
+
+    string str := "a";
+
+    void foo(){
+        str := str + "a";
+    }
+}
+
+
+
+void main() {
+
+    Person x := new Person;
+    x.foo();
+    x.foo();
+    PrintString(x.str);
+
+
+
+}

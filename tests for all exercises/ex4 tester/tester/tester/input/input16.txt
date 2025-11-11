@@ -1,0 +1,12 @@
+int counter;
+void main() {
+    int x;
+    while (counter < 10) {
+        int y := x + 1;
+        if (y > 5) {
+            int z := y + 2;
+        }
+        counter := counter + 1;
+    }
+    PrintInt(x);
+}

@@ -1,0 +1,12 @@
+void foo(int i){
+    if(i=0){
+        return;
+    }
+    foo(i-1);
+    PrintInt(i);
+
+}
+
+void main() {
+    foo(10);
+}

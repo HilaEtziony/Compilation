@@ -1,0 +1,8 @@
+int g;
+void main () {
+    int y;
+    while (y>0) {
+        g := 1;
+    }
+    PrintInt(g);
+}

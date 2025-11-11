@@ -1,0 +1,5 @@
+class IllegalSameName
+{
+    int foo;
+    void foo(int i) { PrintInt(i); }
+}

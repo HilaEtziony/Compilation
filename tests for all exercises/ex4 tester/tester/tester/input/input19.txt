@@ -1,0 +1,12 @@
+int level;
+void main() {
+    int score;
+    while (level < 3) {
+        int progress := score + 10;
+        if (progress > 50) {
+            level := level + 1;
+        }
+        score := progress;
+    }
+    PrintInt(score);
+}

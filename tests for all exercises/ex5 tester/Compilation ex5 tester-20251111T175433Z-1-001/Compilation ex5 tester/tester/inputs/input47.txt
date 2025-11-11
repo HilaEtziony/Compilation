@@ -1,0 +1,12 @@
+class Person{
+    int y := 5;
+}
+
+void foo(){
+    Person x;
+    x.y := 8;
+}
+
+void main() {
+    foo();
+}

@@ -1,0 +1,22 @@
+string global;
+
+class Person{
+
+    void foo(){
+        global := "def";
+    }
+}
+void foo(){
+    global := "abc";
+}
+void main() {
+    foo();
+    PrintString(global);
+    Person x := new Person;
+    x.foo();
+    PrintString(global);
+
+
+
+
+}

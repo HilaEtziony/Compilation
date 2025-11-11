@@ -1,0 +1,8 @@
+int x := 1;
+
+void main() {
+    int g;
+    x := g;
+}
+int y := x;
+

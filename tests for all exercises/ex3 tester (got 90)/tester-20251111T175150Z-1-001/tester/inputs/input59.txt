@@ -1,0 +1,24 @@
+class Grandfather
+{
+	int WALK := 8;
+	string RUN := "RUN";
+}
+array test = int[];
+class Father extends Grandfather
+{
+	Father g := nil;
+}
+
+class Son extends Father
+{
+	Son swim;
+	int iii;
+}
+
+array WisePeople = Grandfather[];
+
+void main(WisePeople x)
+{
+    WisePeople y = new GrandFather[5];
+	main(y, nil);
+}

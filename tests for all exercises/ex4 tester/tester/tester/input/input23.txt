@@ -1,0 +1,10 @@
+void main() {
+    int x;
+    int level := 0;
+    while (level < 3) {
+       while (1) {
+            x := 1;
+       }
+       level := x + 1;
+    }
+}

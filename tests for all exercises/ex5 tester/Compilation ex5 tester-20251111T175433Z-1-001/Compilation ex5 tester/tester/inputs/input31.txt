@@ -1,0 +1,8 @@
+class x{
+    string z := "abc";
+}
+
+void main() {
+    x moshe := new x;
+    PrintString(moshe.z);
+}

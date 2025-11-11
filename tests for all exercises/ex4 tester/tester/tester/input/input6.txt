@@ -1,0 +1,11 @@
+void main() {
+    int x;
+    int condition := 1;
+    if (condition > 0) {
+        x := 10;
+    }
+    if (1) {
+        x := 20;
+    }
+    PrintInt(x);
+}

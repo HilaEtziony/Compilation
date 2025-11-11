@@ -1,0 +1,53 @@
+class Node {
+    int value;
+    Node next;
+}
+
+class LinkedList {
+    Node head;
+
+    void reverse() {
+        Node prev := nil;
+        Node current := head;
+        Node next := nil;
+
+        while (1 - (current = nil)) {
+            next := current.next;
+            current.next := prev;
+            prev := current;
+            current := next;
+        }
+
+        head := prev;
+    }
+
+    void printList() {
+        Node current := head;
+
+        while (1 - (current = nil)) {
+            PrintInt(current.value);
+            current := current.next;
+        }
+    }
+}
+LinkedList createList(int size) {
+    LinkedList list := new LinkedList;
+    Node current := nil;
+    int i := size;
+
+    while (i > 0) {
+        Node newNode := new Node;
+        newNode.value := i;
+        newNode.next := current;
+        current := newNode;
+        i := i - 1;
+    }
+
+    list.head := current;
+    return list;
+}
+
+void main() {
+    LinkedList myList := createList(5);
+    myList.printList();
+}

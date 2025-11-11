@@ -1,0 +1,17 @@
+class Base {
+    int getValue() {
+        return 1;
+    }
+}
+
+class Derived extends Base {
+    int getValue() {
+        return 2;
+    }
+}
+
+void main() {
+    Base b := new Derived;
+    int result := b.getValue();
+    PrintInt(result);
+}

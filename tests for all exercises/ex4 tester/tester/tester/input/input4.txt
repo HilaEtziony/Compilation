@@ -1,0 +1,11 @@
+int globalInit := 100;
+int globalUninit;
+
+void main() {
+    int x := globalInit + 1;
+    int y;
+    if (x > 50) {
+        y := x;
+    }
+    PrintInt(y);
+}

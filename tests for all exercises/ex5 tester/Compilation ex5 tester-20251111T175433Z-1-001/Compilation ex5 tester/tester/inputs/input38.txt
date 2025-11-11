@@ -1,0 +1,42 @@
+class GrandFather{
+    int x;
+    string y;
+    void foo(){
+        PrintString("GrandFoo");
+    }
+    void bar(){
+        PrintString("GrandBar");
+    }
+}
+
+class Father extends GrandFather{
+
+    void foo(){
+        PrintString("FatherFoo");
+    }
+
+    void zoo(){
+        PrintString("Fatherzoo");
+    }
+}
+
+class Son extends Father{
+
+    void foo(){
+        PrintString("SonFoo");
+    }
+    void zoo(){
+        PrintString("Sonzoo");
+    }
+
+    void bar(){
+        PrintString("sonbar");
+    }
+}
+void main() {
+    GrandFather b := new Son;
+    b.foo();
+    b.bar();
+
+
+}

@@ -1,0 +1,8 @@
+void main() {
+    int x;
+    int check := 0;
+    if (check = 0) {
+        x := 5;
+    }
+    PrintInt(x);
+}
