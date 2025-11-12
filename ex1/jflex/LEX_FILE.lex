@@ -51,7 +51,6 @@ import java_cup.runtime.*;
  * INSIDE_QUOTES: Used when scanning inside string literals
  * COMMENT_TYPE_1: Used when scanning inside comment blocks (declare here!)
  */
-%state INSIDE_QUOTES
 %state COMMENT_TYPE_2
 
 /****************/
@@ -105,8 +104,7 @@ ID				= [a-zA-Z][a-zA-Z0-9]*
 LETTERS			= [a-zA-Z]*
 COMMENT_LEGAL_CHAR = [a-zA-Z0-9 \t\[\](){};.?!+-]
 COMMENT_TYPE_ONE = "//" [a-zA-Z0-9 \t\[\](){};.?!\+\-*/]* "\n" 
-
-%state INSIDE_QUOTES
+STRING_SEQ = "\"" [a-zA-z]* "\""
 
 /******************************/
 /* DOLLAR DOLLAR - DON'T TOUCH! */
@@ -145,7 +143,7 @@ COMMENT_TYPE_ONE = "//" [a-zA-Z0-9 \t\[\](){};.?!\+\-*/]* "\n"
 "="					{ return symbol(TokenNames.EQ); }
 "<"					{ return symbol(TokenNames.LT); }
 ">"					{ return symbol(TokenNames.GT); }
-"\""				{ yybegin(INSIDE_QUOTES); } // Enter a special dedicated state
+{STRING_SEQ}		{ return symbol(TokenNames.STRING, yytext()); }
 
 "array"				{ return symbol(TokenNames.ARRAY); }
 "class"				{ return symbol(TokenNames.CLASS); }
@@ -169,22 +167,6 @@ COMMENT_TYPE_ONE = "//" [a-zA-Z0-9 \t\[\](){};.?!\+\-*/]* "\n"
 .                   { return symbol(TokenNames.ERROR); } // Catch-all: Match any single character that is NOT a quote or a letter
 }
 
-<INSIDE_QUOTES> {
-"\"" 				{ yybegin(YYINITIAL); } // Closed astrics - move back to initial state
-{LETTERS} 			{ return symbol(TokenNames.STRING, String.valueOf(yytext())); }
-<<EOF>>				{ return symbol(TokenNames.ERROR); } // = Unclosed string
-.                   { return symbol(TokenNames.ERROR); } // Catch-all: Match any single character that is NOT a quote or a letter
-}
-
-<INSIDE_QUOTES> {
-[a-zA-Z]* "\""	{ 
-					yybegin(YYINITIAL);  // So it'll no where to return after finishing this action
-					String val = yytext().substring(0, yytext().length() - 1);
-					return symbol(TokenNames.STRING, val); // All this in order to avoid returning the quote character in end
-				}
-<<EOF>>			{ return symbol(TokenNames.ERROR); } 
-.				{ return symbol(TokenNames.ERROR); }
-}
 
 <COMMENT_TYPE_2> {
 "*/"			{

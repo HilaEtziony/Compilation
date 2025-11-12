@@ -55,7 +55,6 @@ public class Main
 			while (s.sym != TokenNames.EOF)
 			{
 				if(s.sym == TokenNames.ERROR){
-					fileWriter.print("ERROR");
 					fileWriter.close();
 					throw new RuntimeException("Lexical Error at line " + l.getLine() + ", position " + l.getTokenStartPosition());
 				}
@@ -101,10 +100,24 @@ public class Main
 			/**************************/
 			fileWriter.close();
     	}
-			     
+		catch (FileNotFoundException e)
+		{
+			System.err.println("File not found: " + e.getMessage());
+		}
+		catch (IOException e)
+		{
+			System.err.println("IO Error: " + e.getMessage());
+		}     
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			try {
+				PrintWriter secondfilewriter = new PrintWriter(outputFileName);
+				secondfilewriter.print("ERROR");
+				secondfilewriter.close();
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+			//e.printStackTrace();
 		}
 	}
 }
