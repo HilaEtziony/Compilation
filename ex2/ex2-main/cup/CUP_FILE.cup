@@ -118,36 +118,17 @@ start with stmtList;
 /* DERIVATION RULES */
 /********************/
 
-
-
-
-					
-
-
-
-
-
-
-program 	::= 	decList:dl	 													{: RESULT = dl; 								:}
+program 	::= 	decList:l	 													{: RESULT = l; 									:}
 					;
 
-decList 	::=		dec:first 	
-					{: 
-						java.util.ArrayList list = new java.util.ArrayList();
-						list.add(first);
-						RESULT = list;
-					:}
-    				| decList:list dec:next
-					{:
-						list.add(next);
-						RESULT = list;
-					:}
+decList		:=		dec:d	decList:l												{: RESULT = new AstDecList(d,l);    			:}  //TODO - create AstDecList
+					| dec:d															{: RESULT = new AstDecList(d,null); 			:}	//TODO - create AstDecList
 					;
 
-dec 		::=		varDec:name          											{: RESULT = name; 								:}
-    				| funcDec:name       											{: RESULT = name; 								:}
-    				| classDec:name      											{: RESULT = name; 								:}
-    				| arrayTypedef:name  											{: RESULT = name; 								:}
+dec 		::=		varDec:vDec          											{: RESULT = vDec; 								:}
+    				| funcDec:fDec       											{: RESULT = fDec; 								:}
+    				| classDec:cDec      											{: RESULT = cDec; 								:}
+    				| arrayTypedef:aDec  											{: RESULT = aDec; 								:}
     				;
 
 type 		::=		TYPE_INT          												{: RESULT = "int"; 								:}
@@ -165,31 +146,24 @@ funcDec 	::= 	type:t ID:i LPAREN type:t_inner ID:i_inner { COMMA type ID } RPARE
 					| type:t ID:i LPAREN RPAREN LBRACE stmtList:s RBRACE
 					;
 
-
 stmtList	::=		stmt:s	stmtList:l												{: RESULT = new AstStmtList(s,l);    			:}
 					| stmt:s														{: RESULT = new AstStmtList(s,null); 			:}
 					;
 
-
-classDec 	::= 	CLASS ID:name EXTENDS ID:parentName LBRACE cFieldList:fields RBRACE
-					| CLASS ID:name LBRACE cFieldList:fields RBRACE
+classDec 	::= 	CLASS ID:name EXTENDS ID:parentName 
+					LBRACE cField:c	cFieldList:l RBRACE
+					| CLASS ID:name EXTENDS ID:parentName 
+					  LBRACE cField:c RBRACE
+					| CLASS ID:name LBRACE cField:c	cFieldList:l RBRACE
+					| CLASS ID:name LBRACE cField:c RBRACE
 					;
 
-cFieldList 	::=		cField:first 	
-					{: 
-						java.util.ArrayList list = new java.util.ArrayList();
-						list.add(first);
-						RESULT = list;
-					:}
-    				| cFieldList:list cField:next
-					{:
-						list.add(next);
-						RESULT = list;
-					:}
+cFieldList	::=		cField:c	cFieldList:l										{: RESULT = new AstCFieldList(c,l);    			:} //TODO - create AstCFieldList
+					| cField:c														{: RESULT = new AstCFieldList(c,null); 			:} //TODO - create AstCFieldList
 					;
 
-cField 		::= 	varDec:vDec 
-					| funcDec:fDec
+cField 		::= 	varDec:vDec 													{: RESULT = vDec; 								:}
+					| funcDec:fDec													{: RESULT = fDec; 								:}
 					;
 
 arrayTypedef ::= 	ARRAY ID:i EQ type:t LBRACK RBRACK SEMICOLON
