@@ -204,7 +204,7 @@ var			::=		ID:name															{: RESULT = new AstVarSimple(name);       		:}
 					| var:v LBRACK exp:e RBRACK										{: RESULT = new AstVarSubscript(v,e);     		:}
 					;
 
-stmt 		::= 	varDec:vDec
+stmt 		::= 	varDec:vDec														{: RESULT = vDec; 								:}	//TODO - create AstDecList extends AstNode (as AstStmt extends AstNode)
 					| var ASSIGN exp SEMICOLON										{: RESULT = new AstStmtAssign(v,e); 			:}
 					| var ASSIGN newExp SEMICOLON
 					| RETURN exp:e SEMICOLON										{: RESULT = new AstStmtReturn(ret); 			:}
