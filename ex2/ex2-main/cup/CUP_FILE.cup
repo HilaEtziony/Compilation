@@ -68,12 +68,30 @@ terminal LBRACE;
 terminal RBRACE;
 terminal SEMICOLON;
 terminal ASSIGN;
+terminal EOF;
+terminal COMMA;
+terminal TYPE_INT;
+terminal TYPE_STRING;
+terminal TYPE_VOID;
+terminal LT;
+terminal GT;
+terminal ARRAY;
+terminal CLASS;
+terminal RETURN;
+terminal ELSE;
+terminal NEW;
+terminal EXTENDS;
+terminal NIL;
+terminal INT_W_LEADING_Z; // TODO needed?
+terminal COMMENT;
+terminal ERROR; // TODO needed?
 
 /*************/
 /* TERMINALS */
 /*************/
 terminal Integer INT;
 terminal String ID;
+terminal String STRING;
 
 /*****************/
 /* NON TERMINALS */
@@ -100,22 +118,122 @@ start with stmtList;
 /* DERIVATION RULES */
 /********************/
 
-stmtList	::=		stmt:s	stmtList:l		{: RESULT = new AstStmtList(s,l);    :}
-					| stmt:s				{: RESULT = new AstStmtList(s,null); :}
-					;
 
-var			::=		ID:name								{: RESULT = new AstVarSimple(name);       :}
-					| var:v DOT ID:fieldName			{: RESULT = new AstVarField(v,fieldName); :}
-					| var:v LBRACK exp:e RBRACK			{: RESULT = new AstVarSubscript(v,e);     :}
-					;
+
+
 					
-stmt		::=		var:v ASSIGN exp:e SEMICOLON								{: RESULT = new AstStmtAssign(v,e); :}
-					| IF    LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE	{: RESULT = new AstStmtIf(   cond,body); :}
-					| WHILE LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE	{: RESULT = new AstStmtWhile(cond,body); :}
+
+
+
+
+
+
+program 	::= 	decList:dl	 													{: RESULT = dl; 								:}
 					;
 
-exp			::=		INT:i								{: RESULT = new AstExpInt(i);          :}
-					| var:v								{: RESULT = new AstExpVar(v);          :}
-					| exp:e1 PLUS  exp:e2				{: RESULT = new AstExpBinop(e1, e2, 0);:}
-					| exp:e1 MINUS exp:e2				{: RESULT = new AstExpBinop(e1, e2, 1);:}
+decList 	::=		dec:first 	
+					{: 
+						java.util.ArrayList list = new java.util.ArrayList();
+						list.add(first);
+						RESULT = list;
+					:}
+    				| decList:list dec:next
+					{:
+						list.add(next);
+						RESULT = list;
+					:}
+					;
+
+dec 		::=		varDec:name          											{: RESULT = name; 								:}
+    				| funcDec:name       											{: RESULT = name; 								:}
+    				| classDec:name      											{: RESULT = name; 								:}
+    				| arrayTypedef:name  											{: RESULT = name; 								:}
+    				;
+
+type 		::=		TYPE_INT          												{: RESULT = "int"; 								:}
+					| TYPE_STRING     												{: RESULT = "string"; 							:}
+    				| TYPE_VOID       												{: RESULT = "void"; 							:}
+    				| ID:name         												{: RESULT = name; 								:}
+    				;
+
+varDec 		::= 	type:t ID:i ASSIGN exp:e SEMICOLON
+					| type:t ID:i SEMICOLON
+					| type:t ID:i ASSIGN newExp:nE SEMICOLON
+					;
+
+funcDec 	::= 	type:t ID:i LPAREN type:t_inner ID:i_inner { COMMA type ID } RPAREN LBRACE stmtList:s RBRACE //TODO - take care in { COMMA type ID }
+					| type:t ID:i LPAREN RPAREN LBRACE stmtList:s RBRACE
+					;
+
+
+stmtList	::=		stmt:s	stmtList:l												{: RESULT = new AstStmtList(s,l);    			:}
+					| stmt:s														{: RESULT = new AstStmtList(s,null); 			:}
+					;
+
+
+classDec 	::= 	CLASS ID:name EXTENDS ID:parentName LBRACE cFieldList:fields RBRACE
+					| CLASS ID:name LBRACE cFieldList:fields RBRACE
+					;
+
+cFieldList 	::=		cField:first 	
+					{: 
+						java.util.ArrayList list = new java.util.ArrayList();
+						list.add(first);
+						RESULT = list;
+					:}
+    				| cFieldList:list cField:next
+					{:
+						list.add(next);
+						RESULT = list;
+					:}
+					;
+
+cField 		::= 	varDec:vDec 
+					| funcDec:fDec
+					;
+
+arrayTypedef ::= 	ARRAY ID:i EQ type:t LBRACK RBRACK SEMICOLON
+					;
+
+exp 		::= 	var:v															{: RESULT = new AstExpVar(v); 					:}
+					| LPAREN exp:e RPAREN											{: RESULT = e; :}
+					| exp:e1 PLUS exp:e2											{: RESULT = new AstExpBinop(e1, e2, 0); 		:}
+					| exp:e1 MINUS exp:e2											{: RESULT = new AstExpBinop(e1, e2, 1); 		:}
+					| exp:e1 TIMES exp:e2											{: RESULT = new AstExpBinop(e1, e2, 2); 		:}
+					| exp:e1 DIVIDE exp:e2											{: RESULT = new AstExpBinop(e1, e2, 3); 		:}
+					| exp:e1 LT exp:e2												{: RESULT = new AstExpBinop(e1, e2, 4); 		:}
+					| exp:e1 GT exp:e2												{: RESULT = new AstExpBinop(e1, e2, 5); 		:}
+					| exp:e1 EQ exp:e2												{: RESULT = new AstExpBinop(e1, e2, 6); 		:}
+					| callExp:c
+					| MINUS INT:i 
+					| INT:i 														{: RESULT = new AstExpInt(i); 					:}
+					| NIL 
+					| STRING:s														{: RESULT = s; 									:}														
+					;
+
+newExp 		::= 	NEW type:t
+					| NEW type:t LBRACK exp:e RBRACK
+					;
+
+callExp 	::= 	var:v DOT ID:name LPAREN exp { COMMA exp } RPAREN //TODO - take care in { COMMA exp }
+					| var:v DOT ID:name LPAREN RPAREN
+					| ID:name LPAREN exp { COMMA exp } RPAREN //TODO - take care in { COMMA exp }
+					| ID:name LPAREN RPAREN
+					;
+
+var			::=		ID:name															{: RESULT = new AstVarSimple(name);       		:}
+					| var:v DOT ID:fieldName										{: RESULT = new AstVarField(v,fieldName); 		:}
+					| var:v LBRACK exp:e RBRACK										{: RESULT = new AstVarSubscript(v,e);     		:}
+					;
+
+stmt 		::= 	varDec:vDec
+					| var ASSIGN exp SEMICOLON										{: RESULT = new AstStmtAssign(v,e); 			:}
+					| var ASSIGN newExp SEMICOLON
+					| RETURN exp:e SEMICOLON										{: RESULT = new AstStmtReturn(ret); 			:}
+					| RETURN SEMICOLON												{: RESULT = new AstStmtReturn(null); 			:}
+					| IF LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE 
+					  ELSE LBRACE stmtList:elseBody RBRACE 							{: RESULT = new AstStmtIf(cond,body,elseBody); 	:} //if else must be before if
+					| IF LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE 		{: RESULT = new AstStmtIf(cond,body); 			:}
+					| WHILE LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE 		{: RESULT = new AstStmtWhile(cond,body); 		:}
+					| callExp:c SEMICOLON
 					;
