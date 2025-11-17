@@ -101,6 +101,10 @@ non terminal AstVar var;
 non terminal AstStmt stmt;
 non terminal AstStmtList stmtList;
 
+non terminal AstDecList program;
+non terminal AstDecList decList;
+non terminal AstDec dec;
+
 /***********************/
 /* OPERATOR PRECEDENCE */
 /***********************/
@@ -121,14 +125,14 @@ start with stmtList;
 program 	::= 	decList:l	 													{: RESULT = l; 									:}
 					;
 
-decList		:=		dec:d	decList:l												{: RESULT = new AstDecList(d,l);    			:}  //TODO - create AstDecList
-					| dec:d															{: RESULT = new AstDecList(d,null); 			:}	//TODO - create AstDecList
+decList		:=		dec:d	decList:l												{: RESULT = new AstDecList(d,l);    			:}  //TODO - create AstDecList extends AstNode (as AstStmtList extends AstNode)
+					| dec:d															{: RESULT = new AstDecList(d,null); 			:}	//TODO - the same as above
 					;
 
-dec 		::=		varDec:vDec          											{: RESULT = vDec; 								:}
-    				| funcDec:fDec       											{: RESULT = fDec; 								:}
-    				| classDec:cDec      											{: RESULT = cDec; 								:}
-    				| arrayTypedef:aDec  											{: RESULT = aDec; 								:}
+dec 		::=		varDec:vDec          											{: RESULT = vDec; 								:}	//TODO - create AstDecList extends AstNode (as AstStmt extends AstNode)
+    				| funcDec:fDec       											{: RESULT = fDec; 								:}	//TODO - the same as above
+    				| classDec:cDec      											{: RESULT = cDec; 								:}  //TODO - the same as above
+    				| arrayTypedef:aDec  											{: RESULT = aDec; 								:}  //TODO - the same as above
     				;
 
 type 		::=		TYPE_INT          												{: RESULT = "int"; 								:}
