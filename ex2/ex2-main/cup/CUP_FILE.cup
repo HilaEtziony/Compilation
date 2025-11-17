@@ -182,7 +182,7 @@ exp 		::= 	var:v															{: RESULT = new AstExpVar(v); 					:}
 					| exp:e1 LT exp:e2												{: RESULT = new AstExpBinop(e1, e2, 4); 		:}
 					| exp:e1 GT exp:e2												{: RESULT = new AstExpBinop(e1, e2, 5); 		:}
 					| exp:e1 EQ exp:e2												{: RESULT = new AstExpBinop(e1, e2, 6); 		:}
-					| callExp:c
+					| callExp:c														{: RESULT = c; 									:}
 					| MINUS INT:i 
 					| INT:i 														{: RESULT = new AstExpInt(i); 					:}
 					| NIL 
@@ -213,5 +213,5 @@ stmt 		::= 	varDec:vDec														{: RESULT = vDec; 								:}	//TODO - creat
 					  ELSE LBRACE stmtList:elseBody RBRACE 							{: RESULT = new AstStmtIf(cond,body,elseBody); 	:} //if else must be before if
 					| IF LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE 		{: RESULT = new AstStmtIf(cond,body); 			:}
 					| WHILE LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE 		{: RESULT = new AstStmtWhile(cond,body); 		:}
-					| callExp:c SEMICOLON
+					| callExp:c SEMICOLON											{: RESULT = c; 									:}
 					;
