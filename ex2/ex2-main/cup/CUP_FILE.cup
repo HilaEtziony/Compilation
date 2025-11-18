@@ -4,7 +4,7 @@
 import java_cup.runtime.*;
 import ast.*;
 
-parser code 
+parser code
 {:
 	public Lexer lexer;
 
@@ -15,12 +15,12 @@ parser code
 	}
 	public void report_error(String message, Object info)
 	{
-		System.out.print("ERROR >> ");		
+		System.out.print("ERROR >> ");
 		System.out.print("[");
 		System.out.print(lexer.getLine());
 		System.out.print(":");
 		System.out.print(lexer.getTokenStartPosition());
-		System.out.print("] ");		
+		System.out.print("] ");
 		System.exit(0);
 	}
 :}
@@ -46,7 +46,7 @@ scan with
 		System.out.print(" )");
 	}
 	System.out.print("\n");
-	return s; 
+	return s;
 :};
 
 /*************/
@@ -105,6 +105,16 @@ non terminal AstDecList program;
 non terminal AstDecList decList;
 non terminal AstDec dec;
 
+non terminal AstVarType type;
+non terminal AstVarDec varDec;
+non terminal AstFuncDec funcDec;
+non terminal AstClassDec classDec;
+non terminal AstCFieldList cFieldList;
+non terminal AstCField cField;
+non terminal AstNewExp newExp;
+non terminal AstCallExp callExp;
+
+
 /***********************/
 /* OPERATOR PRECEDENCE */
 /***********************/
@@ -125,52 +135,52 @@ start with stmtList;
 program 	::= 	decList:l	 													{: RESULT = l; 									:}
 					;
 
-decList		:=		dec:d	decList:l												{: RESULT = new AstDecList(d,l);    			:}  //TODO - create AstDecList extends AstNode (as AstStmtList extends AstNode)
-					| dec:d															{: RESULT = new AstDecList(d,null); 			:}	//TODO - the same as above
+decList		:=		dec:d	decList:l												{: RESULT = new AstDecList(d,l);    			:}
+					| dec:d															{: RESULT = new AstDecList(d,null); 			:}
 					;
 
-dec 		::=		varDec:vDec          											{: RESULT = vDec; 								:}	//TODO - create AstDecList extends AstNode (as AstStmt extends AstNode)
-    				| funcDec:fDec       											{: RESULT = fDec; 								:}	//TODO - the same as above
-    				| classDec:cDec      											{: RESULT = cDec; 								:}  //TODO - the same as above
-    				| arrayTypedef:aDec  											{: RESULT = aDec; 								:}  //TODO - the same as above
+dec 		::=		varDec:vDec          											{: RESULT = vDec; 				:}
+    				| funcDec:fDec       											{: RESULT = fDec; 				:}
+    				| classDec:cDec      											{: RESULT = cDec; 				:}
+    				| arrayTypedef:aDec  											{: RESULT = aDec; 				:}
     				;
 
-type 		::=		TYPE_INT          												{: RESULT = "int"; 								:}
-					| TYPE_STRING     												{: RESULT = "string"; 							:}
-    				| TYPE_VOID       												{: RESULT = "void"; 							:}
-    				| ID:name         												{: RESULT = name; 								:}
+type 		::=		TYPE_INT          												{: RESULT = new AstVarType("INT"); 				:} // TODO Yamit: make sure this is the proper type
+					| TYPE_STRING     												{: RESULT = new AstVarType("STRING"); 			:}
+    				| TYPE_VOID       												{: RESULT = new AstVarType("VOID"); 			:}
+    				| ID:name         												{: RESULT = new AstVarType(name); 				:} // TODO Yamit: make sure this is the proper type
     				;
 
-varDec 		::= 	type:t ID:i ASSIGN exp:e SEMICOLON
-					| type:t ID:i SEMICOLON
-					| type:t ID:i ASSIGN newExp:nE SEMICOLON
-					;
-
-funcDec 	::= 	type:t ID:i LPAREN type:t_inner ID:i_inner { COMMA type ID } RPAREN LBRACE stmtList:s RBRACE //TODO - take care in { COMMA type ID }
-					| type:t ID:i LPAREN RPAREN LBRACE stmtList:s RBRACE
+varDec 		::= 	type:t ID:i ASSIGN exp:e SEMICOLON 								{: RESULT = new AstVarDec(t,i,e); 				:}
+					| type:t ID:i SEMICOLON											{: RESULT = new AstVarDec(t,i,null); 			:}
+					| type:t ID:i ASSIGN newExp:nE SEMICOLON						{: RESULT = new AstVarDec(t,i,nE); 				:}
 					;
 
 stmtList	::=		stmt:s	stmtList:l												{: RESULT = new AstStmtList(s,l);    			:}
 					| stmt:s														{: RESULT = new AstStmtList(s,null); 			:}
 					;
 
-classDec 	::= 	CLASS ID:name EXTENDS ID:parentName 
-					LBRACE cField:c	cFieldList:l RBRACE
-					| CLASS ID:name EXTENDS ID:parentName 
-					  LBRACE cField:c RBRACE
-					| CLASS ID:name LBRACE cField:c	cFieldList:l RBRACE
-					| CLASS ID:name LBRACE cField:c RBRACE
+cFieldList	::=		cField:c	cFieldList:l										{: RESULT = new AstCFieldList(c,l);    			:}
+					| cField:c														{: RESULT = new AstCFieldList(c,null); 			:}
 					;
 
-cFieldList	::=		cField:c	cFieldList:l										{: RESULT = new AstCFieldList(c,l);    			:} //TODO - create AstCFieldList
-					| cField:c														{: RESULT = new AstCFieldList(c,null); 			:} //TODO - create AstCFieldList
+funcDec 	::= 	type:t ID:i LPAREN type:t_inner ID:i_inner { COMMA type ID } RPAREN LBRACE stmtList:s RBRACE 					// TODO - take care in { COMMA type ID }
+					| type:t ID:i LPAREN RPAREN LBRACE stmtList:s RBRACE			// TODO ?
+					;
+
+classDec 	::= 	CLASS ID:name EXTENDS ID:parentName 							// TODO ?
+					LBRACE cField:c	cFieldList:l RBRACE								// TODO ?
+					| CLASS ID:name EXTENDS ID:parentName 							// TODO ?
+					  LBRACE cField:c RBRACE										// TODO ?
+					| CLASS ID:name LBRACE cField:c	cFieldList:l RBRACE				// TODO ?
+					| CLASS ID:name LBRACE cField:c RBRACE							// TODO ?
 					;
 
 cField 		::= 	varDec:vDec 													{: RESULT = vDec; 								:}
 					| funcDec:fDec													{: RESULT = fDec; 								:}
 					;
 
-arrayTypedef ::= 	ARRAY ID:i EQ type:t LBRACK RBRACK SEMICOLON
+arrayTypedef ::= 	ARRAY ID:i EQ type:t LBRACK RBRACK SEMICOLON					// TODO ?
 					;
 
 exp 		::= 	var:v															{: RESULT = new AstExpVar(v); 					:}
@@ -183,34 +193,34 @@ exp 		::= 	var:v															{: RESULT = new AstExpVar(v); 					:}
 					| exp:e1 GT exp:e2												{: RESULT = new AstExpBinop(e1, e2, 5); 		:}
 					| exp:e1 EQ exp:e2												{: RESULT = new AstExpBinop(e1, e2, 6); 		:}
 					| callExp:c														{: RESULT = c; 									:}
-					| MINUS INT:i 
+					| MINUS INT:i													// TODO ?
 					| INT:i 														{: RESULT = new AstExpInt(i); 					:}
-					| NIL 
-					| STRING:s														{: RESULT = s; 									:}														
+					| NIL
+					| STRING:s														{: RESULT = s; 									:}
 					;
 
-newExp 		::= 	NEW type:t
-					| NEW type:t LBRACK exp:e RBRACK
+newExp 		::= 	NEW type:t 														// TODO ?
+					| NEW type:t LBRACK exp:e RBRACK								// TODO ?
 					;
 
-callExp 	::= 	var:v DOT ID:name LPAREN exp { COMMA exp } RPAREN //TODO - take care in { COMMA exp }
+callExp 	::= 	var:v DOT ID:name LPAREN exp { COMMA exp } RPAREN 				// TODO - take care in { COMMA exp }
 					| var:v DOT ID:name LPAREN RPAREN
-					| ID:name LPAREN exp { COMMA exp } RPAREN //TODO - take care in { COMMA exp }
+					| ID:name LPAREN exp { COMMA exp } RPAREN 						// TODO - take care in { COMMA exp }
 					| ID:name LPAREN RPAREN
 					;
 
-var			::=		ID:name															{: RESULT = new AstVarSimple(name);       		:}
+var			::=		ID:name															{: RESULT = new AstVarSimple(name);       		:} // TODO Yamit: make sure this is the proper type
 					| var:v DOT ID:fieldName										{: RESULT = new AstVarField(v,fieldName); 		:}
 					| var:v LBRACK exp:e RBRACK										{: RESULT = new AstVarSubscript(v,e);     		:}
 					;
 
-stmt 		::= 	varDec:vDec														{: RESULT = vDec; 								:}	//TODO - create AstDecList extends AstNode (as AstStmt extends AstNode)
-					| var ASSIGN exp SEMICOLON										{: RESULT = new AstStmtAssign(v,e); 			:}
-					| var ASSIGN newExp SEMICOLON
+stmt 		::= 	varDec:vDec														{: RESULT = vDec; 								:} // so varDec must implement stmt
+					| var:v ASSIGN exp:e SEMICOLON									{: RESULT = new AstStmtAssign(v,e); 			:}
+					| var:v ASSIGN newExp:nExp SEMICOLON							{: RESULT = new AstStmtAssignNew(v,nExp); 	:}
 					| RETURN exp:e SEMICOLON										{: RESULT = new AstStmtReturn(ret); 			:}
 					| RETURN SEMICOLON												{: RESULT = new AstStmtReturn(null); 			:}
-					| IF LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE 
-					  ELSE LBRACE stmtList:elseBody RBRACE 							{: RESULT = new AstStmtIf(cond,body,elseBody); 	:} //if else must be before if
+					| IF LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE
+					  ELSE LBRACE stmtList:elseBody RBRACE 							{: RESULT = new AstStmtIf(cond,body,elseBody); 	:} // if-else must come before if
 					| IF LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE 		{: RESULT = new AstStmtIf(cond,body); 			:}
 					| WHILE LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE 		{: RESULT = new AstStmtWhile(cond,body); 		:}
 					| callExp:c SEMICOLON											{: RESULT = c; 									:}
