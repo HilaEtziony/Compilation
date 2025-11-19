@@ -7,7 +7,7 @@ public class AstExpInt extends AstExp
 	/******************/
 	/* CONSTRUCTOR(S) */
 	/******************/
-	public AstExpInt(int value)
+	public AstExpInt(int value, boolean isNegative)
 	{
 		/******************************/
 		/* SET A UNIQUE SERIAL NUMBER */
@@ -22,8 +22,16 @@ public class AstExpInt extends AstExp
 		/*******************************/
 		/* COPY INPUT DATA MEMBERS ... */
 		/*******************************/
-		this.value = value;
+		if (isNegative) 
+		{
+			this.value = -1 * value;
+		} 
+		else 
+		{
+			this.value = value;
+		}
 	}
+
 
 	/************************************************/
 	/* The printing message for an int exp AST node */
