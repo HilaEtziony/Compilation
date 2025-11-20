@@ -8,3 +8,7 @@ public abstract class AstDec extends AstStmt
         serialNumber = AstNodeSerialNumber.getFresh();
     }
 }
+
+/*
+This class is only being derived-from. Need to think about fields that should be shared among all declarations.
+*/

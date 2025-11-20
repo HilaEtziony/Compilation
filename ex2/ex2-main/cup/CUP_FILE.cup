@@ -1,6 +1,3 @@
-/*************/
-/* IMPORT(S) */
-/*************/
 import java_cup.runtime.*;
 import ast.*;
 
@@ -112,7 +109,17 @@ non terminal AstClassDec classDec;
 non terminal AstCFieldList cFieldList;
 non terminal AstCField cField;
 non terminal AstNewExp newExp;
-non terminal AstCallExp callExp;
+non terminal AstExpCall callExp;
+non terminal AstDecArray arrayTypedef;
+non terminal AstTypeIdList typeIdList;
+non terminal AstExpInt intExp;
+non terminal AstExpNIL nilExp;
+
+// TODO hila: GPT suggested these as well. Please make sure they weren't missed. If were, just rm
+non terminal AstStmtAssign assignStmt;
+non terminal AstStmtReturn returnStmt;
+non terminal AstStmtIf ifStmt;
+non terminal AstStmtWhile whileStmt;
 
 
 /***********************/
@@ -145,10 +152,10 @@ dec 		::=		varDec:vDec          											{: RESULT = vDec; 									:}
     				| arrayTypedef:aDec  											{: RESULT = aDec; 									:}
     				;
 
-type 		::=		TYPE_INT          												{: RESULT = new AstVarType("int"); 					:} // TODO Yamit: make sure this is the proper type - from hila - I think it should be lower case
+type 		::=		TYPE_INT          												{: RESULT = new AstVarType("int"); 					:} // TODO Yamit: make sure "AstVarType" is the proper type
 					| TYPE_STRING     												{: RESULT = new AstVarType("string"); 				:}
     				| TYPE_VOID       												{: RESULT = new AstVarType("void"); 				:}
-    				| ID:name         												{: RESULT = new AstVarType(name); 					:} // TODO Yamit: make sure this is the proper type
+    				| ID:name         												{: RESULT = new AstVarType(name); 					:} // TODO Yamit: make sure this is the proper type. ID is a str - will that work?
     				;
 
 varDec 		::= 	type:t ID:i ASSIGN exp:e SEMICOLON 								{: RESULT = new AstVarDec(t,i,e); 					:}
@@ -164,27 +171,32 @@ cFieldList	::=		cField:c	cFieldList:l										{: RESULT = new AstCFieldList(c,l
 					| cField:c														{: RESULT = new AstCFieldList(c,null); 				:}
 					;
 
-funcDec 	::= 	type:t ID:i LPAREN typeIdList:l RPAREN LBRACE stmtList:s RBRACE {: RESULT = new AstFuncDec(t,i,l,s);    			:} //TODO - from hila - yamit pls implement AstFuncDec 				
-					| type:t ID:i LPAREN RPAREN LBRACE stmtList:s RBRACE			{: RESULT = new AstFuncDec(t,i,null,s);    			:}				
+funcDec 	::= 	type:t ID:i LPAREN typeIdList:l RPAREN LBRACE stmtList:s RBRACE {: RESULT = new AstDecFunc(t,i,l,s);    			:}
+					| type:t ID:i LPAREN RPAREN LBRACE stmtList:s RBRACE			{: RESULT = new AstDecFunc(t,i,null,s);    			:}
 					;
 
-typeIdList	::=		type:t ID:i COMMA typeIdList:l									{: RESULT = new AstTypeIdList(t,i,l);    			:} //TODO - from hila - yamit pls implement AstTypeIdList 
-					| type:t ID:i													{: RESULT = new AstTypeIdList(t,i,null);    		:}
-					;
+// TODO Hila: Regarding "typeIdList" please note, this is a direct sub-group of stmntList. Why would we want a sepetate Ast class for var declerations?
+// [var decleration = type and ID] is specifically a stmt.
+// There is generally a pretty big mess here with types and their implied hierarchy, might be caused by these duplications. We need to talk about it,
+// or better yet, perhaps create and agree on some diagram of all classes, who derives from who, simplest ex. to easily differ...
 
-classDec 	::= 	CLASS ID:name EXTENDS ID:parentName LBRACE cFieldList:l RBRACE	{: RESULT = new AstClassDec(name,parentNmae,l); 	:} //TODO - from hila - yamit pls implement AstClassDec 
-					| CLASS ID:name LBRACE cFieldList:l RBRACE						{: RESULT = new AstClassDec(name,null,l); 			:}
+// typeIdList	::=		type:t ID:i COMMA typeIdList:l									{: RESULT = new AstTypeIdList(t,i,l);    			:}
+// 					| type:t ID:i													{: RESULT = new AstTypeIdList(t,i,null);    		:}
+// 					;
+
+classDec 	::= 	CLASS ID:name EXTENDS ID:parentName LBRACE cFieldList:l RBRACE	{: RESULT = new AstDecClass(name,parentNmae,l); 	:}
+					| CLASS ID:name LBRACE cFieldList:l RBRACE						{: RESULT = new AstDecClass(name,null,l); 			:}
 					;
 
 cField 		::= 	varDec:vDec 													{: RESULT = vDec; 									:}
 					| funcDec:fDec													{: RESULT = fDec; 									:}
 					;
 
-arrayTypedef ::= 	ARRAY ID:i EQ type:t LBRACK RBRACK SEMICOLON					{: RESULT = new AstArrayTypeDef(i,t); 				:} //TODO - from hila - yamit pls implement AstArrayTypeDef 
+arrayTypedef ::= 	ARRAY ID:i EQ type:t LBRACK RBRACK SEMICOLON					{: RESULT = new AstDecArray(i,t); 					:}
 					;
 
 exp 		::= 	var:v															{: RESULT = new AstExpVar(v); 						:}
-					| LPAREN exp:e RPAREN											{: RESULT = e; :}
+					| LPAREN exp:e RPAREN											{: RESULT = e; 										:}
 					| exp:e1 PLUS exp:e2											{: RESULT = new AstExpBinop(e1, e2, 0); 			:}
 					| exp:e1 MINUS exp:e2											{: RESULT = new AstExpBinop(e1, e2, 1); 			:}
 					| exp:e1 TIMES exp:e2											{: RESULT = new AstExpBinop(e1, e2, 2); 			:}
@@ -195,25 +207,25 @@ exp 		::= 	var:v															{: RESULT = new AstExpVar(v); 						:}
 					| callExp:c														{: RESULT = c; 										:}
 					| MINUS INT:i													{: RESULT = new AstExpInt(i, true); 				:}
 					| INT:i 														{: RESULT = new AstExpInt(i, false); 				:}
-					| NIL															{: RESULT = new AstExpNIL(); 						:} //TODO - from hila - yamit pls implement AstExpNIL - a class without fields that represent NIL
+					| NIL															{: RESULT = new AstExpNIL(); 						:}
 					| STRING:s														{: RESULT = s; 										:}
 					;
 
-newExp 		::= 	NEW type:t 														{: RESULT = new AstNewExp(t, null); 				:} //TODO - from hila - yamit pls implement AstNewExp 
+newExp 		::= 	NEW type:t 														{: RESULT = new AstNewExp(t, null); 				:}
 					| NEW type:t LBRACK exp:e RBRACK								{: RESULT = new AstNewExp(t, e); 					:}
 					;
 
-callExp 	::= 	var:v DOT ID:i LPAREN expList:l RPAREN 							{: RESULT = new AstCallExp(v,i,l);    				:} //TODO - from hila - yamit pls implement AstCallExp 
+callExp 	::= 	var:v DOT ID:i LPAREN expList:l RPAREN 							{: RESULT = new AstCallExp(v,i,l);    				:}
 					| var:v DOT ID:i LPAREN RPAREN									{: RESULT = new AstCallExp(v,i,null);    			:}
 					| ID:i LPAREN expList:l RPAREN 									{: RESULT = new AstCallExp(null,i,l);    			:}
 					| ID:i LPAREN RPAREN											{: RESULT = new AstCallExp(null,i,null);    		:}
 					;
 
-expList		::=		exp:e COMMA expList:l											{: RESULT = new AstExpList(e,l);    				:} //TODO - from hila - yamit pls implement AstExpList 
+expList		::=		exp:e COMMA expList:l											{: RESULT = new AstExpList(e,l);    				:}
 					| exp:e															{: RESULT = new AstExpList(e,null);    				:}
 					;
 
-var			::=		ID:name															{: RESULT = new AstVarSimple(name);       			:} // TODO Yamit: make sure this is the proper type
+var			::=		ID:name															{: RESULT = new AstVarSimple(name);       			:} // TODO Yamit: make sure "AstVarSimple" is the proper type
 					| var:v DOT ID:fieldName										{: RESULT = new AstVarField(v,fieldName); 			:}
 					| var:v LBRACK exp:e RBRACK										{: RESULT = new AstVarSubscript(v,e);     			:}
 					;
@@ -229,6 +241,3 @@ stmt 		::= 	varDec:vDec														{: RESULT = vDec; 									:} // so varDec 
 					| WHILE LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE 		{: RESULT = new AstStmtWhile(cond,body); 			:}
 					| callExp:c SEMICOLON											{: RESULT = c; 										:}
 					;
-
-
-//TODO - from hila - yamit pls after you implement all classes I am asking for, add Declarations to NON TERMINALS DECLARATIONS - THANKS

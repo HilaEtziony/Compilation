@@ -2,9 +2,9 @@ package ast;
 
 public abstract class AstVarType extends AstDec
 {
-    public int type;
+    public String type;
 
-    public AstVarType(int type)
+    public AstVarType(String type)
     {
         // TODO get line num
         serialNumber = AstNodeSerialNumber.getFresh();
