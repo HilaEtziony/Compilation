@@ -1,6 +1,6 @@
 package ast;
 
-public class AstDecList extends AstNode
+public class AstDecList extends AstStmt 
 {
     /****************/
     /* DATA MEMBERS */

@@ -1,6 +1,6 @@
 package ast;
 
-public abstract class AstExpCall extends AstDec
+public abstract class AstExpCall extends AstExp
 {
     public AstVar var;
     public String id;

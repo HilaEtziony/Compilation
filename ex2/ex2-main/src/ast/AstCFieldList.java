@@ -1,6 +1,6 @@
 package ast;
 
-public class AstCFieldList extends AstNode
+public class AstCFieldList extends AstDec
 {
     public AstCField head;
     public AstCFieldList tail;

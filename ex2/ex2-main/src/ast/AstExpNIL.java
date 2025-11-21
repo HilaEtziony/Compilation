@@ -1,6 +1,6 @@
 package ast;
 
-public abstract class AstExpNIL extends AstNode
+public abstract class AstExpNIL extends AstExp
 {
     public AstExpNIL()
     {

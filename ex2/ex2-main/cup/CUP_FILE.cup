@@ -93,34 +93,24 @@ terminal String STRING;
 /*****************/
 /* NON TERMINALS */
 /*****************/
-non terminal AstExp exp;
-non terminal AstVar var;
-non terminal AstStmt stmt;
-non terminal AstStmtList stmtList;
-
-non terminal AstDecList program;
+non terminal AstDecList program; 
 non terminal AstDecList decList;
 non terminal AstDec dec;
-
-non terminal AstVarType type;
-non terminal AstVarDec varDec;
-non terminal AstFuncDec funcDec;
-non terminal AstClassDec classDec;
-non terminal AstCFieldList cFieldList;
-non terminal AstCField cField;
-non terminal AstNewExp newExp;
-non terminal AstExpCall callExp;
-non terminal AstDecArray arrayTypedef;
-non terminal AstTypeIdList typeIdList;
-non terminal AstExpInt intExp;
-non terminal AstExpNIL nilExp;
-
-// TODO hila: GPT suggested these as well. Please make sure they weren't missed. If were, just rm
-non terminal AstStmtAssign assignStmt;
-non terminal AstStmtReturn returnStmt;
-non terminal AstStmtIf ifStmt;
-non terminal AstStmtWhile whileStmt;
-
+non terminal AstVarType type; 
+non terminal AstVarDec varDec; 
+non terminal AstStmtList stmtList;
+non terminal AstFuncDec funcDec; 
+non terminal AstTypeIdList typeIdList; 
+non terminal AstDecClass classDec; 
+non terminal AstCFieldList cFieldList; 
+non terminal AstCField cField; 			// Explanation: cField == varDec/FunctDec - AstCfieldList/AstCfield/AstVarDec/AstFuncDec->AstDec->AstStmt->AstNode
+non terminal AstDecArray arrayTypedef; 
+non terminal AstExp exp; 
+non terminal AstNewExp newExp; 
+non terminal AstExpCall callExp; 
+non terminal AstExpList expList; 
+non terminal AstVar var; 
+non terminal AstStmt stmt; 
 
 /***********************/
 /* OPERATOR PRECEDENCE */
@@ -167,10 +157,6 @@ stmtList	::=		stmt:s	stmtList:l												{: RESULT = new AstStmtList(s,l);    
 					| stmt:s														{: RESULT = new AstStmtList(s,null); 				:}
 					;
 
-cFieldList	::=		cField:c	cFieldList:l										{: RESULT = new AstCFieldList(c,l);    				:}
-					| cField:c														{: RESULT = new AstCFieldList(c,null); 				:}
-					;
-
 funcDec 	::= 	type:t ID:i LPAREN typeIdList:l RPAREN LBRACE stmtList:s RBRACE {: RESULT = new AstDecFunc(t,i,l,s);    			:}
 					| type:t ID:i LPAREN RPAREN LBRACE stmtList:s RBRACE			{: RESULT = new AstDecFunc(t,i,null,s);    			:}
 					;
@@ -186,6 +172,10 @@ funcDec 	::= 	type:t ID:i LPAREN typeIdList:l RPAREN LBRACE stmtList:s RBRACE {:
 
 classDec 	::= 	CLASS ID:name EXTENDS ID:parentName LBRACE cFieldList:l RBRACE	{: RESULT = new AstDecClass(name,parentNmae,l); 	:}
 					| CLASS ID:name LBRACE cFieldList:l RBRACE						{: RESULT = new AstDecClass(name,null,l); 			:}
+					;
+
+cFieldList	::=		cField:c	cFieldList:l										{: RESULT = new AstCFieldList(c,l);    				:}
+					| cField:c														{: RESULT = new AstCFieldList(c,null); 				:}
 					;
 
 cField 		::= 	varDec:vDec 													{: RESULT = vDec; 									:}
@@ -208,17 +198,17 @@ exp 		::= 	var:v															{: RESULT = new AstExpVar(v); 						:}
 					| MINUS INT:i													{: RESULT = new AstExpInt(i, true); 				:}
 					| INT:i 														{: RESULT = new AstExpInt(i, false); 				:}
 					| NIL															{: RESULT = new AstExpNIL(); 						:}
-					| STRING:s														{: RESULT = s; 										:}
+					| STRING:s														{: RESULT = new AstExpString(s); 					:} //TODO - yamit - pls create AstExpString extend AstExp
 					;
 
 newExp 		::= 	NEW type:t 														{: RESULT = new AstNewExp(t, null); 				:}
 					| NEW type:t LBRACK exp:e RBRACK								{: RESULT = new AstNewExp(t, e); 					:}
 					;
 
-callExp 	::= 	var:v DOT ID:i LPAREN expList:l RPAREN 							{: RESULT = new AstCallExp(v,i,l);    				:}
-					| var:v DOT ID:i LPAREN RPAREN									{: RESULT = new AstCallExp(v,i,null);    			:}
-					| ID:i LPAREN expList:l RPAREN 									{: RESULT = new AstCallExp(null,i,l);    			:}
-					| ID:i LPAREN RPAREN											{: RESULT = new AstCallExp(null,i,null);    		:}
+callExp 	::= 	var:v DOT ID:i LPAREN expList:l RPAREN 							{: RESULT = new AstExpCall(v,i,l);    				:}
+					| var:v DOT ID:i LPAREN RPAREN									{: RESULT = new AstExpCall(v,i,null);    			:}
+					| ID:i LPAREN expList:l RPAREN 									{: RESULT = new AstExpCall(null,i,l);    			:}
+					| ID:i LPAREN RPAREN											{: RESULT = new AstExpCall(null,i,null);    		:}
 					;
 
 expList		::=		exp:e COMMA expList:l											{: RESULT = new AstExpList(e,l);    				:}
