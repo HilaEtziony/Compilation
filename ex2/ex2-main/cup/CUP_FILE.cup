@@ -115,10 +115,16 @@ non terminal AstStmt stmt;
 /***********************/
 /* OPERATOR PRECEDENCE */
 /***********************/
-precedence left PLUS;
-precedence left MINUS;
+
 precedence left TIMES;
 precedence left DIVIDE;
+precedence left PLUS;
+precedence left MINUS;
+precedence left LT;
+precedence left GT;
+precedence left EQ;
+precedence left ASSIGN;
+
 
 /************************/
 /* START WITH: stmtList */
