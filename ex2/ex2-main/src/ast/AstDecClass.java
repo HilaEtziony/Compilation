@@ -1,6 +1,6 @@
 package ast;
 
-public abstract class AstDecClass extends AstDec
+public class AstDecClass extends AstDec
 {
     public String name;
     public String parentName;

@@ -1,6 +1,6 @@
 package ast;
 
-public abstract class AstVarType extends AstDec
+public class AstVarType extends AstDec
 {
     public String type;
 

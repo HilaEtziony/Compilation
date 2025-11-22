@@ -1,6 +1,6 @@
 package ast;
 
-public abstract class AstExpList extends AstDec
+public class AstExpList extends AstDec
 {
     public AstExp head;
     public AstExpList tail;

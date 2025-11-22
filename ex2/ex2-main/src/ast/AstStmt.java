@@ -1,5 +1,5 @@
 package ast;
 
-public abstract class AstStmt extends AstNode
+public class AstStmt extends AstNode
 {
 }

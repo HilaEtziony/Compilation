@@ -1,6 +1,6 @@
 package ast;
 
-public abstract class AstDecFunc extends AstDec
+public class AstDecFunc extends AstDec
 {
     public AstVarType return_type;
     public String identifier;

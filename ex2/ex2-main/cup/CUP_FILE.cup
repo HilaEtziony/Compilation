@@ -96,16 +96,16 @@ non terminal AstDecList program;
 non terminal AstDecList decList;
 non terminal AstDec dec;
 non terminal AstVarType type; 
-non terminal AstVarDec varDec; 
+non terminal AstDecVar varDec; 
 non terminal AstStmtList stmtList;
-non terminal AstFuncDec funcDec; 
+non terminal AstDecFunc funcDec; 
 non terminal AstTypeIdList typeIdList; 
 non terminal AstDecClass classDec; 
 non terminal AstCFieldList cFieldList; 
-non terminal AstCField cField; 			// Explanation: cField == varDec/FunctDec - AstCfieldList/AstCfield/AstVarDec/AstFuncDec->AstDec->AstStmt->AstNode
+non terminal AstCField cField; 			// Explanation: cField == varDec/FunctDec - AstCfieldList/AstCfield/AstDecVar/AstDecFunc->AstDec->AstStmt->AstNode
 non terminal AstDecArray arrayTypedef; 
 non terminal AstExp exp; 
-non terminal AstNewExp newExp; 
+non terminal AstExpNew newExp; 
 non terminal AstExpCall callExp; 
 non terminal AstExpList expList; 
 non terminal AstVar var; 
@@ -151,9 +151,9 @@ type 		::=		TYPE_INT          												{: RESULT = new AstVarType("int"); 			
     				| ID:name         												{: RESULT = new AstVarType(name); 					:} // TODO Yamit: make sure this is the proper type. ID is a str - will that work?
     				;
 
-varDec 		::= 	type:t ID:i ASSIGN exp:e SEMICOLON 								{: RESULT = new AstVarDec(t,i,e); 					:}
-					| type:t ID:i SEMICOLON											{: RESULT = new AstVarDec(t,i,null); 				:}
-					| type:t ID:i ASSIGN newExp:nE SEMICOLON						{: RESULT = new AstVarDec(t,i,nE); 					:}
+varDec 		::= 	type:t ID:i ASSIGN exp:e SEMICOLON 								{: RESULT = new AstDecVar(t,i,e); 					:}
+					| type:t ID:i SEMICOLON											{: RESULT = new AstDecVar(t,i,null); 				:}
+					| type:t ID:i ASSIGN newExp:nE SEMICOLON						{: RESULT = new AstDecVar(t,i,nE); 					:}
 					;
 
 stmtList	::=		stmt:s	stmtList:l												{: RESULT = new AstStmtList(s,l);    				:}
@@ -163,11 +163,6 @@ stmtList	::=		stmt:s	stmtList:l												{: RESULT = new AstStmtList(s,l);    
 funcDec 	::= 	type:t ID:i LPAREN typeIdList:l RPAREN LBRACE stmtList:s RBRACE {: RESULT = new AstDecFunc(t,i,l,s);    			:}
 					| type:t ID:i LPAREN RPAREN LBRACE stmtList:s RBRACE			{: RESULT = new AstDecFunc(t,i,null,s);    			:}
 					;
-
-// TODO Hila: Regarding "typeIdList" please note, this is a direct sub-group of stmntList. Why would we want a sepetate Ast class for var declerations?
-// [var decleration = type and ID] is specifically a stmt.
-// There is generally a pretty big mess here with types and their implied hierarchy, might be caused by these duplications. We need to talk about it,
-// or better yet, perhaps create and agree on some diagram of all classes, who derives from who, simplest ex. to easily differ...
 
 typeIdList	::=		type:t ID:i COMMA typeIdList:l									{: RESULT = new AstTypeIdList(t,i,l);    			:}
 					| type:t ID:i													{: RESULT = new AstTypeIdList(t,i,null);    		:}
@@ -201,11 +196,11 @@ exp 		::= 	var:v															{: RESULT = new AstExpVar(v); 						:}
 					| MINUS INT:i													{: RESULT = new AstExpInt(i, true); 				:}
 					| INT:i 														{: RESULT = new AstExpInt(i, false); 				:}
 					| NIL															{: RESULT = new AstExpNIL(); 						:}
-					| STRING:s														{: RESULT = new AstExpString(s); 					:} //TODO - yamit - pls create AstExpString extend AstExp
+					| STRING:s														{: RESULT = new AstExpString(s); 					:}
 					;
 
-newExp 		::= 	NEW type:t 														{: RESULT = new AstNewExp(t, null); 				:}
-					| NEW type:t LBRACK exp:e RBRACK								{: RESULT = new AstNewExp(t, e); 					:}
+newExp 		::= 	NEW type:t 														{: RESULT = new AstExpNew(t, null); 				:}
+					| NEW type:t LBRACK exp:e RBRACK								{: RESULT = new AstExpNew(t, e); 					:}
 					;
 
 callExp 	::= 	var:v DOT ID:i LPAREN expList:l RPAREN 							{: RESULT = new AstExpCall(v,i,l);    				:}
@@ -223,8 +218,8 @@ var			::=		ID:name															{: RESULT = new AstVarSimple(name);       			:}
 					| var:v LBRACK exp:e RBRACK										{: RESULT = new AstVarSubscript(v,e);     			:}
 					;
 
-stmt 		::= 	varDec:vDec																{: RESULT = vDec; 									:} // so varDec must implement stmt
-					| var:v ASSIGN exp:e SEMICOLON										{: RESULT = new AstStmtAssign(v,e); 				:}
+stmt 		::= 	varDec:vDec														{: RESULT = vDec; 									:} // so varDec must implement stmt
+					| var:v ASSIGN exp:e SEMICOLON									{: RESULT = new AstStmtAssign(v,e); 				:}
 					| var:v ASSIGN newExp:nExp SEMICOLON							{: RESULT = new AstStmtAssignNew(v,nExp); 			:}
 					| RETURN exp:e SEMICOLON										{: RESULT = new AstStmtReturn(e); 					:}
 					| RETURN SEMICOLON												{: RESULT = new AstStmtReturn(null); 				:}
