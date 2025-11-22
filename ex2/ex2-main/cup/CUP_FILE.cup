@@ -151,9 +151,9 @@ type 		::=		TYPE_INT          												{: RESULT = new AstVarType("int"); 			
     				| ID:name         												{: RESULT = new AstVarType(name); 					:} // TODO Yamit: make sure this is the proper type. ID is a str - will that work?
     				;
 
-varDec 		::= 	type:t ID:i ASSIGN exp:e SEMICOLON 								{: RESULT = new AstVarDec(t,i,e); 					:}
-					| type:t ID:i SEMICOLON											{: RESULT = new AstVarDec(t,i,null); 				:}
-					| type:t ID:i ASSIGN newExp:nE SEMICOLON						{: RESULT = new AstVarDec(t,i,nE); 					:}
+varDec 		::= 	type:t ID:i ASSIGN exp:e SEMICOLON 								{: RESULT = new AstVarDec(t,new AstVarSimple(i),e); 					:}
+					| type:t ID:i SEMICOLON										{: RESULT = new AstVarDec(t,new AstVarSimple(i),null); 				:}
+					| type:t ID:i ASSIGN newExp:nE SEMICOLON						{: RESULT = new AstVarDec(t,new AstVarSimple(i),nE); 					:}
 					;
 
 stmtList	::=		stmt:s	stmtList:l												{: RESULT = new AstStmtList(s,l);    				:}
@@ -220,7 +220,7 @@ var			::=		ID:name															{: RESULT = new AstVarSimple(name);       			:}
 
 stmt 		::= 	varDec:vDec														{: RESULT = vDec; 									:} // so varDec must implement stmt
 					| var:v ASSIGN exp:e SEMICOLON									{: RESULT = new AstStmtAssign(v,e); 				:}
-					| var:v ASSIGN newExp:nExp SEMICOLON							{: RESULT = new AstStmtAssignNew(v,nExp); 			:}
+					| var:v ASSIGN newExp:nExp SEMICOLON							{: RESULT = new AstStmtAssign(v,nExp); 			:}     // check if right logic wise
 					| RETURN exp:e SEMICOLON										{: RESULT = new AstStmtReturn(e); 					:}
 					| RETURN SEMICOLON												{: RESULT = new AstStmtReturn(null); 				:}
 					| IF LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE
