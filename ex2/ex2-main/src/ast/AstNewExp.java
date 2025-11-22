@@ -1,6 +1,6 @@
 package ast;
 
-public abstract class AstNewExp extends AstExp
+public class AstNewExp extends AstExp
 {
     public AstVarType type;
     public AstExp exp;

@@ -1,6 +1,6 @@
 package ast;
 
-public abstract class AstVarDec extends AstDec
+public class AstVarDec extends AstDec
 {
     public AstVarType type;
     public AstVarSimple id;

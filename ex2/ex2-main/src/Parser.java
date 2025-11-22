@@ -411,7 +411,7 @@ class CUP$Parser$actions {
               AstDec RESULT =null;
 		int fDecleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int fDecright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
-		AstFuncDec fDec = (AstFuncDec)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		AstDecFunc fDec = (AstDecFunc)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		 RESULT = fDec; 									
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("dec",2, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -561,7 +561,7 @@ class CUP$Parser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 17: // funcDec ::= type ID LPAREN typeIdList RPAREN LBRACE stmtList RBRACE 
             {
-              AstFuncDec RESULT =null;
+              AstDecFunc RESULT =null;
 		int tleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-7)).left;
 		int tright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-7)).right;
 		AstVarType t = (AstVarType)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-7)).value;
@@ -582,7 +582,7 @@ class CUP$Parser$actions {
           /*. . . . . . . . . . . . . . . . . . . .*/
           case 18: // funcDec ::= type ID LPAREN RPAREN LBRACE stmtList RBRACE 
             {
-              AstFuncDec RESULT =null;
+              AstDecFunc RESULT =null;
 		int tleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-6)).left;
 		int tright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-6)).right;
 		AstVarType t = (AstVarType)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-6)).value;
@@ -708,7 +708,7 @@ class CUP$Parser$actions {
               AstCField RESULT =null;
 		int fDecleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int fDecright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
-		AstFuncDec fDec = (AstFuncDec)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		AstDecFunc fDec = (AstDecFunc)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		 RESULT = fDec; 									
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("cField",10, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }

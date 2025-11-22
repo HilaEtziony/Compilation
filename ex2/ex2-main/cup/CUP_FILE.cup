@@ -96,16 +96,16 @@ non terminal AstDecList program;
 non terminal AstDecList decList;
 non terminal AstDec dec;
 non terminal AstVarType type; 
-non terminal AstDecVar varDec; 
+non terminal AstVarDec varDec; 
 non terminal AstStmtList stmtList;
 non terminal AstDecFunc funcDec; 
 non terminal AstTypeIdList typeIdList; 
 non terminal AstDecClass classDec; 
 non terminal AstCFieldList cFieldList; 
-non terminal AstCField cField; 			// Explanation: cField == varDec/FunctDec - AstCfieldList/AstCfield/AstDecVar/AstDecFunc->AstDec->AstStmt->AstNode
+non terminal AstCField cField; 			// Explanation: cField == varDec/FunctDec - AstCfieldList/AstCfield/AstVarDec/AstDecFunc->AstDec->AstStmt->AstNode
 non terminal AstDecArray arrayTypedef; 
 non terminal AstExp exp; 
-non terminal AstExpNew newExp; 
+non terminal AstNewExp newExp; 
 non terminal AstExpCall callExp; 
 non terminal AstExpList expList; 
 non terminal AstVar var; 
@@ -151,9 +151,9 @@ type 		::=		TYPE_INT          												{: RESULT = new AstVarType("int"); 			
     				| ID:name         												{: RESULT = new AstVarType(name); 					:} // TODO Yamit: make sure this is the proper type. ID is a str - will that work?
     				;
 
-varDec 		::= 	type:t ID:i ASSIGN exp:e SEMICOLON 								{: RESULT = new AstDecVar(t,i,e); 					:}
-					| type:t ID:i SEMICOLON											{: RESULT = new AstDecVar(t,i,null); 				:}
-					| type:t ID:i ASSIGN newExp:nE SEMICOLON						{: RESULT = new AstDecVar(t,i,nE); 					:}
+varDec 		::= 	type:t ID:i ASSIGN exp:e SEMICOLON 								{: RESULT = new AstVarDec(t,i,e); 					:}
+					| type:t ID:i SEMICOLON											{: RESULT = new AstVarDec(t,i,null); 				:}
+					| type:t ID:i ASSIGN newExp:nE SEMICOLON						{: RESULT = new AstVarDec(t,i,nE); 					:}
 					;
 
 stmtList	::=		stmt:s	stmtList:l												{: RESULT = new AstStmtList(s,l);    				:}
@@ -199,8 +199,8 @@ exp 		::= 	var:v															{: RESULT = new AstExpVar(v); 						:}
 					| STRING:s														{: RESULT = new AstExpString(s); 					:}
 					;
 
-newExp 		::= 	NEW type:t 														{: RESULT = new AstExpNew(t, null); 				:}
-					| NEW type:t LBRACK exp:e RBRACK								{: RESULT = new AstExpNew(t, e); 					:}
+newExp 		::= 	NEW type:t 														{: RESULT = new AstNewExp(t, null); 				:}
+					| NEW type:t LBRACK exp:e RBRACK								{: RESULT = new AstNewExp(t, e); 					:}
 					;
 
 callExp 	::= 	var:v DOT ID:i LPAREN expList:l RPAREN 							{: RESULT = new AstExpCall(v,i,l);    				:}
