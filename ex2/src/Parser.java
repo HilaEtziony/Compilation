@@ -312,7 +312,7 @@ public class Parser extends java_cup.runtime.lr_parser {
 		System.out.print(":");
 		System.out.print(lexer.getTokenStartPosition());
 		System.out.print("] ");
-		System.exit(0);
+		throw new Error("ERROR("+lexer.getLine()+")");
 	}
 
 

@@ -1,5 +1,5 @@
 import java.io.*;
-import java.io.PrintWriter;
+
 import java_cup.runtime.Symbol;
 import ast.*;
 
@@ -51,6 +51,8 @@ public class Main
 			/*************************/
 			/* [7] Close output file */
 			/*************************/
+			fileWriter.print("OK");
+			System.out.println("OK");
 			fileWriter.close();
 			
 			/*************************************/
@@ -62,6 +64,30 @@ public class Main
 		catch (Exception e)
 		{
 			e.printStackTrace();
+		}
+
+		catch(Error e)
+		{
+			try
+			{
+				fileWriter = new PrintWriter(outputFileName);
+				String message = e.getMessage();
+				System.out.println(message);
+				if(message.startsWith("ERROR("))
+				{
+					fileWriter.print(message);
+				}
+				else
+				{
+					fileWriter.print("ERROR");
+				}
+				fileWriter.close();
+			}
+			catch (FileNotFoundException ex)
+			{
+				
+			}
+
 		}
 	}
 }
