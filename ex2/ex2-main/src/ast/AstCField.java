@@ -1,5 +1,5 @@
-package ast;
+// package ast;
 
-public abstract class AstCField extends AstDec
-{
-}
+// public abstract class AstCField extends AstDec
+// {
+// }

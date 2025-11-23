@@ -4,9 +4,9 @@ public class AstDecClass extends AstDec
 {
     public String name;
     public String parentName;
-    public AstCFieldList cFieldList;
+    public AstDecList cFieldList;
 
-    public AstDecClass(String name, String parentName, AstCFieldList cFieldList)
+    public AstDecClass(String name, String parentName, AstDecList cFieldList)
     {
         // TODO get line num
         serialNumber = AstNodeSerialNumber.getFresh();

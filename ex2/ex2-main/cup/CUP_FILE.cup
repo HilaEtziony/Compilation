@@ -101,8 +101,8 @@ non terminal AstStmtList stmtList;
 non terminal AstDecFunc funcDec; 
 non terminal AstTypeIdList typeIdList; 
 non terminal AstDecClass classDec; 
-non terminal AstCFieldList cFieldList; 
-non terminal AstCField cField; 			// Explanation: cField == varDec/FunctDec - AstCfieldList/AstCfield/AstVarDec/AstDecFunc->AstDec->AstStmt->AstNode
+non terminal AstDecList cFieldList; 
+non terminal AstDec cField; 			// Explanation: cField == varDec/FunctDec - AstCfieldList/AstCfield/AstVarDec/AstDecFunc->AstDec->AstStmt->AstNode
 non terminal AstDecArray arrayTypedef; 
 non terminal AstExp exp; 
 non terminal AstNewExp newExp; 
@@ -110,6 +110,7 @@ non terminal AstExpCall callExp;
 non terminal AstExpList expList; 
 non terminal AstVar var; 
 non terminal AstStmt stmt; 
+
 
 /***********************/
 /* OPERATOR PRECEDENCE */
@@ -172,8 +173,8 @@ classDec 	::= 	CLASS ID:name EXTENDS ID:parentName LBRACE cFieldList:l RBRACE	{:
 					| CLASS ID:name LBRACE cFieldList:l RBRACE						{: RESULT = new AstDecClass(name,null,l); 			:}
 					;
 
-cFieldList	::=		cField:c	cFieldList:l										{: RESULT = new AstCFieldList(c,l);    				:}
-					| cField:c														{: RESULT = new AstCFieldList(c,null); 				:}
+cFieldList	::=		cField:c	cFieldList:l										{: RESULT = new AstDecList(c,l);    				:}
+					| cField:c														{: RESULT = new AstDecList(c,null); 				:}
 					;
 
 cField 		::= 	varDec:vDec 													{: RESULT = vDec; 									:}
@@ -220,7 +221,7 @@ var			::=		ID:name															{: RESULT = new AstVarSimple(name);       			:}
 
 stmt 		::= 	varDec:vDec														{: RESULT = vDec; 									:} // so varDec must implement stmt
 					| var:v ASSIGN exp:e SEMICOLON									{: RESULT = new AstStmtAssign(v,e); 				:}
-					| var:v ASSIGN newExp:nExp SEMICOLON							{: RESULT = new AstStmtAssign(v,nExp); 			:}     // check if right logic wise
+					| var:v ASSIGN newExp:nExp SEMICOLON							{: RESULT = new AstStmtAssignNew(v,nExp); 			:}     // check if right logic wise
 					| RETURN exp:e SEMICOLON										{: RESULT = new AstStmtReturn(e); 					:}
 					| RETURN SEMICOLON												{: RESULT = new AstStmtReturn(null); 				:}
 					| IF LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE
