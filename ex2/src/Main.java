@@ -43,11 +43,23 @@ public class Main
 			/***********************************/
 			ast = (AstDecList) p.parse().value;
 			
-			/*************************/
-			/* [6] Print the AST ... */
-			/*************************/
-			ast.printMe();
-			
+			try
+			{
+				/*************************/
+				/* [6] Print the AST ... */
+				/*************************/
+				ast.printMe();
+
+				/*************************************/
+				/* [8] Finalize AST GRAPHIZ DOT file */
+				/*************************************/
+				AstGraphviz.getInstance().finalizeFile();
+			}
+			catch (Exception e) 
+			{
+
+			}
+
 			/*************************/
 			/* [7] Close output file */
 			/*************************/
@@ -55,10 +67,6 @@ public class Main
 			System.out.println("OK");
 			fileWriter.close();
 			
-			/*************************************/
-			/* [8] Finalize AST GRAPHIZ DOT file */
-			/*************************************/
-			AstGraphviz.getInstance().finalizeFile();
     	}
 			     
 		catch (Exception e)
