@@ -1,5 +1,5 @@
 import java.io.*;
-import java.io.PrintWriter;
+
 import java_cup.runtime.Symbol;
 import ast.*;
 
@@ -10,7 +10,7 @@ public class Main
 		Lexer l;
 		Parser p;
 		Symbol s;
-		AstStmtList ast;
+		AstDecList ast;
 		FileReader fileReader;
 		PrintWriter fileWriter;
 		String inputFileName = argv[0];
@@ -41,27 +41,61 @@ public class Main
 			/***********************************/
 			/* [5] 3 ... 2 ... 1 ... Parse !!! */
 			/***********************************/
-			ast = (AstStmtList) p.parse().value;
+			ast = (AstDecList) p.parse().value;
 			
-			/*************************/
-			/* [6] Print the AST ... */
-			/*************************/
-			ast.printMe();
-			
+			try
+			{
+				/*************************/
+				/* [6] Print the AST ... */
+				/*************************/
+				ast.printMe();
+
+				/*************************************/
+				/* [8] Finalize AST GRAPHIZ DOT file */
+				/*************************************/
+				AstGraphviz.getInstance().finalizeFile();
+			}
+			catch (Exception e) 
+			{
+
+			}
+
 			/*************************/
 			/* [7] Close output file */
 			/*************************/
+			fileWriter.print("OK");
+			System.out.println("OK");
 			fileWriter.close();
 			
-			/*************************************/
-			/* [8] Finalize AST GRAPHIZ DOT file */
-			/*************************************/
-			AstGraphviz.getInstance().finalizeFile();
     	}
 			     
 		catch (Exception e)
 		{
 			e.printStackTrace();
+		}
+
+		catch(Error e)
+		{
+			try
+			{
+				fileWriter = new PrintWriter(outputFileName);
+				String message = e.getMessage();
+				System.out.println(message);
+				if(message.startsWith("ERROR("))
+				{
+					fileWriter.print(message);
+				}
+				else
+				{
+					fileWriter.print("ERROR");
+				}
+				fileWriter.close();
+			}
+			catch (FileNotFoundException ex)
+			{
+				
+			}
+
 		}
 	}
 }

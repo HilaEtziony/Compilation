@@ -18,7 +18,7 @@ parser code
 		System.out.print(":");
 		System.out.print(lexer.getTokenStartPosition());
 		System.out.print("] ");
-		System.exit(0);
+		throw new Error("ERROR("+lexer.getLine()+")");
 	}
 :}
 
@@ -125,9 +125,9 @@ precedence left DOT;
 precedence left LBRACK;
 
 /************************/
-/* START WITH: stmtList */
+/* START WITH: program */
 /************************/
-start with stmtList;
+start with program;
 
 /********************/
 /* DERIVATION RULES */
