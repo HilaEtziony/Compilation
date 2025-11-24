@@ -102,9 +102,9 @@ INTEGER			= 0 | [1-9][0-9]*
 INT_W_LEADING_Z = 0[0-9]+
 ID				= [a-zA-Z][a-zA-Z0-9]*
 LETTERS			= [a-zA-Z]*
-COMMENT_LEGAL_CHAR = [a-zA-Z0-9 \t\[\](){};.?!+-]
-COMMENT_TYPE_ONE = "//" [a-zA-Z0-9 \t\[\](){};.?!\+\-*/]* "\n" 
 STRING_SEQ = "\"" [a-zA-z]* "\""
+COMMENT_LEGAL_CHAR = [a-zA-Z0-9\(\)\[\]\{\}\?!+\-*/;. \t\f]
+COMMENT_2_LEGAL_CHAR = {COMMENT_LEGAL_CHAR} | {LineTerminator}
 
 /******************************/
 /* DOLLAR DOLLAR - DON'T TOUCH! */
@@ -123,6 +123,10 @@ STRING_SEQ = "\"" [a-zA-z]* "\""
 /**************************************************************/
 
 <YYINITIAL> {
+"//" ({COMMENT_LEGAL_CHAR})+{LineTerminator} 			{}
+"//"				[^LineTerminator]*[^COMMENT_LEGAL_CHAR] [^LineTerminator]*(LineTerminator) { throw new Error (); }
+"/*"				{ yybegin (COMMENT_TYPE_2) ; }
+
 "("					{ return symbol(TokenNames.LPAREN); }
 ")"					{ return symbol(TokenNames.RPAREN); }
 "["					{ return symbol(TokenNames.LBRACK); }
@@ -155,26 +159,18 @@ STRING_SEQ = "\"" [a-zA-z]* "\""
 "extends"			{ return symbol(TokenNames.EXTENDS); }
 "nil"				{ return symbol(TokenNames.NIL); }
 
-{COMMENT_TYPE_ONE}	{ return symbol(TokenNames.COMMENT);}
-"/*"				{ yybegin(COMMENT_TYPE_2); }
-
 {INT_W_LEADING_Z} 	{ return symbol(TokenNames.ERROR); } // It's before INTEGER otherwise wouldn't be cought
 {INTEGER}			{ return isIntValid(yytext()); }
 {ID}				{ return symbol(TokenNames.ID, String.valueOf(yytext())); }
 
-{WhiteSpace}		{ /* Just skip what was found, do nothing */ }
+{WhiteSpace}		{ }
 <<EOF>>				{ return symbol(TokenNames.EOF); }
 .                   { return symbol(TokenNames.ERROR); } // Catch-all: Match any single character that is NOT a quote or a letter
 }
 
-
 <COMMENT_TYPE_2> {
-"*/"			{
-				  yybegin(YYINITIAL);
-				  return symbol(TokenNames.COMMENT);
-				}
-({COMMENT_LEGAL_CHAR} | "*" | \/ | \n)
-				{ return symbol(TokenNames.COMMENT); }
-<<EOF>>			{ return symbol(TokenNames.ERROR); } 
-.				{ return symbol(TokenNames.ERROR); }
+"*/"					{ yybegin(YYINITIAL);}
+{COMMENT_2_LEGAL_CHAR}	{}
+. 						{ return symbol(TokenNames.ERROR); }
+<<EOF>>					{ return symbol(TokenNames.ERROR); }
 }
