@@ -125,9 +125,9 @@ precedence left DOT;
 precedence left LBRACK;
 
 /************************/
-/* START WITH: stmtList */
+/* START WITH: program */
 /************************/
-start with stmtList;
+start with program;
 
 /********************/
 /* DERIVATION RULES */
