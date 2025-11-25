@@ -1,3 +1,0 @@
-STRING(int)[1,2]
-STRING(string)[2,2]
-STRING(class)[3,2]

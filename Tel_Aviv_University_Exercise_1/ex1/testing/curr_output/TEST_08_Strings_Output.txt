@@ -1,3 +1,0 @@
-STRING(aaaaa)[1,2]
-STRING(abcdefghijklmnopqrstuvwxyz)[1,10]
-STRING(AaAaAa)[2,2]
