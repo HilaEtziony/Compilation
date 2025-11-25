@@ -85,7 +85,7 @@ import java_cup.runtime.*;
 		long value = Long.parseLong(given_int);
 		
 		if (value > MAX_INT) {
-			return symbol(TokenNames.ERROR);
+			throw new Error();
 		}
 		
 		return symbol(TokenNames.INT, Integer.valueOf(yytext()));
@@ -159,18 +159,18 @@ COMMENT_2_LEGAL_CHAR = {COMMENT_LEGAL_CHAR} | {LineTerminator}
 "extends"			{ return symbol(TokenNames.EXTENDS); }
 "nil"				{ return symbol(TokenNames.NIL); }
 
-{INT_W_LEADING_Z} 	{ return symbol(TokenNames.ERROR); } // It's before INTEGER otherwise wouldn't be cought
+{INT_W_LEADING_Z} 	{ throw new Error(); } // It's before INTEGER otherwise wouldn't be cought
 {INTEGER}			{ return isIntValid(yytext()); }
 {ID}				{ return symbol(TokenNames.ID, String.valueOf(yytext())); }
 
 {WhiteSpace}		{ }
 <<EOF>>				{ return symbol(TokenNames.EOF); }
-.                   { return symbol(TokenNames.ERROR); } // Catch-all: Match any single character that is NOT a quote or a letter
+.                   { throw new Error(); } // Catch-all: Match any single character that is NOT a quote or a letter
 }
 
 <COMMENT_TYPE_2> {
 "*/"					{ yybegin(YYINITIAL);}
 {COMMENT_2_LEGAL_CHAR}	{}
-. 						{ return symbol(TokenNames.ERROR); }
-<<EOF>>					{ return symbol(TokenNames.ERROR); }
+. 						{ throw new Error(); }
+<<EOF>>					{ throw new Error(); }
 }

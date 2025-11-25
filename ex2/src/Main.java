@@ -80,14 +80,13 @@ public class Main
 			{
 				fileWriter = new PrintWriter(outputFileName);
 				String message = e.getMessage();
-				System.out.println(message);
-				if(message.startsWith("ERROR("))
+				if(message == null)
 				{
-					fileWriter.print(message);
+					fileWriter.print("ERROR");
 				}
 				else
 				{
-					fileWriter.print("ERROR");
+					fileWriter.print(message);
 				}
 				fileWriter.close();
 			}

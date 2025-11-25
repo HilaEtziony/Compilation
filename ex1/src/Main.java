@@ -54,11 +54,7 @@ public class Main
 			/********************************/
 			while (s.sym != TokenNames.EOF)
 			{
-				if(s.sym == TokenNames.ERROR){
-					fileWriter.close();
-					throw new RuntimeException("Lexical Error at line " + l.getLine() + ", position " + l.getTokenStartPosition());
-				}
-				else if (s.sym == TokenNames.COMMENT){
+				if (s.sym == TokenNames.COMMENT){
 					s = l.next_token();
 					continue;
 				}
@@ -107,7 +103,17 @@ public class Main
 		catch (IOException e)
 		{
 			System.err.println("IO Error: " + e.getMessage());
-		}     
+		}  
+		catch (Error e)
+		{
+			try {
+				PrintWriter secondfilewriter = new PrintWriter(outputFileName);
+				secondfilewriter.print("ERROR");
+				secondfilewriter.close();
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		}   
 		catch (Exception e)
 		{
 			try {
@@ -117,7 +123,6 @@ public class Main
 			} catch (Exception e2) {
 				e2.printStackTrace();
 			}
-			//e.printStackTrace();
 		}
 	}
 }
