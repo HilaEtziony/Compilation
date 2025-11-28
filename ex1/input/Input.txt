@@ -1,14 +1,10 @@
-ident Ident ident1 Ident2
-class nil array while int extends return new if string
-void // not in the reserved keyword table for some reason?
-( ) [ ] { }
-+ - * /
-, . ;
-:= = < >
-// whitespace below
+void printf(string format, ...)
+{
+    // Do stuff
+    return;
+}
 
-
-
-
-
-                    ident
+void main()
+{
+    printf("Hello", "World");
+}

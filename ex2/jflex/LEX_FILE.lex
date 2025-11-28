@@ -90,6 +90,21 @@ import java_cup.runtime.*;
 		
 		return symbol(TokenNames.INT, Integer.valueOf(yytext()));
 	}
+
+	final static String COMMENT_LEGAL = "()[]{}?!+-*;./ \t\f\r\n";
+	private void checkLegalComment(String comment, int line){
+		//System.out.println("Checking comment");
+		//System.out.println(comment);
+		//System.out.println(line);
+		char c;
+		for (int i = 0; i < comment.length(); i++) {
+			c = comment.charAt(i);
+            if (!Character.isLetterOrDigit(c) && COMMENT_LEGAL.indexOf(c) ==-1){
+		//		System.out.println("Error in comment! " + c);
+				throw new Error();
+			}
+        }
+	}
 %}
 
 /***********************/
@@ -123,8 +138,14 @@ COMMENT_2_LEGAL_CHAR = {COMMENT_LEGAL_CHAR} | {LineTerminator}
 /**************************************************************/
 
 <YYINITIAL> {
-"//" ({COMMENT_LEGAL_CHAR})+{LineTerminator} 			{}
-"//"				[^LineTerminator]*[^COMMENT_LEGAL_CHAR] [^LineTerminator]*(LineTerminator) { throw new Error (); }
+"//"[^\r\n]*(\r\n|\r|\n)	{ 
+					String text = yytext();
+					// Remove the "//" prefix and any line terminator suffix
+					String comment = text.substring(2);
+					// Remove trailing line terminators (handles \n, \r, or \r\n)
+					comment = comment.replaceAll("[\r\n]+$", "");
+					checkLegalComment(comment, yyline); 
+}
 "/*"				{ yybegin (COMMENT_TYPE_2) ; }
 
 "("					{ return symbol(TokenNames.LPAREN); }
