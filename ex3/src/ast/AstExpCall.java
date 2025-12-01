@@ -2,51 +2,26 @@ package ast;
 
 public class AstExpCall extends AstExp
 {
-	/****************/
-	/* DATA MEMBERS */
-	/****************/
-	public String funcName;
-	public AstExpList params;
+    public AstVar var;
+    public String id;
+    public AstExpList expList;
 
-	/******************/
-	/* CONSTRUCTOR(S) */
-	/******************/
-	public AstExpCall(String funcName, AstExpList params)
-	{
-		/******************************/
-		/* SET A UNIQUE SERIAL NUMBER */
-		/******************************/
-		serialNumber = AstNodeSerialNumber.getFresh();
+    public AstExpCall(AstVar var, String id, AstExpList expList)
+    {
+        // TODO get line num
+        serialNumber = AstNodeSerialNumber.getFresh();
 
-		this.funcName = funcName;
-		this.params = params;
-	}
-
-	/************************************************/
-	/* The printing message for a call exp AST node */
-	/************************************************/
-	public void printMe()
-	{
-		/********************************/
-		/* AST NODE TYPE = AST CALL EXP */
-		/********************************/
-		System.out.format("CALL(%s)\nWITH:\n",funcName);
-
-		/***************************************/
-		/* RECURSIVELY PRINT params + body ... */
-		/***************************************/
-		if (params != null) params.printMe();
-		
-		/***************************************/
-		/* PRINT Node to AST GRAPHVIZ DOT file */
-		/***************************************/
-		AstGraphviz.getInstance().logNode(
-                serialNumber,
-			String.format("CALL(%s)\nWITH",funcName));
-		
-		/****************************************/
-		/* PRINT Edges to AST GRAPHVIZ DOT file */
-		/****************************************/
-		AstGraphviz.getInstance().logEdge(serialNumber,params.serialNumber);
-	}
+        this.var = var;
+        this.id = id;
+        this.expList = expList;
+    }
 }
+
+/*
+USAGES:
+
+callExp 	::= 	var:v DOT ID:i LPAREN expList:l RPAREN 							{: RESULT = new AstCallExp(v,i,l);    				:}
+					| var:v DOT ID:i LPAREN RPAREN									{: RESULT = new AstCallExp(v,i,null);    			:}
+					| ID:i LPAREN expList:l RPAREN 									{: RESULT = new AstCallExp(null,i,l);    			:}
+					| ID:i LPAREN RPAREN											{: RESULT = new AstCallExp(null,i,null);    		:}
+*/

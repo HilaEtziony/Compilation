@@ -1,9 +1,6 @@
 package ast;
 
-import types.*;
-import symboltable.*;
-
-public class AstExpVarSimple extends AstExpVar
+public class AstVarSimple extends AstVar
 {
 	/************************/
 	/* simple variable name */
@@ -13,14 +10,21 @@ public class AstExpVarSimple extends AstExpVar
 	/******************/
 	/* CONSTRUCTOR(S) */
 	/******************/
-	public AstExpVarSimple(String name)
+	public AstVarSimple(String name)
 	{
 		/******************************/
 		/* SET A UNIQUE SERIAL NUMBER */
 		/******************************/
 		serialNumber = AstNodeSerialNumber.getFresh();
-
+	
+		/***************************************/
+		/* PRINT CORRESPONDING DERIVATION RULE */
+		/***************************************/
 		System.out.format("====================== var -> ID( %s )\n",name);
+
+		/*******************************/
+		/* COPY INPUT DATA MEMBERS ... */
+		/*******************************/
 		this.name = name;
 	}
 
@@ -34,16 +38,11 @@ public class AstExpVarSimple extends AstExpVar
 		/**********************************/
 		System.out.format("AST NODE SIMPLE VAR( %s )\n",name);
 
-		/***************************************/
-		/* PRINT Node to AST GRAPHVIZ DOT file */
-		/***************************************/
+		/*********************************/
+		/* Print to AST GRAPHVIZ DOT file */
+		/*********************************/
 		AstGraphviz.getInstance().logNode(
-                serialNumber,
+				serialNumber,
 			String.format("SIMPLE\nVAR\n(%s)",name));
-	}
-
-	public Type semantMe()
-	{
-		return SymbolTable.getInstance().find(name);
 	}
 }

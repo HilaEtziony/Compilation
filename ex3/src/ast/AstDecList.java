@@ -1,67 +1,52 @@
 package ast;
 
-import types.*;
-
-public class AstDecList extends AstNode
+public class AstDecList extends AstStmt 
 {
-	/****************/
-	/* DATA MEMBERS */
-	/****************/
-	public AstDec head;
-	public AstDecList tail;
+    /****************/
+    /* DATA MEMBERS */
+    /****************/
+    public AstDec head;
+    public AstDecList tail;
 
-	/******************/
-	/* CONSTRUCTOR(S) */
-	/******************/
-	public AstDecList(AstDec head, AstDecList tail)
-	{
-		/******************************/
-		/* SET A UNIQUE SERIAL NUMBER */
-		/******************************/
-		serialNumber = AstNodeSerialNumber.getFresh();
+    /******************/
+    /* CONSTRUCTOR(S) */
+    /******************/
+    public AstDecList(AstDec head, AstDecList tail)
+    {
+        // TODO get line num
+        serialNumber = AstNodeSerialNumber.getFresh();
 
-		this.head = head;
-		this.tail = tail;
-	}
+        if (tail != null) System.out.print("====================== decList -> dec decList\n");
+        if (tail == null) System.out.print("====================== decList -> dec         \n");
 
-	/********************************************************/
-	/* The printing message for a declaration list AST node */
-	/********************************************************/
-	public void printMe()
-	{
-		/********************************/
-		/* AST NODE TYPE = AST DEC LIST */
-		/********************************/
-		System.out.print("AST NODE DEC LIST\n");
+        this.head = head;
+        this.tail = tail;
+    }
 
-		/*************************************/
-		/* RECURSIVELY PRINT HEAD + TAIL ... */
-		/*************************************/
-		if (head != null) head.printMe();
-		if (tail != null) tail.printMe();
+    public void printMe()
+    {
+        /**************************************/
+        /* AST NODE TYPE = AST DECLARATION LIST */
+        /**************************************/
+        System.out.print("AST NODE DEC LIST\n");
 
-		/**********************************/
-		/* PRINT to AST GRAPHVIZ DOT file */
-		/**********************************/
-		AstGraphviz.getInstance().logNode(
-				serialNumber,
-			"DEC\nLIST\n");
-				
-		/****************************************/
-		/* PRINT Edges to AST GRAPHVIZ DOT file */
-		/****************************************/
-		if (head != null) AstGraphviz.getInstance().logEdge(serialNumber,head.serialNumber);
-		if (tail != null) AstGraphviz.getInstance().logEdge(serialNumber,tail.serialNumber);
-	}
+        /*************************************/
+        /* RECURSIVELY PRINT HEAD + TAIL ... */
+        /*************************************/
+        if (head != null) head.printMe();
+        if (tail != null) tail.printMe();
 
-	public Type semantMe()
-	{
-		/*************************************/
-		/* RECURSIVELY PRINT HEAD + TAIL ... */
-		/*************************************/
-		if (head != null) head.semantMe();
-		if (tail != null) tail.semantMe();
-
-		return null;
-	}
+        /**********************************/
+        /* PRINT to AST GRAPHVIZ DOT file */
+        /**********************************/
+        AstGraphviz.getInstance().logNode(
+                serialNumber,
+            "DEC\nLIST\n");
+        
+        /****************************************/
+        /* PRINT Edges to AST GRAPHVIZ DOT file */
+        /****************************************/
+        if (head != null) AstGraphviz.getInstance().logEdge(serialNumber,head.serialNumber);
+        if (tail != null) AstGraphviz.getInstance().logEdge(serialNumber,tail.serialNumber);
+    }
 }

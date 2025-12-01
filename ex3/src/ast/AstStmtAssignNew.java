@@ -1,17 +1,17 @@
 package ast;
 
-public class AstStmtAssign extends AstStmt
+public class AstStmtAssignNew extends AstStmt
 {
 	/***************/
 	/*  var := exp */
 	/***************/
 	public AstVar var;
-	public AstExp exp;
+	public AstNewExp exp;
 
 	/*******************/
 	/*  CONSTRUCTOR(S) */
 	/*******************/
-	public AstStmtAssign(AstVar var, AstExp exp)
+	public AstStmtAssignNew(AstVar var, AstNewExp exp)
 	{
 		/******************************/
 		/* SET A UNIQUE SERIAL NUMBER */
@@ -38,7 +38,7 @@ public class AstStmtAssign extends AstStmt
 		/********************************************/
 		/* AST NODE TYPE = AST ASSIGNMENT STATEMENT */
 		/********************************************/
-		System.out.print("AST NODE ASSIGN STMT\n");
+		System.out.print("AST NODE ASSIGN STMT NEW\n");
 
 		/***********************************/
 		/* RECURSIVELY PRINT VAR + EXP ... */

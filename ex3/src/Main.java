@@ -1,6 +1,5 @@
-   
 import java.io.*;
-import java.io.PrintWriter;
+
 import java_cup.runtime.Symbol;
 import ast.*;
 
@@ -44,30 +43,63 @@ public class Main
 			/***********************************/
 			ast = (AstDecList) p.parse().value;
 			
-			/*************************/
-			/* [6] Print the AST ... */
-			/*************************/
-			ast.printMe();
+			try
+			{
+				/*************************/
+				/* [6] Print the AST ... */
+				/*************************/
+				ast.printMe();
 
-			/**************************/
-			/* [7] Semant the AST ... */
-			/**************************/
-			ast.semantMe();
-			
+				/**************************/
+				/* [7] Semant the AST ... */
+				/**************************/
+				ast.semantMe();
+
+				/*************************************/
+				/* [8] Finalize AST GRAPHIZ DOT file */
+				/*************************************/
+				AstGraphviz.getInstance().finalizeFile();
+			}
+			catch (Exception e) 
+			{
+				// TODO
+			}
+
 			/*************************/
-			/* [8] Close output file */
+			/* [7] Close output file */
 			/*************************/
+			fileWriter.print("OK");
+			System.out.println("OK");
 			fileWriter.close();
-
-			/*************************************/
-			/* [9] Finalize AST GRAPHIZ DOT file */
-			/*************************************/
-			AstGraphviz.getInstance().finalizeFile();
+			
     	}
 			     
 		catch (Exception e)
 		{
 			e.printStackTrace();
+		}
+
+		catch(Error e)
+		{
+			try
+			{
+				fileWriter = new PrintWriter(outputFileName);
+				String message = e.getMessage();
+				if(message == null)
+				{
+					fileWriter.print("ERROR");
+				}
+				else
+				{
+					fileWriter.print(message);
+				}
+				fileWriter.close();
+			}
+			catch (FileNotFoundException ex)
+			{
+				// TODO
+			}
+
 		}
 	}
 }

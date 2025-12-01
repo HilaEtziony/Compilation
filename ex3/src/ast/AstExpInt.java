@@ -1,7 +1,5 @@
 package ast;
 
-import types.*;
-
 public class AstExpInt extends AstExp
 {
 	public int value;
@@ -9,19 +7,34 @@ public class AstExpInt extends AstExp
 	/******************/
 	/* CONSTRUCTOR(S) */
 	/******************/
-	public AstExpInt(int value)
+	public AstExpInt(int value, boolean isNegative)
 	{
 		/******************************/
 		/* SET A UNIQUE SERIAL NUMBER */
 		/******************************/
 		serialNumber = AstNodeSerialNumber.getFresh();
 
+		/***************************************/
+		/* PRINT CORRESPONDING DERIVATION RULE */
+		/***************************************/
 		System.out.format("====================== exp -> INT( %d )\n", value);
-		this.value = value;
+
+		/*******************************/
+		/* COPY INPUT DATA MEMBERS ... */
+		/*******************************/
+		if (isNegative) 
+		{
+			this.value = -1 * value;
+		} 
+		else 
+		{
+			this.value = value;
+		}
 	}
 
+
 	/************************************************/
-	/* The printing message for an INT EXP AST node */
+	/* The printing message for an int exp AST node */
 	/************************************************/
 	public void printMe()
 	{
@@ -30,16 +43,11 @@ public class AstExpInt extends AstExp
 		/*******************************/
 		System.out.format("AST NODE INT( %d )\n",value);
 
-		/***************************************/
-		/* PRINT Node to AST GRAPHVIZ DOT file */
-		/***************************************/
+		/*********************************/
+		/* Print to AST GRAPHVIZ DOT file */
+		/*********************************/
 		AstGraphviz.getInstance().logNode(
-                serialNumber,
+				serialNumber,
 			String.format("INT(%d)",value));
-	}
-
-	public Type semantMe()
-	{
-		return TypeInt.getInstance();
 	}
 }

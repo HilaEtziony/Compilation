@@ -1,14 +1,14 @@
 package ast;
 
-import types.*;
-
-public abstract class AstDec extends AstNode
+public abstract class AstDec extends AstStmt
 {
-	/***********************************************/
-	/* The default semantic action for an AST node */
-	/***********************************************/
-	public Type semantMe()
-	{
-		return null;
-	}
+    public AstDec()
+    {
+        // TODO get line num
+        serialNumber = AstNodeSerialNumber.getFresh();
+    }
 }
+
+/*
+This class is only being derived-from. Need to think about fields that should be shared among all declarations.
+*/
