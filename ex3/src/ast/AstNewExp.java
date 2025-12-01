@@ -1,5 +1,8 @@
 package ast;
 
+import types.*;
+import symboltable.*;
+
 public class AstNewExp extends AstExp
 {
     public AstVarType type;

@@ -1,5 +1,8 @@
 package ast;
 
+import types.*;
+import symboltable.*;
+
 public class AstDecArray extends AstDec
 {
     public String identifier;

@@ -1,5 +1,8 @@
 package ast;
 
+import types.*;
+import symboltable.*;
+
 public class AstVarSubscript extends AstVar
 {
 	public AstVar var;

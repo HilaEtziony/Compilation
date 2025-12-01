@@ -1,5 +1,8 @@
 package ast;
 
+import types.*;
+import symboltable.*;
+
 public class AstStmtCall extends AstStmt
 {
 	/***************/
@@ -29,33 +32,20 @@ public class AstStmtCall extends AstStmt
 		this.expCall = expCall;
 	}
 
-	/*********************************************************/
-	/* The printing message for an assign statement AST node */
-	/*********************************************************/
 	public void printMe()
-	{
-		/********************************************/
-		/* AST NODE TYPE = AST CALL STATEMENT */
-		/********************************************/
-		System.out.print("AST NODE CALL STMT\n");
+		{
+			expCall.printMe();
 
-		/***********************************/
-		/* RECURSIVELY PRINT VAR + EXP ... */
-		/***********************************/
-		if (expCall != null) expCall.printMe();
-		// if (exp != null) exp.printMe();
-
-		/***************************************/
-		/* PRINT Node to AST GRAPHVIZ DOT file */
-		/***************************************/
-		AstGraphviz.getInstance().logNode(
-				serialNumber,
-			"ASSIGN\nleft := right\n");
-		
-		/****************************************/
-		/* PRINT Edges to AST GRAPHVIZ DOT file */
-		/****************************************/
-		AstGraphviz.getInstance().logEdge(serialNumber,expCall.serialNumber);
-		// AstGraphviz.getInstance().logEdge(serialNumber,exp.serialNumber);
+			/***************************************/
+			/* PRINT Node to AST GRAPHVIZ DOT file */
+			/***************************************/
+			AstGraphviz.getInstance().logNode(
+					serialNumber,
+				String.format("STMT\nCALL"));
+			
+			/****************************************/
+			/* PRINT Edges to AST GRAPHVIZ DOT file */
+			/****************************************/
+			AstGraphviz.getInstance().logEdge(serialNumber,expCall.serialNumber);
 	}
 }

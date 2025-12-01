@@ -1,5 +1,8 @@
 package ast;
 
+import types.*;
+import symboltable.*;
+
 public class AstExpInt extends AstExp
 {
 	public int value;
@@ -34,7 +37,7 @@ public class AstExpInt extends AstExp
 
 
 	/************************************************/
-	/* The printing message for an int exp AST node */
+	/* The printing message for an INT EXP AST node */
 	/************************************************/
 	public void printMe()
 	{
@@ -43,11 +46,16 @@ public class AstExpInt extends AstExp
 		/*******************************/
 		System.out.format("AST NODE INT( %d )\n",value);
 
-		/*********************************/
-		/* Print to AST GRAPHVIZ DOT file */
-		/*********************************/
+		/***************************************/
+		/* PRINT Node to AST GRAPHVIZ DOT file */
+		/***************************************/
 		AstGraphviz.getInstance().logNode(
-				serialNumber,
+                serialNumber,
 			String.format("INT(%d)",value));
+	}
+
+	public Type semantMe()
+	{
+		return TypeInt.getInstance();
 	}
 }

@@ -1,5 +1,8 @@
 package ast;
 
+import types.*;
+import symboltable.*;
+
 public class AstExpCall extends AstExp
 {
     public AstVar var;
@@ -15,6 +18,34 @@ public class AstExpCall extends AstExp
         this.id = id;
         this.expList = expList;
     }
+
+    /************************************************/
+	/* The printing message for a call exp AST node */
+	/************************************************/
+	public void printMe()
+	{
+		/********************************/
+		/* AST NODE TYPE = AST CALL EXP */
+		/********************************/
+		System.out.format("CALL(%s)\nWITH:\n",id);
+
+		/***************************************/
+		/* RECURSIVELY PRINT expList + body ... */
+		/***************************************/
+		if (expList != null) expList.printMe();
+		
+		/***************************************/
+		/* PRINT Node to AST GRAPHVIZ DOT file */
+		/***************************************/
+		AstGraphviz.getInstance().logNode(
+                serialNumber,
+			String.format("CALL(%s)\nWITH",id));
+		
+		/****************************************/
+		/* PRINT Edges to AST GRAPHVIZ DOT file */
+		/****************************************/
+		AstGraphviz.getInstance().logEdge(serialNumber,expList.serialNumber);
+	}
 }
 
 /*

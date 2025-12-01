@@ -1,6 +1,9 @@
 package ast;
 
-public class AstDecList extends AstStmt 
+import types.*;
+import symboltable.*;
+
+public class AstDecList extends AstStmt
 {
     /****************/
     /* DATA MEMBERS */
@@ -23,30 +26,44 @@ public class AstDecList extends AstStmt
         this.tail = tail;
     }
 
-    public void printMe()
-    {
-        /**************************************/
-        /* AST NODE TYPE = AST DECLARATION LIST */
-        /**************************************/
-        System.out.print("AST NODE DEC LIST\n");
+	/********************************************************/
+	/* The printing message for a declaration list AST node */
+	/********************************************************/
+	public void printMe()
+	{
+		/********************************/
+		/* AST NODE TYPE = AST DEC LIST */
+		/********************************/
+		System.out.print("AST NODE DEC LIST\n");
 
-        /*************************************/
-        /* RECURSIVELY PRINT HEAD + TAIL ... */
-        /*************************************/
-        if (head != null) head.printMe();
-        if (tail != null) tail.printMe();
+		/*************************************/
+		/* RECURSIVELY PRINT HEAD + TAIL ... */
+		/*************************************/
+		if (head != null) head.printMe();
+		if (tail != null) tail.printMe();
 
-        /**********************************/
-        /* PRINT to AST GRAPHVIZ DOT file */
-        /**********************************/
-        AstGraphviz.getInstance().logNode(
-                serialNumber,
-            "DEC\nLIST\n");
-        
-        /****************************************/
-        /* PRINT Edges to AST GRAPHVIZ DOT file */
-        /****************************************/
-        if (head != null) AstGraphviz.getInstance().logEdge(serialNumber,head.serialNumber);
-        if (tail != null) AstGraphviz.getInstance().logEdge(serialNumber,tail.serialNumber);
-    }
+		/**********************************/
+		/* PRINT to AST GRAPHVIZ DOT file */
+		/**********************************/
+		AstGraphviz.getInstance().logNode(
+				serialNumber,
+			"DEC\nLIST\n");
+
+		/****************************************/
+		/* PRINT Edges to AST GRAPHVIZ DOT file */
+		/****************************************/
+		if (head != null) AstGraphviz.getInstance().logEdge(serialNumber,head.serialNumber);
+		if (tail != null) AstGraphviz.getInstance().logEdge(serialNumber,tail.serialNumber);
+	}
+
+	public Type semantMe()
+	{
+		/*************************************/
+		/* RECURSIVELY PRINT HEAD + TAIL ... */
+		/*************************************/
+		if (head != null) head.semantMe();
+		if (tail != null) tail.semantMe();
+
+		return null;
+	}
 }

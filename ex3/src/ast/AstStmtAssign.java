@@ -1,5 +1,8 @@
 package ast;
 
+import types.*;
+import symboltable.*;
+
 public class AstStmtAssign extends AstStmt
 {
 	/***************/
@@ -50,7 +53,7 @@ public class AstStmtAssign extends AstStmt
 		/* PRINT Node to AST GRAPHVIZ DOT file */
 		/***************************************/
 		AstGraphviz.getInstance().logNode(
-				serialNumber,
+                serialNumber,
 			"ASSIGN\nleft := right\n");
 		
 		/****************************************/
@@ -58,5 +61,20 @@ public class AstStmtAssign extends AstStmt
 		/****************************************/
 		AstGraphviz.getInstance().logEdge(serialNumber,var.serialNumber);
 		AstGraphviz.getInstance().logEdge(serialNumber,exp.serialNumber);
+	}
+
+	public Type semantMe()
+	{
+		Type t1 = null;
+		Type t2 = null;
+		
+		if (var != null) t1 = var.semantMe();
+		if (exp != null) t2 = exp.semantMe();
+		
+		if (t1 != t2)
+		{
+			System.out.format(">> ERROR [%d:%d] type mismatch for var := exp\n",6,6);				
+		}
+		return null;
 	}
 }

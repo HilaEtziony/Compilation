@@ -1,5 +1,8 @@
 package ast;
 
+import types.*;
+import symboltable.*;
+
 public abstract class AstNode
 {
 	/*******************************************/
@@ -16,5 +19,13 @@ public abstract class AstNode
 	public void printMe()
 	{
 		System.out.print("AST NODE UNKNOWN\n");
+	}
+
+	/***********************************************/
+	/* The default semantic action for an AST node */
+	/***********************************************/
+	public Type semantMe()
+	{
+		return null;
 	}
 }

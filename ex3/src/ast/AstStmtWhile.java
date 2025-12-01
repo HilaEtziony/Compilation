@@ -1,5 +1,8 @@
 package ast;
 
+import types.*;
+import symboltable.*;
+
 public class AstStmtWhile extends AstStmt
 {
 	public AstExp cond;

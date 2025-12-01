@@ -1,5 +1,8 @@
 package ast;
 
+import types.*;
+import symboltable.*;
+
 public abstract class AstDec extends AstStmt
 {
     public AstDec()
