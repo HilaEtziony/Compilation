@@ -10,4 +10,22 @@ public class AstExpNIL extends AstExp
         // TODO get line num
         serialNumber = AstNodeSerialNumber.getFresh();
     }
+
+	/****************************************************/
+	/* The printing message for a NIL exp AST node */
+	/****************************************************/
+	public void printMe()
+	{
+		/*****************************/
+		/* AST NODE TYPE = NIL EXP */
+		/*****************************/
+		System.out.print("AST NODE NIL\n");
+
+		/***************************************/
+		/* PRINT Node to AST GRAPHVIZ DOT file */
+		/***************************************/
+		AstGraphviz.getInstance().logNode(
+                serialNumber,
+			"NIL");
+	}
 }

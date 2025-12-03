@@ -14,4 +14,22 @@ public class AstVarType extends AstDec
         
         this.type = type;
     }
+
+    /****************************************************/
+	/* The printing message for a var type AST node */
+	/****************************************************/
+	public void printMe()
+	{
+		/*****************************/
+		/* AST NODE TYPE = VAR TYPE */
+		/*****************************/
+		System.out.format("AST NODE VAR TYPE( %s )\n", type);
+
+		/***************************************/
+		/* PRINT Node to AST GRAPHVIZ DOT file */
+		/***************************************/
+		AstGraphviz.getInstance().logNode(
+                serialNumber,
+			String.format("VAR\nTYPE(%s)", type));
+	}
 }

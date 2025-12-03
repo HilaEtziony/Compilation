@@ -48,11 +48,3 @@ public class AstExpCall extends AstExp
 	}
 }
 
-/*
-USAGES:
-
-callExp 	::= 	var:v DOT ID:i LPAREN expList:l RPAREN 							{: RESULT = new AstCallExp(v,i,l);    				:}
-					| var:v DOT ID:i LPAREN RPAREN									{: RESULT = new AstCallExp(v,i,null);    			:}
-					| ID:i LPAREN expList:l RPAREN 									{: RESULT = new AstCallExp(null,i,l);    			:}
-					| ID:i LPAREN RPAREN											{: RESULT = new AstCallExp(null,i,null);    		:}
-*/

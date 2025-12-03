@@ -48,9 +48,3 @@ public class AstExpList extends AstDec
 	}
 }
 
-/*
-USAGES:
-
-expList		::=		exp:e COMMA expList:l											{: RESULT = new AstExpList(e,l);    				:}
-					| exp:e															{: RESULT = new AstExpList(e,null);    				:}
-*/

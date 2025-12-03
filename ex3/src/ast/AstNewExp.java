@@ -16,11 +16,33 @@ public class AstNewExp extends AstExp
         this.type = type;
         this.exp = exp;
     }
+
+	/****************************************************/
+	/* The printing message for a new exp AST node */
+	/****************************************************/
+	public void printMe()
+	{
+		/*****************************/
+		/* AST NODE TYPE = NEW EXP */
+		/*****************************/
+		System.out.format("AST NODE NEW EXP( %s )\n", type.type);
+
+		/**************************************/
+		/* RECURSIVELY PRINT exp ... */
+		/**************************************/
+		if (exp != null) exp.printMe();
+
+		/***************************************/
+		/* PRINT Node to AST GRAPHVIZ DOT file */
+		/***************************************/
+		AstGraphviz.getInstance().logNode(
+                serialNumber,
+			String.format("NEW(%s)", type.type));
+		
+		/****************************************/
+		/* PRINT Edges to AST GRAPHVIZ DOT file */
+		/****************************************/
+		if (exp != null) AstGraphviz.getInstance().logEdge(serialNumber, exp.serialNumber);
+	}
 }
 
-/*
-USAGES:
-
-newExp 		::= 	NEW type:t 														{: RESULT = new AstNewExp(t, null); 				:}
-					| NEW type:t LBRACK exp:e RBRACK								{: RESULT = new AstNewExp(t, e); 					:}
-*/

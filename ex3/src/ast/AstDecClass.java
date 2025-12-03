@@ -72,9 +72,3 @@ public class AstDecClass extends AstDec
 	}
 }
 
-/*
-USAGES:
-
-classDec 	::= 	CLASS ID:name EXTENDS ID:parentName LBRACE cFieldList:l RBRACE	{: RESULT = new AstDecClass(name,parentNmae,l); 	:}
-					| CLASS ID:name LBRACE cFieldList:l RBRACE						{: RESULT = new AstDecClass(name,null,l); 			:}
-*/
