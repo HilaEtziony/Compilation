@@ -1,3 +1,3 @@
 [submodule "compilation-ex2-testers"]
-	path = compilation-ex2-testers
+	path = tests for all exercises/compilation-ex2-testers
 	url = https://github.com/amitnovick/compilation-ex2-testers
