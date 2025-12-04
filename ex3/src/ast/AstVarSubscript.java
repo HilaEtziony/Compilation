@@ -64,4 +64,10 @@ public class AstVarSubscript extends AstVar
 		if (var       != null) AstGraphviz.getInstance().logEdge(serialNumber,var.serialNumber);
 		if (subscript != null) AstGraphviz.getInstance().logEdge(serialNumber,subscript.serialNumber);
 	}
+
+	public Type semantMe()
+	{
+		// TODO
+		return null;
+	}
 }

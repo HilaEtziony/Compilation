@@ -67,4 +67,10 @@ public class AstStmtAssignNew extends AstStmt
 		AstGraphviz.getInstance().logEdge(serialNumber,var.serialNumber);
 		AstGraphviz.getInstance().logEdge(serialNumber,exp.serialNumber);
 	}
+
+	public Type semantMe()
+	{
+		// TODO
+		return null;
+	}
 }

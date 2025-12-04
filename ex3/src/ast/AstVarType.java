@@ -40,4 +40,10 @@ public class AstVarType extends AstDec
                 serialNumber,
 			String.format("VAR\nTYPE(%s)", type));
 	}
+
+	public Type semantMe()
+	{
+		// TODO
+		return null;
+	}
 }

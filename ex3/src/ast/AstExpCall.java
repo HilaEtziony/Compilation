@@ -54,5 +54,11 @@ public class AstExpCall extends AstExp
 		/****************************************/
 		AstGraphviz.getInstance().logEdge(serialNumber,expList.serialNumber);
 	}
+
+	public Type semantMe()
+	{
+		// TODO
+		return null;
+	}
 }
 

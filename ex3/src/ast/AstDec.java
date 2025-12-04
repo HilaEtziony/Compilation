@@ -10,6 +10,12 @@ public abstract class AstDec extends AstStmt
         // TODO get line num
         serialNumber = AstNodeSerialNumber.getFresh();
     }
+
+	public Type semantMe()
+	{
+		// TODO
+		return null;
+	}
 }
 
 /*

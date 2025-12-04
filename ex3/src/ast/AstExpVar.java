@@ -61,4 +61,10 @@ public class AstExpVar extends AstExp
 		AstGraphviz.getInstance().logEdge(serialNumber,var.serialNumber);
 			
 	}
+
+	public Type semantMe()
+	{
+		// TODO
+		return null;
+	}
 }

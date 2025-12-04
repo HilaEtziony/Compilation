@@ -49,4 +49,10 @@ public class AstDecArray extends AstDec
 		/****************************************/
 		if (type != null) AstGraphviz.getInstance().logEdge(serialNumber, type.serialNumber);
 	}
+
+	public Type semantMe()
+	{
+		// TODO
+		return null;
+	}
 }

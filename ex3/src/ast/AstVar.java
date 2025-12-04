@@ -5,4 +5,9 @@ import symboltable.*;
 
 public abstract class AstVar extends AstNode
 {
+	public Type semantMe()
+	{
+		// TODO
+		return null;
+	}
 }

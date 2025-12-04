@@ -22,4 +22,10 @@ public class AstStmt extends AstNode
                 serialNumber,
 			"STMT");
 	}
+
+	public Type semantMe()
+	{
+		// TODO
+		return null;
+	}
 }

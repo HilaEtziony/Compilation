@@ -3,34 +3,22 @@ package ast;
 import types.*;
 import symboltable.*;
 
-/*
-USAGE:
-	| NIL															{: RESULT = new AstExpNIL(); 						:}
-*/
-
 public class AstExpNIL extends AstExp
 {
     public AstExpNIL()
     {
-        // TODO get line num
         serialNumber = AstNodeSerialNumber.getFresh();
     }
 
-	/****************************************************/
-	/* The printing message for a NIL exp AST node */
-	/****************************************************/
-	public void printMe()
-	{
-		/*****************************/
-		/* AST NODE TYPE = NIL EXP */
-		/*****************************/
-		System.out.print("AST NODE NIL\n");
+    public void printMe()
+    {
+        System.out.print("AST NODE NIL\n");
+        AstGraphviz.getInstance().logNode(serialNumber, "NIL");
+    }
 
-		/***************************************/
-		/* PRINT Node to AST GRAPHVIZ DOT file */
-		/***************************************/
-		AstGraphviz.getInstance().logNode(
-                serialNumber,
-			"NIL");
-	}
+    public Type semantMe()
+    {
+        // TODO
+        return null;
+    }
 }

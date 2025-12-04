@@ -50,5 +50,11 @@ public class AstNewExp extends AstExp
 		/****************************************/
 		if (exp != null) AstGraphviz.getInstance().logEdge(serialNumber, exp.serialNumber);
 	}
+
+	public Type semantMe()
+	{
+		// TODO
+		return null;
+	}
 }
 
