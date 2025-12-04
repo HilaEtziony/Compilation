@@ -270,7 +270,7 @@ public class SymbolTable
 					new TypeList(
 						TypeInt.getInstance(),
 						null)));
-			
+
 			instance.enter(
 				"PrintString",
 				new TypeFunction( // this PrintString func represents a func obj, returns void, takes string as args
@@ -278,8 +278,7 @@ public class SymbolTable
 					"PrintString",
 					new TypeList(
 						TypeString.getInstance(),
-						null))
-			)
+						null)));
 		}
 		return instance;
 	}

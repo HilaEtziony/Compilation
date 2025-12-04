@@ -20,7 +20,7 @@ public class TypeClass extends Type
 	public TypeClass(TypeClass father, String name, TypeList dataMembers)
 	{
 		this.name = name;
-		this.father = father;
+		this.father = father; // may be null
 		this.dataMembers = dataMembers;
 	}
 

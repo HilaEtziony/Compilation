@@ -58,6 +58,7 @@ public class AstVarDec extends AstDec
 
 	}
 
+	// Target: Ensure no duplicate names in the current scope and that the declared type exists.
 	public Type semantMe()
 	{
 		Type t;
@@ -81,14 +82,12 @@ public class AstVarDec extends AstDec
 		// if (SymbolTable.getInstance().find(id) != null)
 		{
 			System.out.format(">> ERROR [%d:%d] variable %s already exists in scope\n",2,2,id.name);
-			// System.out.format(">> ERROR [%d:%d] variable %s already exists in scope\n",2,2,id);
 		}
 
 		/************************************************/
 		/* [3] Enter the Identifier to the Symbol Table */
 		/************************************************/
 		SymbolTable.getInstance().enter(id.name,t);
-		// SymbolTable.getInstance().enter(id,t);
 
 		/************************************************************/
 		/* [4] Return value is irrelevant for variable declarations */

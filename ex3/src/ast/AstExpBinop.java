@@ -99,14 +99,30 @@ public class AstExpBinop extends AstExp
 		// *, -, /, <, >, == are allowed in TypeInt only
 		if ((t1 == TypeInt.getInstance()) && (t2 == TypeInt.getInstance()))
 		{
-			if (op == 0 /* + */ || op == 1 /* - */ || op == 2 /* * */ || op == 3 /* / */)
+			if (op == 0 /* + */ || op == 1 /* - */ || op == 2 /* * */)
 			{
+				return TypeInt.getInstance();
+			}
+
+			if (op == 3 /* / */)
+			{
+				// Division by zero check could be added here if right is a constant expression
+				if (right.isConstant()) // TODO add isConstant() to AstExp
+				{
+					int rightValue = right.getConstantValue(); // TODO add getConstantValue() to AstExp
+					if (rightValue == 0)
+					{
+						System.out.format(">> ERROR: Division by zero\n");
+						System.exit(0);
+					}
+				}
+
 				return TypeInt.getInstance();
 			}
 
 			if (op == 4 /* < */ || op == 5 /* > */ || op == 6 /* == */)
 			{
-				return TypeInt.getInstance(); // L has 2 primitive types, but splitting for login and in case that'll change
+				return TypeInt.getInstance(); // L has 2 primitive types, but still we're splitting for login just in case that'll change
 			}
 		}
 
