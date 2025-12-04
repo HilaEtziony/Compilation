@@ -3,6 +3,11 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| var:v ASSIGN newExp:nExp SEMICOLON							{: RESULT = new AstStmtAssignNew(v,nExp); 			:}
+*/
+
 public class AstStmtAssignNew extends AstStmt
 {
 	/***************/

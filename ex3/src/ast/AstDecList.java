@@ -3,6 +3,14 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| dec:d	decList:l												{: RESULT = new AstDecList(d,l);    				:}
+	| dec:d															{: RESULT = new AstDecList(d,null); 				:}
+	| cField:c	cFieldList:l										{: RESULT = new AstDecList(c,l);    				:}
+	| cField:c														{: RESULT = new AstDecList(c,null); 				:}
+*/
+
 public class AstDecList extends AstStmt
 {
     /****************/

@@ -3,6 +3,11 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| STRING:s														{: RESULT = new AstExpString(s); 					:}
+*/
+
 public class AstExpString extends AstExp
 {
     public String string;

@@ -3,6 +3,12 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| type:t ID:i LPAREN typeIdList:l RPAREN LBRACE stmtList:s RBRACE {: RESULT = new AstDecFunc(t,i,l,s);    			:}
+	| type:t ID:i LPAREN RPAREN LBRACE stmtList:s RBRACE			{: RESULT = new AstDecFunc(t,i,null,s);    			:}
+*/
+
 public class AstDecFunc extends AstDec
 {
     public AstVarType return_type;
@@ -109,10 +115,3 @@ public class AstDecFunc extends AstDec
 		return null;		
 	}
 }
-
-/*
-accepts:
-
-RESULT = new AstDecFunc(t,i,l,s);
-RESULT = new AstDecFunc(t,i,null,s);
-*/

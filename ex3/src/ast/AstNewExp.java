@@ -3,6 +3,12 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| NEW type:t 														{: RESULT = new AstNewExp(t, null); 				:}
+	| NEW type:t LBRACK exp:e RBRACK								{: RESULT = new AstNewExp(t, e); 					:}
+*/
+
 public class AstNewExp extends AstExp
 {
     public AstVarType type;

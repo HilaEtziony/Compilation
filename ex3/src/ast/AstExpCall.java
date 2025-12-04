@@ -3,6 +3,14 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| var:v DOT ID:i LPAREN expList:l RPAREN 							{: RESULT = new AstExpCall(v,i,l);    				:}
+	| var:v DOT ID:i LPAREN RPAREN									{: RESULT = new AstExpCall(v,i,null);    			:}
+	| ID:i LPAREN expList:l RPAREN 									{: RESULT = new AstExpCall(null,i,l);    			:}
+	| ID:i LPAREN RPAREN											{: RESULT = new AstExpCall(null,i,null);    		:}
+*/
+
 public class AstExpCall extends AstExp
 {
     public AstVar var;

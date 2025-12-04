@@ -3,6 +3,12 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| exp:e COMMA expList:l											{: RESULT = new AstExpList(e,l);    				:}
+	| exp:e															{: RESULT = new AstExpList(e,null);    				:}
+*/
+
 public class AstExpList extends AstDec
 {
     public AstExp head;

@@ -3,6 +3,13 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| IF LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE
+	  ELSE LBRACE stmtList:elseBody RBRACE 							{: RESULT = new AstStmtIf(cond,body,elseBody); 		:}
+	| IF LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE 		{: RESULT = new AstStmtIf(cond,body); 				:}
+*/
+
 public class AstStmtIf extends AstStmt
 {
 	public AstExp cond;

@@ -3,6 +3,12 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| RETURN exp:e SEMICOLON										{: RESULT = new AstStmtReturn(e); 					:}
+	| RETURN SEMICOLON												{: RESULT = new AstStmtReturn(null); 				:}
+*/
+
 public class AstStmtReturn extends AstStmt
 {
 	public AstExp exp;

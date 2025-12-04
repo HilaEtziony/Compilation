@@ -3,6 +3,11 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| NIL															{: RESULT = new AstExpNIL(); 						:}
+*/
+
 public class AstExpNIL extends AstExp
 {
     public AstExpNIL()

@@ -3,6 +3,11 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| var:v															{: RESULT = new AstExpVar(v); 						:}
+*/
+
 public class AstExpVar extends AstExp
 {
 	public AstVar var;

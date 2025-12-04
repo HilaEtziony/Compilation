@@ -3,6 +3,12 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| CLASS ID:name EXTENDS ID:parentName LBRACE cFieldList:l RBRACE	{: RESULT = new AstDecClass(name,parentName,l); 	:}
+	| CLASS ID:name LBRACE cFieldList:l RBRACE						{: RESULT = new AstDecClass(name,null,l); 			:}
+*/
+
 public class AstDecClass extends AstDec
 {
     public String name;

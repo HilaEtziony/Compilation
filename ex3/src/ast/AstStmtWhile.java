@@ -3,6 +3,11 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| WHILE LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE 		{: RESULT = new AstStmtWhile(cond,body); 			:}
+*/
+
 public class AstStmtWhile extends AstStmt
 {
 	public AstExp cond;

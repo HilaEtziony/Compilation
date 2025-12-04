@@ -3,6 +3,11 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| var:v LBRACK exp:e RBRACK										{: RESULT = new AstVarSubscript(v,e);     			:}
+*/
+
 public class AstVarSubscript extends AstVar
 {
 	public AstVar var;

@@ -3,6 +3,11 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| callExp:c SEMICOLON											{: RESULT = new AstStmtCall(c); 					:}
+*/
+
 public class AstStmtCall extends AstStmt
 {
 	/***************/

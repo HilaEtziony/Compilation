@@ -3,6 +3,12 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| MINUS INT:i													{: RESULT = new AstExpInt(i, true); 				:}
+	| INT:i 														{: RESULT = new AstExpInt(i, false); 				:}
+*/
+
 public class AstExpInt extends AstExp
 {
 	public int value;

@@ -3,6 +3,12 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| type:t ID:i COMMA typeIdList:l									{: RESULT = new AstTypeIdList(t,i,l);    			:}
+	| type:t ID:i													{: RESULT = new AstTypeIdList(t,i,null);    		:}
+*/
+
 public class AstTypeIdList extends AstDec
 {
     public AstVarType head;
@@ -48,10 +54,3 @@ public class AstTypeIdList extends AstDec
 		if (tail != null) AstGraphviz.getInstance().logEdge(serialNumber, tail.serialNumber);
 	}
 }
-
-/*
-accepts:
-
-RESULT = new AstTypeIdList(t,i,l);
-RESULT = new AstTypeIdList(t,i,null);
-*/

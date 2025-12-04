@@ -3,6 +3,17 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| exp:e1 PLUS exp:e2											{: RESULT = new AstExpBinop(e1, e2, 0); 			:}
+	| exp:e1 MINUS exp:e2											{: RESULT = new AstExpBinop(e1, e2, 1); 			:}
+	| exp:e1 TIMES exp:e2											{: RESULT = new AstExpBinop(e1, e2, 2); 			:}
+	| exp:e1 DIVIDE exp:e2											{: RESULT = new AstExpBinop(e1, e2, 3); 			:}
+	| exp:e1 LT exp:e2												{: RESULT = new AstExpBinop(e1, e2, 4); 			:}
+	| exp:e1 GT exp:e2												{: RESULT = new AstExpBinop(e1, e2, 5); 			:}
+	| exp:e1 EQ exp:e2												{: RESULT = new AstExpBinop(e1, e2, 6); 			:}
+*/
+
 public class AstExpBinop extends AstExp
 {
 	int op;
@@ -114,14 +125,3 @@ public class AstExpBinop extends AstExp
 		return null;
 	}
 }
-
-/*
-USAGE:
-	| exp:e1 PLUS exp:e2											{: RESULT = new AstExpBinop(e1, e2, 0); 			:}
-	| exp:e1 MINUS exp:e2											{: RESULT = new AstExpBinop(e1, e2, 1); 			:}
-	| exp:e1 TIMES exp:e2											{: RESULT = new AstExpBinop(e1, e2, 2); 			:}
-	| exp:e1 DIVIDE exp:e2											{: RESULT = new AstExpBinop(e1, e2, 3); 			:}
-	| exp:e1 LT exp:e2												{: RESULT = new AstExpBinop(e1, e2, 4); 			:}
-	| exp:e1 GT exp:e2												{: RESULT = new AstExpBinop(e1, e2, 5); 			:}
-	| exp:e1 EQ exp:e2												{: RESULT = new AstExpBinop(e1, e2, 6); 			:}
-*/

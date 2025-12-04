@@ -3,6 +3,11 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| var:v DOT ID:fieldName										{: RESULT = new AstVarField(v,fieldName); 			:}
+*/
+
 public class AstVarField extends AstVar
 {
 	public AstVar var;

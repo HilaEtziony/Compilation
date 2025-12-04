@@ -3,6 +3,12 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| stmt:s	stmtList:l												{: RESULT = new AstStmtList(s,l);    				:}
+	| stmt:s														{: RESULT = new AstStmtList(s,null); 				:}
+*/
+
 public class AstStmtList extends AstNode
 {
 	/****************/

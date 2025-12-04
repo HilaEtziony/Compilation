@@ -3,6 +3,13 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| type:t ID:i ASSIGN exp:e SEMICOLON 								{: RESULT = new AstVarDec(t,new AstVarSimple(i),e); 	:}
+	| type:t ID:i SEMICOLON											{: RESULT = new AstVarDec(t,new AstVarSimple(i),null); 	:}
+	| type:t ID:i ASSIGN newExp:nE SEMICOLON						{: RESULT = new AstVarDec(t,new AstVarSimple(i),nE); 	:}
+*/
+
 // TODO rename to AstDecVar, consistency with class's origin
 public class AstVarDec extends AstDec
 {

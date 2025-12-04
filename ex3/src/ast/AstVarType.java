@@ -3,6 +3,14 @@ package ast;
 import types.*;
 import symboltable.*;
 
+/*
+USAGE:
+	| TYPE_INT          												{: RESULT = new AstVarType("int"); 					:}
+	| TYPE_STRING     												{: RESULT = new AstVarType("string"); 				:}
+	| TYPE_VOID       												{: RESULT = new AstVarType("void"); 				:}
+	| ID:name         												{: RESULT = new AstVarType(name); 					:}
+*/
+
 public class AstVarType extends AstDec
 {
     public String type;
