@@ -148,7 +148,7 @@ dec 		::=		varDec:vDec          											{: RESULT = vDec; 									:}
     				;
 
 type 		::=		TYPE_INT          												{: RESULT = new AstVarType("int"); 					:} // TODO Yamit: make sure "AstVarType" is the proper type
-					| TYPE_STRING     												{: RESULT = new AstVarType("string"); 				:}
+					| TYPE_STRING     												{: RESULT = new AstVarType("string"); 				:} // Note that in skeleton, there is no "type" - these are all strings (IDs)
     				| TYPE_VOID       												{: RESULT = new AstVarType("void"); 				:}
     				| ID:name         												{: RESULT = new AstVarType(name); 					:} // TODO Yamit: make sure this is the proper type. ID is a str - will that work?
     				;

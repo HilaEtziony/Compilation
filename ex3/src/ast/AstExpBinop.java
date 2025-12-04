@@ -44,7 +44,11 @@ public class AstExpBinop extends AstExp
 		/*********************************/
 		if (op == 0) {sop = "+";}
 		if (op == 1) {sop = "-";}
-		if (op == 3) {sop = "=";}
+		if (op == 3) {sop = "*";}
+		if (op == 4) {sop = "/";}
+		if (op == 4) {sop = "<";}
+		if (op == 5) {sop = ">";}
+		if (op == 6) {sop = "==";}
 
 		/**********************************/
 		/* AST NODE TYPE = AST BINOP EXP */
@@ -76,15 +80,48 @@ public class AstExpBinop extends AstExp
 	{
 		Type t1 = null;
 		Type t2 = null;
-		
+
 		if (left  != null) t1 = left.semantMe();
 		if (right != null) t2 = right.semantMe();
-		
+
+		// + is allowed in TypeInt, TypeString
+		// *, -, /, <, >, == are allowed in TypeInt only
 		if ((t1 == TypeInt.getInstance()) && (t2 == TypeInt.getInstance()))
 		{
-			return TypeInt.getInstance();
+			if (op == 0 /* + */ || op == 1 /* - */ || op == 2 /* * */ || op == 3 /* / */)
+			{
+				return TypeInt.getInstance();
+			}
+
+			if (op == 4 /* < */ || op == 5 /* > */ || op == 6 /* == */)
+			{
+				return TypeInt.getInstance(); // L has 2 primitive types, but splitting for login and in case that'll change
+			}
 		}
+
+		if (t1 == TypeString.getInstance() && t2 == TypeString.getInstance())
+		{
+			if (op == 0 /* + */){
+				return TypeString.getInstance();
+			}
+
+			if (op == 4 /* < */ || op == 5 /* > */ || op == 6 /* == */){
+				return TypeInt.getInstance();
+			}
+		}
+
 		System.exit(0);
 		return null;
 	}
 }
+
+/*
+USAGE:
+	| exp:e1 PLUS exp:e2											{: RESULT = new AstExpBinop(e1, e2, 0); 			:}
+	| exp:e1 MINUS exp:e2											{: RESULT = new AstExpBinop(e1, e2, 1); 			:}
+	| exp:e1 TIMES exp:e2											{: RESULT = new AstExpBinop(e1, e2, 2); 			:}
+	| exp:e1 DIVIDE exp:e2											{: RESULT = new AstExpBinop(e1, e2, 3); 			:}
+	| exp:e1 LT exp:e2												{: RESULT = new AstExpBinop(e1, e2, 4); 			:}
+	| exp:e1 GT exp:e2												{: RESULT = new AstExpBinop(e1, e2, 5); 			:}
+	| exp:e1 EQ exp:e2												{: RESULT = new AstExpBinop(e1, e2, 6); 			:}
+*/

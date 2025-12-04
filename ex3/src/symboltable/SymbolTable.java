@@ -236,8 +236,8 @@ public class SymbolTable
 	protected SymbolTable() {}
 
 	/******************************/
-	/* GET SINGLETON INSTANCE ... */
-	/******************************/
+	/* GET SINGLETON INSTANCE ... */ // -> only 1 instance of symbol table is created
+	/******************************/ // whenever we want to modify it, we call SymbolTable.getInstance().XXX
 	public static SymbolTable getInstance()
 	{
 		if (instance == null)
@@ -257,18 +257,29 @@ public class SymbolTable
 			/* [2] How should we handle void ??? */
 			/*************************************/
 
+			// TODO
+
 			/***************************************/
-			/* [3] Enter library function PrintInt */
+			/* [3] Enter library functions */
 			/***************************************/
 			instance.enter(
 				"PrintInt",
-				new TypeFunction(
+				new TypeFunction( // this PrintInt func represents a func obj, returns void, takes int as args
 					TypeVoid.getInstance(),
 					"PrintInt",
 					new TypeList(
 						TypeInt.getInstance(),
 						null)));
 			
+			instance.enter(
+				"PrintString",
+				new TypeFunction( // this PrintString func represents a func obj, returns void, takes string as args
+					TypeVoid.getInstance(),
+					"PrintString",
+					new TypeList(
+						TypeString.getInstance(),
+						null))
+			)
 		}
 		return instance;
 	}

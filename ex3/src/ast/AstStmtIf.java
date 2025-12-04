@@ -59,7 +59,7 @@ public class AstStmtIf extends AstStmt
 		/****************************/
 		/* [0] Semant the Condition */
 		/****************************/
-		if (cond.semantMe() != TypeInt.getInstance())
+		if (cond.semantMe() != TypeInt.getInstance()) // cond should be considered an int
 		{
 			System.out.format(">> ERROR [%d:%d] condition inside IF is not integral\n",2,2);
 		}
@@ -79,9 +79,27 @@ public class AstStmtIf extends AstStmt
 		/*****************/
 		SymbolTable.getInstance().endScope();
 
+		if (elseBody != null)
+		{
+			/*************************/
+			/* [1] Begin Else Scope */
+			/*************************/
+			SymbolTable.getInstance().beginScope();
+
+			/***************************/
+			/* [2] Semant Data Members */
+			/***************************/
+			elseBody.semantMe();
+
+			/*****************/
+			/* [3] End Scope */
+			/*****************/
+			SymbolTable.getInstance().endScope();
+		}
+
 		/***************************************************/
 		/* [4] Return value is irrelevant for if statement */
 		/**************************************************/
-		return null;		
-	}	
+		return null;
+	}
 }
