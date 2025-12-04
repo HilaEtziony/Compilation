@@ -64,4 +64,14 @@ public class AstExpInt extends AstExp
 	{
 		return TypeInt.getInstance();
 	}
+
+	public boolean isConstant()
+	{
+		return true;
+	}
+
+	public int getConstantValue()
+	{
+		return this.value;
+	}
 }

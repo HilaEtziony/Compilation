@@ -1,11 +1,5 @@
-/***********/
-/* PACKAGE */
-/***********/
 package symboltable;
 
-/*******************/
-/* PROJECT IMPORTS */
-/*******************/
 import types.*;
 
 /**********************/
@@ -13,19 +7,8 @@ import types.*;
 /**********************/
 public class SymbolTableEntry
 {
-	/*********/
-	/* index */
-	/*********/
 	int index;
-	
-	/********/
-	/* name */
-	/********/
 	public String name;
-
-	/******************/
-	/* TYPE value ... */
-	/******************/
 	public Type type;
 
 	/*********************************************/
@@ -57,4 +40,5 @@ public class SymbolTableEntry
 		this.prevtop = prevtop;
 		this.prevtopIndex = prevtopIndex;
 	}
+
 }

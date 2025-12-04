@@ -7,13 +7,15 @@ public abstract class AstExp extends AstNode
 {
     public boolean isConstant()
     {
-        // Default implementation, TODO should be overridden in subclasses representing constant expressions
+        // Default implementation. Id overridden in subclasses representing constant expressions (AstExpInt)
+        // Perhaps will need to override in AstExpBinop, AstExpString in the future
         return false;
     }
 
     public int getConstantValue()
     {
-        // Default implementation, TODO should be overridden in subclasses representing constant expressions
+        // Default implementation. Is overridden in subclasses representing constant expressions (AstExpInt)
+        // Perhaps will need to override in AstExpBinop, AstExpString in the future
         System.out.format(">> ERROR: getConstantValue() called on non-constant expression\n");
 		System.exit(0);
         return 0;

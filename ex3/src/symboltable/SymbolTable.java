@@ -1,21 +1,9 @@
-/***********/
-/* PACKAGE */
-/***********/
 package symboltable;
 
-/*******************/
-/* GENERAL IMPORTS */
-/*******************/
 import java.io.PrintWriter;
 
-/*******************/
-/* PROJECT IMPORTS */
-/*******************/
 import types.*;
 
-/****************/
-/* SYMBOL TABLE */
-/****************/
 public class SymbolTable
 {
 	private int hashArraySize = 13;
@@ -280,6 +268,34 @@ public class SymbolTable
 						TypeString.getInstance(),
 						null)));
 		}
+
 		return instance;
+	}
+
+	public boolean isInFunction(){
+		SymbolTable temp = this;
+		while (temp.top != null){
+			if (temp.top.type instanceof TypeFunction){
+				return true;
+			}
+
+			temp.top = temp.top.prevtop;
+		}
+
+		return false;
+	}
+
+	public Type getCurrentFunctionReturnType() {
+		SymbolTable temp = this;
+		while (temp.top != null){
+			if (temp.top.type instanceof TypeFunction){
+				TypeFunction funcType = (TypeFunction) temp.top.type;
+				return funcType.returnType;
+			}
+
+			temp.top = temp.top.prevtop;
+		}
+
+		return TypeVoid.getInstance();
 	}
 }

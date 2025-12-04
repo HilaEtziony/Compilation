@@ -107,9 +107,9 @@ public class AstExpBinop extends AstExp
 			if (op == 3 /* / */)
 			{
 				// Division by zero check could be added here if right is a constant expression
-				if (right.isConstant()) // TODO add isConstant() to AstExp
+				if (right.isConstant())
 				{
-					int rightValue = right.getConstantValue(); // TODO add getConstantValue() to AstExp
+					int rightValue = right.getConstantValue();
 					if (rightValue == 0)
 					{
 						System.out.format(">> ERROR: Division by zero\n");
