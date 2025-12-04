@@ -1,0 +1,9 @@
+ex*/Makefile
+ex*/bin/
+ex*/output/
+ex*/SEMANT
+ex*/src/Lexer.java
+ex*/src/Parser.java
+ex*/src/TokenNames.java
+TAU Exercise *
+CMakeLists.txt
