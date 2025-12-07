@@ -56,7 +56,20 @@ public class AstVarSimple extends AstVar
 
 	public Type semantMe()
 	{
-		// TODO
-		return null;
+		/******************************/
+		/* [1] Try finding var in ST */
+		/******************************/
+		Type t = SymbolTable.getInstance().find(name);
+
+		if (t == null)
+		{
+			System.out.format(">> ERROR [%d:%d] variable %s does not exist\n",2,2,name);
+			System.exit(0);
+		}
+
+		/**********************************************************/
+		/* [2] return type of variable, since simple var has type */
+		/**********************************************************/
+		return t;
 	}
 }

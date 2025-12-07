@@ -67,7 +67,53 @@ public class AstVarSubscript extends AstVar
 
 	public Type semantMe()
 	{
-		// TODO
-		return null;
+		/**********************************/
+		/* [1] Evaluate var type (v)      */
+		/**********************************/
+		Type varType = var.semantMe();
+
+		if (varType == null || !varType.isArray())
+		{
+			System.out.format(">> ERROR [%d:%d] variable is not an array type\n",2,2);
+			System.exit(0);
+		}
+
+		/**********************************/
+		/* [2] Evaluate index expression  */
+		/**********************************/
+		Type subType = subscript.semantMe();
+
+		if (subType != TypeInt.getInstance())
+		{
+			System.out.format(">> ERROR [%d:%d] array index must be int\n",2,2);
+			System.exit(0);
+		}
+
+		/************************************************************/
+		/* [3] constant index check (if literal) must be >= 0       */
+		/************************************************************/
+		if (subscript instanceof AstExpInt && ((AstExpInt)subscript).isConstant())
+		{
+			int val = ((AstExpInt)subscript).value;
+			if (val < 0)
+			{
+				System.out.format(">> ERROR [%d:%d] array index must be >= 0\n",2,2);
+				System.exit(0);
+			}
+		}
+
+		/************************************************************/
+		/* [4] Return element type of array (explicit check)       */
+		/************************************************************/
+		TypeArray arrayType = (TypeArray) varType; 
+		Type elementType = arrayType.type_of_array;
+
+		if (elementType == null)
+		{
+			System.out.format(">> ERROR [%d:%d] internal error: array %s has no element type\n",2,2,varType.name);
+			System.exit(0);
+		}
+
+		return elementType;
 	}
 }

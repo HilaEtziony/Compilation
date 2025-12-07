@@ -53,8 +53,52 @@ public class AstNewExp extends AstExp
 
 	public Type semantMe()
 	{
-		// TODO
-		return null;
+		/****************************/
+		/* [1] Check If Type exists */
+		/****************************/
+		Type t = SymbolTable.getInstance().find(type.type);
+		if (t == null)
+		{
+			System.out.format(">> ERROR [%d:%d] non existing type %s\n",2,2,type.type);
+			System.exit(0);
+		}
+
+		/********************************************/
+		/* [2] Require array type for new T[e]      */
+		/********************************************/
+		if (!t.isArray())
+		{
+			System.out.format(">> ERROR [%d:%d] new can only be used on array types (%s is not array)\n",2,2,type.type);
+			System.exit(0);
+		}
+
+		/******************************/
+		/* [3] Check exp type is int  */
+		/******************************/
+		Type sizeType = exp.semantMe();
+		if (sizeType != TypeInt.getInstance())
+		{
+			System.out.format(">> ERROR [%d:%d] array size must be int\n",2,2);
+			System.exit(0);
+		}
+
+		/************************************************************/
+		/* [4] If size is a constant int literal → must be > 0      */
+		/************************************************************/
+		if (exp instanceof AstExpInt && ((AstExpInt)exp).isConstant())
+		{
+			int val = ((AstExpInt)exp).value;
+			if (val <= 0)
+			{
+				System.out.format(">> ERROR [%d:%d] array size must be > 0\n",2,2);
+				System.exit(0);
+			}
+		}
+
+		/*********************************************/
+		/* [5] Return type = array of that base type */
+		/*********************************************/
+		return t; // which is already an array type
 	}
 }
 
