@@ -2,6 +2,7 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import semanticError.SemanticErrorException;
 
 /*
 USAGE:
@@ -13,11 +14,10 @@ public class AstDecArray extends AstDec
     public String identifier;
     public AstVarType type;
 
-    public AstDecArray(String identifier, AstVarType type)
+    public AstDecArray(String identifier, AstVarType type, int lineNumber)
     {
-        // TODO get line num
         serialNumber = AstNodeSerialNumber.getFresh();
-        
+        this.lineNumber = lineNumber;
         this.identifier = identifier;
         this.type = type;
     }
@@ -57,11 +57,11 @@ public class AstDecArray extends AstDec
 		/****************************/
 		/* [1] Check If Type exists */
 		/****************************/
-		t = SymbolTable.getInstance().find(type.type); // type.type הוא ה-ID של טיפוס הבסיס
+		t = SymbolTable.getInstance().find(type.type); 
 		if (t == null)
 		{
-			System.out.format(">> ERROR [%d:%d] non existing type %s\n",2,2,type.type);
-			System.exit(0);
+			System.out.format(">> ERROR: type %s does not exist\n",type.type);
+			throw new Error("ERROR("+ this.lineNumber +")");
 		}
 
 		/****************************/
@@ -69,8 +69,8 @@ public class AstDecArray extends AstDec
 		/****************************/
 		if (t == TypeVoid.getInstance())
 		{
-			System.out.format(">> ERROR [%d:%d] cannot define array over void\n",2,2);
-			System.exit(0);
+			System.out.format(">> ERROR: cannot define array over void\n");
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
 		/**************************************/
@@ -78,8 +78,8 @@ public class AstDecArray extends AstDec
 		/**************************************/
 		if (SymbolTable.getInstance().find(identifier) != null)
 		{
-			System.out.format(">> ERROR [%d:%d] array %s already exists in scope\n",2,2,identifier);
-			System.exit(0);
+			System.out.format(">> ERROR: array %s already exists in scope\n",identifier);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
 		/************************************************/

@@ -2,12 +2,14 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import semanticError.SemanticErrorException;
 
 public class AstExpNIL extends AstExp
 {
-    public AstExpNIL()
+    public AstExpNIL(int lineNumber)
     {
         serialNumber = AstNodeSerialNumber.getFresh();
+        this.lineNumber = lineNumber;
     }
 
     public void printMe()
@@ -16,9 +18,8 @@ public class AstExpNIL extends AstExp
         AstGraphviz.getInstance().logNode(serialNumber, "NIL");
     }
 
-    public Type semantMe()
+    public Type semantMe() 
     {
-        // TODO
-        return null;
+        return TypeNil.getInstance();
     }
 }

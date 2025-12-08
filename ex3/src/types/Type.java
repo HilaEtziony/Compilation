@@ -7,23 +7,26 @@ public abstract class Type
 	/******************************/
 	public String name;
 
-	/*************/
-	/* isClass() */
-	/*************/
+	/***************/
+    /* Default implementations */
+    /***************/
+    public boolean isFunction() { return false; }
+    public TypeList getParamTypes() { return null; }
+    public Type getReturnType() { return null; }
 	public boolean isClass(){ return false;}
-
-	/*************/
-	/* isArray() */
-	/*************/
 	public boolean isArray(){ return false;}
+	public boolean isNil() { return false; }
 
+	/***************/
+    /* isCompatible(Type other) */
+    /***************/
 	public boolean isCompatible(Type other)
 	{
 		if (this == other) return true;
 
 		// T2 is nil and T1 is a Class/Array
-		if (other.name.equals("nil") && (this.isClass() || this.isArray())) return true;
-		if (this.name.equals("nil") && (other.isClass() || other.isArray())) return true;
+		if (other.isNil() && (this.isClass() || this.isArray())) return true;
+		if (this.isNil() && (other.isClass() || other.isArray())) return true;
 
 		// T2 is a subclass of T1 (Inheritance check). TypeClass has field 'father'
 		if (this.isClass() && other.isClass()) // if other is instance of this
@@ -50,6 +53,14 @@ public abstract class Type
 			}
 		}
 
+		// Arrays: only compatible if element types are exactly the same
+		if (this.isArray() && other.isArray()) {
+			TypeArray thisArr = (TypeArray)this;
+			TypeArray otherArr = (TypeArray)other;
+			if (thisArr.type_of_array == otherArr.type_of_array) {
+				return true;
+			}
+		}
 
 		return false;
 	}

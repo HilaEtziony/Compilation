@@ -2,6 +2,7 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import semanticError.SemanticErrorException;
 
 /*
 USAGE:
@@ -23,7 +24,7 @@ public class AstExpBinop extends AstExp
 	/******************/
 	/* CONSTRUCTOR(S) */
 	/******************/
-	public AstExpBinop(AstExp left, AstExp right, int op)
+	public AstExpBinop(AstExp left, AstExp right, int op, int lineNumber)
 	{
 		/******************************/
 		/* SET A UNIQUE SERIAL NUMBER */
@@ -38,6 +39,7 @@ public class AstExpBinop extends AstExp
 		/*******************************/
 		/* COPY INPUT DATA MEMBERS ... */
 		/*******************************/
+		this.lineNumber = lineNumber;
 		this.left = left;
 		this.right = right;
 		this.op = op;
@@ -113,7 +115,7 @@ public class AstExpBinop extends AstExp
 					if (rightValue == 0)
 					{
 						System.out.format(">> ERROR: Division by zero\n");
-						System.exit(0);
+						throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 					}
 				}
 
@@ -137,7 +139,6 @@ public class AstExpBinop extends AstExp
 			}
 		}
 
-		System.exit(0);
-		return null;
+		throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 	}
 }

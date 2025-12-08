@@ -2,6 +2,7 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import semanticError.SemanticErrorException;
 
 /*
 USAGE:
@@ -17,11 +18,10 @@ public class AstExpCall extends AstExp
     public String id;
     public AstExpList expList;
 
-    public AstExpCall(AstVar var, String id, AstExpList expList)
+    public AstExpCall(AstVar var, String id, AstExpList expList, int lineNumber)
     {
-        // TODO get line num
         serialNumber = AstNodeSerialNumber.getFresh();
-
+		this.lineNumber = lineNumber;
         this.var = var;
         this.id = id;
         this.expList = expList;
@@ -57,8 +57,67 @@ public class AstExpCall extends AstExp
 
 	public Type semantMe()
 	{
-		// TODO
-		return null;
+		/**************************************/
+		/* [1] Find function in symbol table  */
+		/**************************************/
+		Type funcType;
+		if (var != null) {
+			// Method call on object
+			Type varType = var.semantMe();
+			if (!varType.isClass()) {
+				System.out.format(">> ERROR: variable is not a class for method call %s\n", id);
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+			}
+			funcType = ((TypeClass)varType).getMethod(id);
+			if (funcType == null) {
+				System.out.format(">> ERROR: method %s does not exist in class %s\n", id, varType.name);
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+			}
+		} else {
+			// Global function call
+			funcType = SymbolTable.getInstance().find(id);
+			if (funcType == null || !funcType.isFunction()) {
+				System.out.format(">> ERROR: function %s does not exist\n", id);
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+			}
+		}
+
+		/***********************************************/
+		/* [2] Check number of arguments if expList    */
+		/***********************************************/
+		TypeList paramTypes = funcType.getParamTypes(); 
+		int nParams = paramTypes.length();
+		int nArgs = (expList != null) ? expList.size() : 0;
+
+		if (nArgs != nParams) {
+			System.out.format(">> ERROR: function %s expects %d arguments, got %d\n", id, nParams, nArgs);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+		}
+
+		/***********************************************/
+		/* [3] Check each argument type               */
+		/***********************************************/
+		for (int i = 0; i < nParams; i++) {
+			Type tArg = expList.get(i).semantMe();
+			Type tParam = paramTypes.get(i);
+
+			// nil can be assigned only to class or array
+			if (tArg.isNil() && !(tParam.isClass() || tParam.isArray())) {
+				System.out.format(">> ERROR: cannot assign nil to parameter %d of type %s in function %s\n", i+1, tParam.name, id);
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+			}
+
+			// check compatibility
+			if (!tParam.isCompatible(tArg)) {
+				System.out.format(">> ERROR: argument %d type %s does not match parameter type %s in function %s\n", i+1, tArg.name, tParam.name, id);
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+			}
+		}
+
+		/***********************************************/
+		/* [4] Return function return type            */
+		/***********************************************/
+		return funcType.getReturnType(); 
 	}
 }
 

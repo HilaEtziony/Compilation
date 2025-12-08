@@ -2,6 +2,7 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import semanticError.SemanticErrorException;
 
 /*
 USAGE:
@@ -15,10 +16,9 @@ public class AstTypeIdList extends AstDec
     public String identifier;
     public AstTypeIdList tail;
 
-    public AstTypeIdList(AstVarType type, String identifier, AstTypeIdList rest_of_list){
-        // TODO get line num
+    public AstTypeIdList(AstVarType type, String identifier, AstTypeIdList rest_of_list, int lineNumber){
         serialNumber = AstNodeSerialNumber.getFresh();
-
+		this.lineNumber = lineNumber;
         this.head = type;
         this.identifier = identifier;
         this.tail = rest_of_list;

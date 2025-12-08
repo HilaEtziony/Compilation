@@ -2,6 +2,7 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import semanticError.SemanticErrorException;
 
 /*
 USAGE:
@@ -16,7 +17,7 @@ public class AstVarSubscript extends AstVar
 	/******************/
 	/* CONSTRUCTOR(S) */
 	/******************/
-	public AstVarSubscript(AstVar var, AstExp subscript)
+	public AstVarSubscript(AstVar var, AstExp subscript, int lineNumber)
 	{
 		/******************************/
 		/* SET A UNIQUE SERIAL NUMBER */
@@ -31,6 +32,7 @@ public class AstVarSubscript extends AstVar
 		/*******************************/
 		/* COPY INPUT DATA MEMBERS ... */
 		/*******************************/
+		this.lineNumber = lineNumber;
 		this.var = var;
 		this.subscript = subscript;
 	}
@@ -74,8 +76,8 @@ public class AstVarSubscript extends AstVar
 
 		if (varType == null || !varType.isArray())
 		{
-			System.out.format(">> ERROR [%d:%d] variable is not an array type\n",2,2);
-			System.exit(0);
+			System.out.format(">> ERROR: variable is not an array type\n");
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
 		/**********************************/
@@ -85,20 +87,20 @@ public class AstVarSubscript extends AstVar
 
 		if (subType != TypeInt.getInstance())
 		{
-			System.out.format(">> ERROR [%d:%d] array index must be int\n",2,2);
-			System.exit(0);
+			System.out.format(">> ERROR: array index must be int\n");
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
 		/************************************************************/
 		/* [3] constant index check (if literal) must be >= 0       */
 		/************************************************************/
-		if (subscript instanceof AstExpInt && ((AstExpInt)subscript).isConstant())
+		if (subscript.isConstant())
 		{
 			int val = ((AstExpInt)subscript).value;
 			if (val < 0)
 			{
-				System.out.format(">> ERROR [%d:%d] array index must be >= 0\n",2,2);
-				System.exit(0);
+				System.out.format(">> ERROR: array index must be >= 0\n");
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 			}
 		}
 
@@ -110,8 +112,8 @@ public class AstVarSubscript extends AstVar
 
 		if (elementType == null)
 		{
-			System.out.format(">> ERROR [%d:%d] internal error: array %s has no element type\n",2,2,varType.name);
-			System.exit(0);
+			System.out.format(">> ERROR: internal error: array %s has no element type\n",varType.name);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
 		return elementType;

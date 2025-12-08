@@ -30,4 +30,31 @@ public class TypeClass extends Type
 
 	@Override
 	public boolean isClass(){ return true;}
+
+	/**********************************************/
+    /* Get a method by name, searching recursively */
+    /**********************************************/
+    public Type getMethod(String id)
+    {
+        // Check current class members
+        TypeList current = dataMembers;
+        while (current != null)
+        {
+            Type t = current.head;
+            if (t.isFunction() && t.name.equals(id))
+            {
+                return t;
+            }
+            current = current.tail;
+        }
+
+        // Check in father class recursively
+        if (father != null)
+        {
+            return father.getMethod(id);
+        }
+
+        // Not found
+        return null;
+    }
 }

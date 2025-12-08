@@ -2,6 +2,7 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import semanticError.SemanticErrorException;
 
 /*
 USAGE:
@@ -17,11 +18,10 @@ public class AstVarDec extends AstDec
     public AstVarSimple id;
     public AstExp expr;
 
-    public AstVarDec(AstVarType type, AstVarSimple id, AstExp expr)
+    public AstVarDec(AstVarType type, AstVarSimple id, AstExp expr, int lineNumber)
     {
-        // TODO get line num
         serialNumber = AstNodeSerialNumber.getFresh();
-
+		this.lineNumber = lineNumber;
         this.type = type;
         this.id = id;
         this.expr = expr;
@@ -70,27 +70,36 @@ public class AstVarDec extends AstDec
 		// t = SymbolTable.getInstance().find(type); // TODO change AstVarType
 		if (t == null)
 		{
-			System.out.format(">> ERROR [%d:%d] non existing type %s\n",2,2,type.type);
+			System.out.format(">> ERROR: non existing type %s\n",type.type);
 			// System.out.format(">> ERROR [%d:%d] non existing type %s\n",2,2,type);
-			System.exit(0);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+		}
+
+		/****************************/
+		/* [2] Check t is void */
+		/****************************/
+		if (t == TypeVoid.getInstance()) {
+			System.out.format(">> ERROR: variable %s cannot be of type void\n", id.name);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
 		/**************************************/
-		/* [2] Check That Name does NOT exist */
+		/* [3] Check That Name does NOT exist */
 		/**************************************/
 		if (SymbolTable.getInstance().find(id.name) != null)
 		// if (SymbolTable.getInstance().find(id) != null)
 		{
-			System.out.format(">> ERROR [%d:%d] variable %s already exists in scope\n",2,2,id.name);
+			System.out.format(">> ERROR: variable %s already exists in scope\n",id.name);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
 		/************************************************/
-		/* [3] Enter the Identifier to the Symbol Table */
+		/* [4] Enter the Identifier to the Symbol Table */
 		/************************************************/
 		SymbolTable.getInstance().enter(id.name,t);
 
 		/************************************************************/
-		/* [4] Return value is irrelevant for variable declarations */
+		/* [5] Return value is irrelevant for variable declarations */
 		/************************************************************/
 		return null;
 	}

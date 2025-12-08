@@ -2,6 +2,7 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import semanticError.SemanticErrorException;
 
 /*
 USAGE:
@@ -12,11 +13,10 @@ public class AstExpString extends AstExp
 {
     public String string;
 
-    public AstExpString(String string)
+    public AstExpString(String string, int lineNumber)
     {
-        // TODO get line num
         serialNumber = AstNodeSerialNumber.getFresh();
-        
+        this.lineNumber = lineNumber;
         this.string = string;
     }
 

@@ -2,6 +2,7 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import semanticError.SemanticErrorException;
 
 /*
 USAGE:
@@ -22,11 +23,10 @@ public class AstDecList extends AstStmt
     /******************/
     /* CONSTRUCTOR(S) */
     /******************/
-    public AstDecList(AstDec head, AstDecList tail)
+    public AstDecList(AstDec head, AstDecList tail, int lineNumber)
     {
-        // TODO get line num
         serialNumber = AstNodeSerialNumber.getFresh();
-
+		this.lineNumber = lineNumber;
         if (tail != null) System.out.print("====================== decList -> dec decList\n");
         if (tail == null) System.out.print("====================== decList -> dec         \n");
 

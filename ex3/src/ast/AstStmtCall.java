@@ -2,6 +2,7 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import semanticError.SemanticErrorException;
 
 /*
 USAGE:
@@ -18,7 +19,7 @@ public class AstStmtCall extends AstStmt
 	/*******************/
 	/*  CONSTRUCTOR(S) */
 	/*******************/
-	public AstStmtCall(AstExpCall expCall)
+	public AstStmtCall(AstExpCall expCall, int lineNumber)
 	{
 		/******************************/
 		/* SET A UNIQUE SERIAL NUMBER */
@@ -34,6 +35,7 @@ public class AstStmtCall extends AstStmt
 		/* COPY INPUT DATA MEMBERS ... */
 		/*******************************/
 		// this.var = var;
+		this.lineNumber = lineNumber;
 		this.expCall = expCall;
 	}
 

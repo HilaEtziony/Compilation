@@ -2,6 +2,7 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import semanticError.SemanticErrorException;
 
 /*
 USAGE:
@@ -16,7 +17,7 @@ public class AstExpInt extends AstExp
 	/******************/
 	/* CONSTRUCTOR(S) */
 	/******************/
-	public AstExpInt(int value, boolean isNegative)
+	public AstExpInt(int value, boolean isNegative, int lineNumber)
 	{
 		/******************************/
 		/* SET A UNIQUE SERIAL NUMBER */
@@ -31,6 +32,7 @@ public class AstExpInt extends AstExp
 		/*******************************/
 		/* COPY INPUT DATA MEMBERS ... */
 		/*******************************/
+		this.lineNumber = lineNumber;
 		if (isNegative) 
 		{
 			this.value = -1 * value;

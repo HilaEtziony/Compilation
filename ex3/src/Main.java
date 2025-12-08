@@ -1,6 +1,8 @@
 import java.io.*;
 
 import java_cup.runtime.Symbol;
+
+import semanticError.SemanticErrorException;
 import ast.*;
 
 public class Main
@@ -73,7 +75,22 @@ public class Main
 			fileWriter.close();
 			
     	}
-			     
+			    
+		catch (SemanticErrorException e) 
+		{
+			try
+			{
+				fileWriter = new PrintWriter(outputFileName);
+				String message = e.getMessage();
+				fileWriter.print(message);
+			}
+			catch (FileNotFoundException ex)
+			{
+				// TODO
+			}
+
+		}
+
 		catch (Exception e)
 		{
 			e.printStackTrace();

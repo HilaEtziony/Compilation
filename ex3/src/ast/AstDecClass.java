@@ -2,6 +2,7 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import semanticError.SemanticErrorException;
 
 /*
 USAGE:
@@ -15,11 +16,10 @@ public class AstDecClass extends AstDec
     public String parentName;
     public AstDecList cFieldList;
 
-    public AstDecClass(String name, String parentName, AstDecList cFieldList)
+    public AstDecClass(String name, String parentName, AstDecList cFieldList, int lineNumber)
     {
-        // TODO get line num
         serialNumber = AstNodeSerialNumber.getFresh();
-
+		this.lineNumber = lineNumber;
         this.name = name;
         this.parentName = parentName;
         this.cFieldList = cFieldList;
@@ -54,7 +54,7 @@ public class AstDecClass extends AstDec
 		/* [0a] Make sure class doesn't already exist */
 		if (SymbolTable.getInstance().find(name) != null) {
 			System.out.format("ERROR: class %s already exists in symbol table\n",name);
-			System.exit(0);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
 		Type parentType = SymbolTable.getInstance().find(parentName);
@@ -62,7 +62,7 @@ public class AstDecClass extends AstDec
 		if (parentName != null) {
 			if (parentType == null || !(parentType instanceof TypeClass)) {
 				System.out.format("ERROR: parent class %s of class %s doesn't exist\n",parentName,name);
-				System.exit(0);
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 			}
 		}
 
@@ -75,7 +75,7 @@ public class AstDecClass extends AstDec
 				if (curr.name.equals(this.name))
 				{
 					System.out.format("ERROR: class %s cannot extend itself, directly nor indirectly\n",name);
-					System.exit(0);
+					throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 				}
 
 				curr = curr.father;

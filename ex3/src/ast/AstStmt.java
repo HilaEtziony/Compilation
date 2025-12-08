@@ -3,7 +3,7 @@ package ast;
 import types.*;
 import symboltable.*;
 
-public class AstStmt extends AstNode
+public abstract class AstStmt extends AstNode
 {
 	/****************************************************/
 	/* The printing message for a stmt AST node */
@@ -25,7 +25,6 @@ public class AstStmt extends AstNode
 
 	public Type semantMe()
 	{
-		// TODO
 		return null;
 	}
 }

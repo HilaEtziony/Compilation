@@ -2,6 +2,7 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import semanticError.SemanticErrorException;
 
 /*
 USAGE:
@@ -18,7 +19,7 @@ public class AstVarSimple extends AstVar
 	/******************/
 	/* CONSTRUCTOR(S) */
 	/******************/
-	public AstVarSimple(String name)
+	public AstVarSimple(String name, int lineNumber)
 	{
 		/******************************/
 		/* SET A UNIQUE SERIAL NUMBER */
@@ -33,6 +34,7 @@ public class AstVarSimple extends AstVar
 		/*******************************/
 		/* COPY INPUT DATA MEMBERS ... */
 		/*******************************/
+		this.lineNumber = lineNumber;
 		this.name = name;
 	}
 
@@ -63,8 +65,8 @@ public class AstVarSimple extends AstVar
 
 		if (t == null)
 		{
-			System.out.format(">> ERROR [%d:%d] variable %s does not exist\n",2,2,name);
-			System.exit(0);
+			System.out.format(">> ERROR: variable %s does not exist\n",name);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
 		/**********************************************************/

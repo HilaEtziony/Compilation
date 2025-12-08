@@ -2,6 +2,7 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import semanticError.SemanticErrorException;
 
 /*
 USAGE:
@@ -19,13 +20,15 @@ public class AstStmtIf extends AstStmt
 	/*******************/
 	/*  CONSTRUCTOR(S) */
 	/*******************/
-	public AstStmtIf(AstExp cond, AstStmtList body)
+	public AstStmtIf(AstExp cond, AstStmtList body, int lineNumber)
 	{
-		this(cond, body, null);
+		this(cond, body, null, lineNumber);
 	}
 
-	public AstStmtIf(AstExp cond, AstStmtList body, AstStmtList elseBody)
+	public AstStmtIf(AstExp cond, AstStmtList body, AstStmtList elseBody, int lineNumber)
 	{
+		serialNumber = AstNodeSerialNumber.getFresh();
+		this.lineNumber = lineNumber;
 		this.cond = cond;
 		this.body = body;
 		this.elseBody = elseBody;
@@ -68,7 +71,8 @@ public class AstStmtIf extends AstStmt
 		/****************************/
 		if (cond.semantMe() != TypeInt.getInstance()) // cond should be considered an int
 		{
-			System.out.format(">> ERROR [%d:%d] condition inside IF is not integral\n",2,2);
+			System.out.format(">> ERROR: condition inside IF is not integral\n");
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 		
 		/*************************/

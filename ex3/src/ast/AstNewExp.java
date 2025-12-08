@@ -2,6 +2,7 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import semanticError.SemanticErrorException;
 
 /*
 USAGE:
@@ -14,11 +15,10 @@ public class AstNewExp extends AstExp
     public AstVarType type;
     public AstExp exp;
 
-    public AstNewExp(AstVarType type, AstExp exp)
+    public AstNewExp(AstVarType type, AstExp exp, int lineNumber)
     {
-        // TODO get line num
         serialNumber = AstNodeSerialNumber.getFresh();
-
+		this.lineNumber = lineNumber;
         this.type = type;
         this.exp = exp;
     }
@@ -59,39 +59,45 @@ public class AstNewExp extends AstExp
 		Type t = SymbolTable.getInstance().find(type.type);
 		if (t == null)
 		{
-			System.out.format(">> ERROR [%d:%d] non existing type %s\n",2,2,type.type);
-			System.exit(0);
+			System.out.format(">> ERROR: non existing type %s\n",type.type);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
 		/********************************************/
-		/* [2] Require array type for new T[e]      */
+		/* [2] Require array or class type  */
 		/********************************************/
-		if (!t.isArray())
+		if (!(t.isArray() || t.isClass()))
 		{
-			System.out.format(">> ERROR [%d:%d] new can only be used on array types (%s is not array)\n",2,2,type.type);
-			System.exit(0);
+			System.out.format(">> ERROR: new can only be used on array or class types (%s is not array or class)\n",type.type);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+
+		}
+
+		if(t.isClass() && exp != null) {
+			System.out.format(">> ERROR: new of class type cannot have size expression\n");
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
 		/******************************/
 		/* [3] Check exp type is int  */
 		/******************************/
 		Type sizeType = exp.semantMe();
-		if (sizeType != TypeInt.getInstance())
+		if (t.isArray() && sizeType != TypeInt.getInstance())
 		{
-			System.out.format(">> ERROR [%d:%d] array size must be int\n",2,2);
-			System.exit(0);
+			System.out.format(">> ERROR: array size must be int\n");
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
 		/************************************************************/
-		/* [4] If size is a constant int literal → must be > 0      */
+		/* [4] If size is a constant int literal must be > 0      */
 		/************************************************************/
-		if (exp instanceof AstExpInt && ((AstExpInt)exp).isConstant())
+		if (t.isArray() && exp.isConstant())
 		{
 			int val = ((AstExpInt)exp).value;
 			if (val <= 0)
 			{
-				System.out.format(">> ERROR [%d:%d] array size must be > 0\n",2,2);
-				System.exit(0);
+				System.out.format(">> ERROR: array size must be > 0\n");
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 			}
 		}
 

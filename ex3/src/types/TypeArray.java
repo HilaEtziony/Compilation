@@ -1,7 +1,10 @@
 package types;
 
+import symboltable.SymbolTable;
+
 public class TypeArray extends Type
 {
+	public String name;
     public Type type_of_array;
 
     /****************/
@@ -19,4 +22,5 @@ public class TypeArray extends Type
 
 	@Override
 	public boolean isArray(){ return true;}
+
 }

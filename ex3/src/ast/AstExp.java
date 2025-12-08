@@ -16,8 +16,6 @@ public abstract class AstExp extends AstNode
     {
         // Default implementation. Is overridden in subclasses representing constant expressions (AstExpInt)
         // Perhaps will need to override in AstExpBinop, AstExpString in the future
-        System.out.format(">> ERROR: getConstantValue() called on non-constant expression\n");
-		System.exit(0);
         return 0;
     }
 

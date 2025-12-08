@@ -2,6 +2,7 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import semanticError.SemanticErrorException;
 
 /*
 USAGE:
@@ -16,8 +17,9 @@ public class AstStmtReturn extends AstStmt
 	/*******************/
 	/*  CONSTRUCTOR(S) */
 	/*******************/
-	public AstStmtReturn(AstExp exp)
+	public AstStmtReturn(AstExp exp, int lineNumber)
 	{
+		this.lineNumber = lineNumber;
 		this.exp = exp;
 	}
 
@@ -51,43 +53,35 @@ public class AstStmtReturn extends AstStmt
 
 	public Type semantMe()
 	{
+		Type funcRetType = SymbolTable.getInstance().getCurrentFunctionReturnType();
+		Type expType = (exp == null) ? TypeVoid.getInstance() : exp.semantMe();
+
 		// return statements can only be found inside functions.
 		if (!SymbolTable.getInstance().isInFunction())
 		{
 			System.out.format("ERROR: return statement is not inside a function\n");
-			System.exit(0);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
 		// If a function has return type void, its return statements must be empty (return;).
-		if (exp != null && SymbolTable.getInstance().getCurrentFunctionReturnType() == TypeVoid.getInstance())
+		if (exp != null && funcRetType == TypeVoid.getInstance())
 		{
 			System.out.format("ERROR: return with a value in a void function\n");
-			System.exit(0);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
 		// If a function has a non-void return type T, then every return statement must return an expression
-		if (exp == null && SymbolTable.getInstance().getCurrentFunctionReturnType() != TypeVoid.getInstance())
+		if (exp == null && funcRetType != TypeVoid.getInstance())
 		{
 			System.out.format("ERROR: missing return value in a non-void function\n");
-			System.exit(0);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
 		// If a function has a non-void return type T, then every return statement must return an expression
 		// whose type is compatible with type T.
-		if (!SymbolTable.getInstance().getCurrentFunctionReturnType().isCompatible(exp.semantMe())){
+		if (!funcRetType.isCompatible(expType)){
 			System.out.format("ERROR: incompatible return type\n");
-			System.exit(0);
-		}
-
-		Type returnType = null;
-		if (exp != null)
-		{
-			returnType = exp.semantMe();
-		}
-
-		else
-		{
-			returnType = TypeVoid.getInstance();
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
 		/* TODO Since functions can not be nested, it follows that a return statement belongs to exactly 1 function.
@@ -95,6 +89,6 @@ public class AstStmtReturn extends AstStmt
 		A function/method may have control flow paths without a return statement, even if the return type of
 		the function is not void. */
 
-		return returnType;
+		return expType;
 	}
 }

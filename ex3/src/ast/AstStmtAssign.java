@@ -2,6 +2,7 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import semanticError.SemanticErrorException;
 
 /*
 USAGE:
@@ -19,7 +20,7 @@ public class AstStmtAssign extends AstStmt
 	/*******************/
 	/*  CONSTRUCTOR(S) */
 	/*******************/
-	public AstStmtAssign(AstVar var, AstExp exp)
+	public AstStmtAssign(AstVar var, AstExp exp, int lineNumber)
 	{
 		/******************************/
 		/* SET A UNIQUE SERIAL NUMBER */
@@ -34,6 +35,7 @@ public class AstStmtAssign extends AstStmt
 		/*******************************/
 		/* COPY INPUT DATA MEMBERS ... */
 		/*******************************/
+		this.lineNumber = lineNumber;
 		this.var = var;
 		this.exp = exp;
 	}
@@ -70,16 +72,28 @@ public class AstStmtAssign extends AstStmt
 
 	public Type semantMe()
 	{
-		Type t1 = null;
-		Type t2 = null;
-		
-		if (var != null) t1 = var.semantMe();
-		if (exp != null) t2 = exp.semantMe();
-		
-		if (t1 != t2)
-		{
-			System.out.format(">> ERROR [%d:%d] type mismatch for var := exp\n",6,6);				
+		Type t_exp = exp.semantMe();
+		Type t_var = var.semantMe();
+
+		/**************************************/
+		/* [1] Check assignment of nil        */
+		/**************************************/
+		if (t_exp.isNil() && !(t_var.isClass() || t_var.isArray())) {
+			System.out.format(">> ERROR: cannot assign nil to %s\n", t_var.name);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
+
+		/**************************************/
+		/* [2] Check assignment compatibility */
+		/**************************************/
+		if (!t_var.isCompatible(t_exp)) {
+			System.out.format(">> ERROR: cannot assign %s to %s\n", t_exp.name, t_var.name);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+		}
+
+		/************************************************************/
+		/* [3] Return value is irrelevant for statements          */
+		/************************************************************/
 		return null;
 	}
 }

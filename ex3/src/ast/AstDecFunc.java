@@ -2,6 +2,7 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import semanticError.SemanticErrorException;
 
 /*
 USAGE:
@@ -16,10 +17,9 @@ public class AstDecFunc extends AstDec
     public AstTypeIdList func_input; // might be null - don't forget to check whenever using
     public AstStmtList stmnts_of_funs;
 
-    public AstDecFunc(AstVarType return_type, String identifier, AstTypeIdList func_input, AstStmtList stmnts_of_funs){
-        // TODO get line num
+    public AstDecFunc(AstVarType return_type, String identifier, AstTypeIdList func_input, AstStmtList stmnts_of_funs, int lineNumber){
         serialNumber = AstNodeSerialNumber.getFresh();
-
+		this.lineNumber = lineNumber;
         this.return_type = return_type;
         this.identifier = identifier;
         this.func_input = func_input;
@@ -69,7 +69,8 @@ public class AstDecFunc extends AstDec
 		// returnType = SymbolTable.getInstance().find(return_type); // TODO change AstVarType
 		if (returnType == null)
 		{
-			System.out.format(">> ERROR [%d:%d] non existing return type %s\n",6,6,returnType);				
+			System.out.format(">> ERROR: non existing return type %s\n",returnType);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");				
 		}
 	
 		/****************************/
@@ -85,7 +86,8 @@ public class AstDecFunc extends AstDec
 			t = SymbolTable.getInstance().find(it.head.type);
 			if (t == null)
 			{
-				System.out.format(">> ERROR [%d:%d] non existing type %s\n",2,2,it.head.type);				
+				System.out.format(">> ERROR: non existing type %s\n",it.head.type);	
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");			
 			}
 			else
 			{

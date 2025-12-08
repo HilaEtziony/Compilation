@@ -2,6 +2,7 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import semanticError.SemanticErrorException;
 
 /*
 USAGE:
@@ -19,7 +20,7 @@ public class AstStmtAssignNew extends AstStmt
 	/*******************/
 	/*  CONSTRUCTOR(S) */
 	/*******************/
-	public AstStmtAssignNew(AstVar var, AstNewExp exp)
+	public AstStmtAssignNew(AstVar var, AstNewExp exp, int lineNumber)
 	{
 		/******************************/
 		/* SET A UNIQUE SERIAL NUMBER */
@@ -34,6 +35,7 @@ public class AstStmtAssignNew extends AstStmt
 		/*******************************/
 		/* COPY INPUT DATA MEMBERS ... */
 		/*******************************/
+		this.lineNumber = lineNumber;
 		this.var = var;
 		this.exp = exp;
 	}
@@ -70,7 +72,16 @@ public class AstStmtAssignNew extends AstStmt
 
 	public Type semantMe()
 	{
-		// TODO
+		Type t_var = var.semantMe();
+		Type t_new = exp.semantMe(); // Can be array or class type
+
+		/******************************/
+		/* [1] Check assignment for new (means class or array) */
+		/******************************/
+		if (!t_var.isCompatible(t_new)) {
+			System.out.format(">> ERROR: cannot assign %s to %s\n", t_new.name, t_var.name);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+		}
 		return null;
 	}
 }
