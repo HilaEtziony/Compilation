@@ -52,6 +52,8 @@ public class Main
 				/*************************/
 				ast.printMe();
 
+				AstGraphviz.getInstance().finalizeFile();
+
 				/**************************/
 				/* [7] Semant the AST ... */
 				/**************************/
@@ -60,11 +62,18 @@ public class Main
 				/*************************************/
 				/* [8] Finalize AST GRAPHIZ DOT file */
 				/*************************************/
-				AstGraphviz.getInstance().finalizeFile();
+				// AstGraphviz.getInstance().finalizeFile();
+			}
+			catch (SemanticErrorException e) 
+			{
+				fileWriter.close();
+				fileReader.close();
+				throw e;
 			}
 			catch (Exception e) 
 			{
-				// TODO
+				e.printStackTrace();
+				throw e;
 			}
 
 			/*************************/
@@ -78,15 +87,18 @@ public class Main
 			    
 		catch (SemanticErrorException e) 
 		{
+			System.out.println("Semantic Error: " + e.getMessage());
 			try
 			{
 				fileWriter = new PrintWriter(outputFileName);
 				String message = e.getMessage();
 				fileWriter.print(message);
+				System.out.print(message);
+				fileWriter.close();
 			}
 			catch (FileNotFoundException ex)
 			{
-				// TODO
+				ex.printStackTrace();
 			}
 
 		}
@@ -114,7 +126,7 @@ public class Main
 			}
 			catch (FileNotFoundException ex)
 			{
-				// TODO
+				ex.printStackTrace();
 			}
 
 		}
