@@ -15,6 +15,33 @@ public class AstExpCall extends AstExp
         this.id = id;
         this.expList = expList;
     }
+
+    public void printMe()
+    {
+        /**************************************/
+        /* AST NODE TYPE = AST CALL EXPRESSION */
+        /**************************************/
+        System.out.print("AST NODE CALL EXPRESSION\n");
+
+        /*************************************/
+        /* RECURSIVELY PRINT VAR + EXPLIST ... */
+        /*************************************/
+        if (var != null) var.printMe();
+        if (expList != null) expList.printMe();
+
+        /**********************************/
+        /* PRINT to AST GRAPHVIZ DOT file */
+        /**********************************/
+        AstGraphviz.getInstance().logNode(
+                serialNumber,
+            "CALL\nEXPRESSION\n" + id);
+        
+        /****************************************/
+        /* PRINT Edges to AST GRAPHVIZ DOT file */
+        /****************************************/
+        if (var != null) AstGraphviz.getInstance().logEdge(serialNumber,var.serialNumber);
+        if (expList != null) AstGraphviz.getInstance().logEdge(serialNumber,expList.serialNumber);
+    }
 }
 
 /*

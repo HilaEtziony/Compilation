@@ -7,6 +7,16 @@ public abstract class AstDec extends AstStmt
         // TODO get line num
         serialNumber = AstNodeSerialNumber.getFresh();
     }
+
+    public void printMe()
+    {
+          /**********************************/
+        /* PRINT to AST GRAPHVIZ DOT file */
+        /**********************************/
+        AstGraphviz.getInstance().logNode(
+                serialNumber,
+            "DEC\n");
+    }
 }
 
 /*

@@ -13,6 +13,31 @@ public class AstDecArray extends AstDec
         this.identifier = identifier;
         this.type = type;
     }
+
+    public void printMe()
+    {
+        /**************************************/
+        /* AST NODE TYPE = AST DECLARATION ARRAY */
+        /**************************************/
+        System.out.print("AST NODE DEC ARRAY\n");
+
+        /*************************************/
+        /* RECURSIVELY PRINT TYPE ... */
+        /*************************************/
+        if (type != null) type.printMe();
+
+        /**********************************/
+        /* PRINT to AST GRAPHVIZ DOT file */
+        /**********************************/
+        AstGraphviz.getInstance().logNode(
+                serialNumber,
+            "DEC\nARRAY\n" + identifier);
+        
+        /****************************************/
+        /* PRINT Edges to AST GRAPHVIZ DOT file */
+        /****************************************/
+        if (type != null) AstGraphviz.getInstance().logEdge(serialNumber,type.serialNumber);
+    }
 }
 
 /*

@@ -11,4 +11,18 @@ public class AstExpString extends AstExp
         
         this.string = string;
     }
+    public void printMe()
+    {
+        /***************************************/
+        /* AST NODE TYPE = AST STRING EXPRESSION */
+        /***************************************/
+        System.out.print("AST NODE STRING EXPRESSION\n");
+
+        /**********************************/
+        /* PRINT to AST GRAPHVIZ DOT file */
+        /**********************************/
+        AstGraphviz.getInstance().logNode(
+                serialNumber,
+            "STRING\n" + string);
+    }
 }

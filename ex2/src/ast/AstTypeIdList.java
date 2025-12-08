@@ -13,6 +13,37 @@ public class AstTypeIdList extends AstDec
         this.head = type;
         this.tail = rest_of_list;
     }
+
+    public void printMe()
+    {
+        /**************************************/
+        /* AST NODE TYPE = AST TYPE ID LIST */
+        /**************************************/
+        System.out.print("AST NODE TYPE ID LIST\n");
+
+        /*************************************/
+        /* RECURSIVELY PRINT HEAD ... */
+        /*************************************/
+        if (head != null) head.printMe();
+
+        /*************************************/
+        /* RECURSIVELY PRINT TAIL ... */
+        /*************************************/
+        if (tail != null) tail.printMe();
+
+        /**********************************/
+        /* PRINT to AST GRAPHVIZ DOT file */
+        /**********************************/
+        AstGraphviz.getInstance().logNode(
+                serialNumber,
+            "TYPE ID\nLIST");
+
+        /****************************************/
+        /* PRINT Edges to AST GRAPHVIZ DOT file */
+        /****************************************/
+        if (head != null) AstGraphviz.getInstance().logEdge(serialNumber,head.serialNumber);
+        if (tail != null) AstGraphviz.getInstance().logEdge(serialNumber,tail.serialNumber);
+    }
 }
 
 /*
