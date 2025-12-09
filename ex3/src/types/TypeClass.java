@@ -57,4 +57,20 @@ public class TypeClass extends Type
         // Not found
         return null;
     }
+
+	public boolean hasDataMember(String id)
+	{
+		TypeList current = dataMembers;
+		while (current != null)
+		{
+			Type t = current.head;
+			if (t.name.equals(id))
+			{
+				return true;
+			}
+			current = current.tail;
+		}
+		// Not found
+		return false;
+	}
 }

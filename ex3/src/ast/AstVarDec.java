@@ -1,8 +1,8 @@
 package ast;
 
-import types.*;
-import symboltable.*;
 import semanticError.SemanticErrorException;
+import symboltable.*;
+import types.*;
 
 /*
 USAGE:
@@ -101,5 +101,70 @@ public class AstVarDec extends AstDec
 		/* [5] Return value is irrelevant for variable declarations */
 		/************************************************************/
 		return null;
+	}
+
+	public void semantMe(TypeClass theirClassType) {
+		// same as above, but enter to theirClassType's data members instead of symbol table
+		Type t; // placeholder
+
+		/****************************/
+		/* [1] Check If Type exists */
+		/****************************/
+		t = SymbolTable.getInstance().find(type.type);
+		if (t == null)
+		{
+			System.out.format(">> ERROR: non existing type %s\n",type.type);
+			// System.out.format(">> ERROR [%d:%d] non existing type %s\n",2,2,type);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+		}
+
+		/****************************/
+		/* [2] Check t is void      */
+		/****************************/
+		if (t == TypeVoid.getInstance()) {
+			System.out.format(">> ERROR: variable %s cannot be of type void\n", id.name);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+		}
+
+		/**************************************/
+		/* [3] Check That Name does NOT exist */
+		/**************************************/
+		if (theirClassType.hasDataMember(id.name))
+		{
+			System.out.format(">> ERROR: variable %s already exists in class %s\n",id.name, theirClassType.name);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+		}
+
+		if(this.type.type.equals("int")) {
+			t = TypeInt.getInstance();
+		}
+		else if(this.type.type.equals("string")) {
+			t = TypeString.getInstance();
+		}
+		else if(this.type.type.equals("void")) {
+			// should have been caught earlier
+			System.out.format(">> ERROR: variable %s cannot be of type void\n", id.name);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+		}
+		else {
+			// must be a class type
+			Type classType = SymbolTable.getInstance().find(this.type.type);
+			if (classType == null || !(classType instanceof TypeClass)) {
+				System.out.format(">> ERROR: non existing type %s\n",this.type.type);
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+			}
+			t = classType;
+		}
+
+		/************************************************/
+		/* [4] Enter the Identifier to the Class Data Members */
+		/************************************************/
+		TypeList prev = theirClassType.dataMembers;
+		if (prev != null) prev.print();
+		TypeClassVarDec enter = new TypeClassVarDec(t, id.name); // set the name of the type to the variable's name
+		if (prev != null) prev.print();
+		TypeList curr = new TypeList((Type)enter, prev);
+		curr.print();
+		theirClassType.dataMembers = new TypeList((Type)enter, theirClassType.dataMembers);
 	}
 }

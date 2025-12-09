@@ -1,7 +1,6 @@
 package ast;
 
 import types.*;
-import symboltable.*;
 
 /*
 USAGE:
@@ -27,7 +26,7 @@ public abstract class AstDec extends AstStmt
 
     public abstract Type semantMe();
 
-    // public Type semantMe(TypeClass theirClassType) // // Dec of a class = cField. Yamit: Not sure if needed
+    public void semantMe(TypeClass theirClassType){} // // Dec of a class = cField. Yamit: Not sure if needed, David: Needed
 }
 
 /*

@@ -1,8 +1,8 @@
 package ast;
 
-import types.*;
-import symboltable.*;
 import semanticError.SemanticErrorException;
+import symboltable.*;
+import types.*;
 
 /*
 USAGE:

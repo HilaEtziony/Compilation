@@ -1,8 +1,8 @@
 package ast;
 
-import types.*;
-import symboltable.*;
 import semanticError.SemanticErrorException;
+import symboltable.*;
+import types.*;
 
 /*
 USAGE:
@@ -55,6 +55,8 @@ public class AstStmtReturn extends AstStmt
 	{
 		Type funcRetType = SymbolTable.getInstance().getCurrentFunctionReturnType();
 		Type expType = (exp == null) ? TypeVoid.getInstance() : exp.semantMe();
+
+		// System.out.println(funcRetType + " " + expType + " " + this.exp + " " + this.exp.semantMe());
 
 		// return statements can only be found inside functions.
 		if (!SymbolTable.getInstance().isInFunction())

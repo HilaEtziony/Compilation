@@ -34,4 +34,16 @@ public class TypeList
         if (i == 0) return head;
         return tail.get(i - 1);
     }
+
+    /***********************************************/
+    /* Print the TypeList - for debugging only    */
+    /***********************************************/
+    public void print()
+    {
+        System.out.print("TypeList: ");
+        for (TypeList it = this; it != null; it = it.tail) {
+            System.out.print(it.head.name + " ");
+        }
+        System.out.println();
+    }
 }

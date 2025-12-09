@@ -1,8 +1,8 @@
 package ast;
 
-import types.*;
-import symboltable.*;
 import semanticError.SemanticErrorException;
+import symboltable.*;
+import types.*;
 
 /*
 USAGE:
@@ -43,7 +43,13 @@ public class AstVarType extends AstDec
 
 	public Type semantMe()
 	{
-		// TODO
-		return null;
+		// check that type exists in symbol table
+		Type t = SymbolTable.getInstance().find(type);
+		if (t == null) {
+			System.out.format("ERROR: type %s not found in symbol table\n",type);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+		}
+
+		return t;
 	}
 }

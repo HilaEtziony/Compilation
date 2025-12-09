@@ -64,7 +64,6 @@ public class AstExpVar extends AstExp
 
 	public Type semantMe()
 	{
-		
 		return var.semantMe();
 	}
 }

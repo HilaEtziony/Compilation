@@ -1,8 +1,8 @@
 package ast;
 
-import types.*;
-import symboltable.*;
 import semanticError.SemanticErrorException;
+import symboltable.*;
+import types.*;
 
 /*
 USAGE:
@@ -90,17 +90,16 @@ public class AstDecClass extends AstDec
 		/*******************************/
 		/* [1a] Semant Class ...  */
 		/*******************************/
-		TypeClass t = new TypeClass(null,name, null);
+		TypeClass t = new TypeClass((TypeClass)parentType,name, null);
 
 		/***************************/
 		/* [2] Semant Data Members */
 		/***************************/
-		if (cFieldList != null) {
-			// cFieldList.semantMe(t); // TODO should a class field be entered any differently than regular declarations?
-			// cFieldList.semantMe();
+		System.out.println("Semanting class data members for class " + name);
+		this.cFieldList.semantMe(t);
 
-			// TODO
-		}
+		this.printTypeList(t.dataMembers);
+	
 
 		/*****************/
 		/* [3] End Scope */
@@ -116,6 +115,14 @@ public class AstDecClass extends AstDec
 		/* [5] Return value is irrelevant for class declarations */
 		/*********************************************************/
 		return null;
+	}
+
+	private void printTypeList(TypeList tl) {
+		System.out.print("TypeList: ");
+		for (TypeList it = tl; it != null; it = it.tail) {
+			System.out.print(it.head.name + " ");
+		}
+		System.out.println();
 	}
 }
 

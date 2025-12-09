@@ -1,8 +1,7 @@
 package ast;
 
-import types.*;
-import symboltable.*;
 import semanticError.SemanticErrorException;
+import types.*;
 
 /*
 USAGE:
@@ -68,7 +67,35 @@ public class AstVarField extends AstVar
 
 	public Type semantMe()
 	{
-		// TODO
-		return null;
+		// Get the type of the base variable
+		Type varType = var.semantMe();
+		System.out.println("Base variable type: " + varType);
+		// Check that the base variable is of a class type
+		if (!(varType instanceof TypeClass))
+		{
+			System.out.format("ERROR: variable is not of a class type\n");
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+		}
+		TypeClass classType = (TypeClass) varType;
+		System.out.println("Class type: " + classType.name);
+		// Look for the field in the class
+		TypeList fieldList = classType.dataMembers;
+		System.out.println("Looking for field: " + fieldName + " " + fieldList);
+
+		while (fieldList != null)
+		{
+			Type field = fieldList.head;
+			System.out.println("Checking field: " + field.name);
+			if (field.name.equals(fieldName))
+			{
+				System.out.println("Field found: " + field.name + " of type " + field);
+				return field;
+			}
+			fieldList = fieldList.tail;
+		}	
+
+		// Field not found
+		System.out.format("ERROR: field %s does not exist in class %s\n", fieldName, classType.name);
+		throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 	}
 }

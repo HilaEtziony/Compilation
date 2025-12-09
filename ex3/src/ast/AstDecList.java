@@ -1,8 +1,6 @@
 package ast;
 
 import types.*;
-import symboltable.*;
-import semanticError.SemanticErrorException;
 
 /*
 USAGE:
@@ -75,12 +73,13 @@ public class AstDecList extends AstStmt
 		return null;
 	}
 
-	// public void semantMe(TypeClass theirClassType) // Dec list of a class = cFieldList. Yamit: Not sure if needed
-	// {
-	// 	/*************************************/
-	// 	/* RECURSIVELY PRINT HEAD + TAIL ... */
-	// 	/*************************************/
-	// 	if (head != null) head.semantMe(theirClassType);
-	// 	if (tail != null) tail.semantMe(theirClassType);
-	// }
+	public void semantMe(TypeClass theirClassType) // Dec list of a class = cFieldList. Yamit: Not sure if needed
+	{
+		/*************************************/
+		/* RECURSIVELY PRINT HEAD + TAIL ... */
+		/*************************************/
+		System.out.println("Semanting class data member declaration " + head + " "+ head.lineNumber + " for class " + theirClassType.name);
+		if (head != null) head.semantMe(theirClassType);
+		if (tail != null) tail.semantMe(theirClassType);
+	}
 }
