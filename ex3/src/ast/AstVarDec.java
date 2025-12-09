@@ -86,8 +86,7 @@ public class AstVarDec extends AstDec
 		/**************************************/
 		/* [3] Check That Name does NOT exist */
 		/**************************************/
-		if (SymbolTable.getInstance().find(id.name) != null)
-		// if (SymbolTable.getInstance().find(id) != null)
+		if (SymbolTable.getInstance().findInCurrentScope(id.name) != null)
 		{
 			System.out.format(">> ERROR: variable %s already exists in scope\n",id.name);
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");

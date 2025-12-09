@@ -1,13 +1,14 @@
 package symboltable;
 
 import java.io.PrintWriter;
-
 import types.*;
 
 public class SymbolTable
 {
 	private int hashArraySize = 13;
 	
+	public static final String SCOPE_BOUNDARY = "SCOPE-BOUNDARY";
+
 	/**********************************************/
 	/* The actual symbol table data structure ... */
 	/**********************************************/
@@ -20,15 +21,8 @@ public class SymbolTable
 	/**************************************************************/
 	private int hash(String s)
 	{
-		if (s.charAt(0) == 'l') {return 1;}
-		if (s.charAt(0) == 'm') {return 1;}
-		if (s.charAt(0) == 'r') {return 3;}
-		if (s.charAt(0) == 'i') {return 6;}
-		if (s.charAt(0) == 'd') {return 6;}
-		if (s.charAt(0) == 'k') {return 6;}
-		if (s.charAt(0) == 'f') {return 6;}
-		if (s.charAt(0) == 'S') {return 6;}
-		return 12;
+		if (s == null) return 0;
+		return Math.abs(s.hashCode()) % hashArraySize;
 	}
 
 	/****************************************************************************/
@@ -73,9 +67,28 @@ public class SymbolTable
 	/***********************************************/
 	public Type find(String name)
 	{
+		if (name == null) return null;
 		SymbolTableEntry e;
 				
 		for (e = table[hash(name)]; e != null; e = e.next)
+		{
+			if (name.equals(e.name))
+			{
+				return e.type;
+			}
+		}
+		
+		return null;
+	}
+
+	/*****************************************************************/
+	/* Find the inner-most scope element with name in current scope  */
+	/*****************************************************************/
+	public Type findInCurrentScope(String name)
+	{
+		if (name == null) return null;
+		
+		for (SymbolTableEntry e = top; e != null && !e.name.equals(SCOPE_BOUNDARY); e = e.prevtop)
 		{
 			if (name.equals(e.name))
 			{
@@ -98,7 +111,7 @@ public class SymbolTable
 		/* class only contain their type name which is the bottom sign: _|_     */
 		/************************************************************************/
 		enter(
-			"SCOPE-BOUNDARY",
+			SCOPE_BOUNDARY,
 			new TypeForScopeBoundaries("NONE"));
 
 		/*********************************************/
@@ -116,7 +129,7 @@ public class SymbolTable
 		/**************************************************************************/
 		/* Pop elements from the symbol table stack until a SCOPE-BOUNDARY is hit */		
 		/**************************************************************************/
-		while (top.name != "SCOPE-BOUNDARY")
+		while (!top.name.equals(SCOPE_BOUNDARY))
 		{
 			table[top.index] = top.next;
 			topIndex = topIndex -1;
@@ -234,7 +247,7 @@ public class SymbolTable
 			/* [0] The instance itself ... */
 			/*******************************/
 			instance = new SymbolTable();
-
+			// instance.beginScope();
 			/*****************************************/
 			/* [1] Enter primitive types int, string */
 			/*****************************************/
