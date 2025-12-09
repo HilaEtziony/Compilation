@@ -68,6 +68,7 @@ public class Main
 			{
 				fileWriter.close();
 				fileReader.close();
+				e.printStackTrace();
 				throw e;
 			}
 			catch (Exception e) 
