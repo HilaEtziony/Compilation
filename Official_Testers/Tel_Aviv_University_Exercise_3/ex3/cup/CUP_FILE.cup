@@ -1,0 +1,233 @@
+import java_cup.runtime.*;
+import ast.*;
+
+parser code
+{:
+	public Lexer lexer;
+
+	public Parser(Lexer lexer)
+	{
+		super(lexer);
+		this.lexer = lexer;
+	}
+	public void report_error(String message, Object info)
+	{
+		System.out.print("ERROR >> ");
+		System.out.print("[");
+		System.out.print(lexer.getLine());
+		System.out.print(":");
+		System.out.print(lexer.getTokenStartPosition());
+		System.out.print("] ");
+		throw new Error("ERROR("+lexer.getLine()+")");
+	}
+:}
+
+/************************/
+/* CUSTOMIZE CUP PARSER */
+/************************/
+scan with
+{:
+	Symbol s;
+	s = lexer.next_token();
+	//System.out.print(s.sym);
+	System.out.print("[");
+	System.out.print(lexer.getLine());
+	System.out.print(":");
+	System.out.print(lexer.getTokenStartPosition());
+	System.out.print("] ");
+	System.out.print(TokenNames.terminalNames[s.sym]);
+	if (s.value != null)
+	{
+		System.out.print("( ");
+		System.out.print(s.value);
+		System.out.print(" )");
+	}
+	System.out.print("\n");
+	return s;
+:};
+
+/*************/
+/* TERMINALS */
+/*************/
+terminal IF;
+terminal EQ;
+terminal DOT;
+terminal PLUS;
+terminal MINUS;
+terminal TIMES;
+terminal WHILE;
+terminal DIVIDE;
+terminal LPAREN;
+terminal RPAREN;
+terminal LBRACK;
+terminal RBRACK;
+terminal LBRACE;
+terminal RBRACE;
+terminal SEMICOLON;
+terminal ASSIGN;
+terminal COMMA;
+terminal TYPE_INT;
+terminal TYPE_STRING;
+terminal TYPE_VOID;
+terminal LT;
+terminal GT;
+terminal ARRAY;
+terminal CLASS;
+terminal RETURN;
+terminal ELSE;
+terminal NEW;
+terminal EXTENDS;
+terminal NIL;
+terminal INT_W_LEADING_Z; // TODO needed?
+terminal COMMENT;
+terminal ERROR; // TODO needed?
+
+/*************/
+/* TERMINALS */
+/*************/
+terminal Integer INT;
+terminal String ID;
+terminal String STRING;
+
+/*****************/
+/* NON TERMINALS */
+/*****************/
+non terminal AstDecList program; 
+non terminal AstDecList decList;
+non terminal AstDec dec;
+non terminal AstVarType type; 
+non terminal AstVarDec varDec; 
+non terminal AstStmtList stmtList;
+non terminal AstDecFunc funcDec; 
+non terminal AstTypeIdList typeIdList; 
+non terminal AstDecClass classDec; 
+non terminal AstDecList cFieldList; 
+non terminal AstDec cField; 			// Explanation: cField == varDec/FunctDec - AstCfieldList/AstCfield/AstVarDec/AstDecFunc->AstDec->AstStmt->AstNode
+non terminal AstDecArray arrayTypedef; 
+non terminal AstExp exp; 
+non terminal AstNewExp newExp; 
+non terminal AstExpCall callExp; 
+non terminal AstExpList expList; 
+non terminal AstVar var; 
+non terminal AstStmt stmt; 
+
+
+/***********************/
+/* OPERATOR PRECEDENCE */
+/***********************/
+
+precedence nonassoc ASSIGN;
+precedence left EQ;
+precedence left LT, GT;
+precedence left PLUS, MINUS;
+precedence left TIMES, DIVIDE;
+precedence nonassoc LBRACK;
+precedence nonassoc LPAREN;
+precedence left DOT;
+
+/************************/
+/* START WITH: program */
+/************************/
+start with program;
+
+/********************/
+/* DERIVATION RULES */
+/********************/
+
+program 	::= 	decList:l	 													{: RESULT = l; 														:}
+					;
+
+decList		::=		dec:d	decList:l												{: RESULT = new AstDecList(d,l, lexer.getLine());    				:}
+					| dec:d															{: RESULT = new AstDecList(d,null, lexer.getLine()); 				:}
+					;
+
+dec 		::=		varDec:vDec          											{: RESULT = vDec; 													:}
+    				| funcDec:fDec       											{: RESULT = fDec; 													:}
+    				| classDec:cDec      											{: RESULT = cDec; 													:}
+    				| arrayTypedef:aDec  											{: RESULT = aDec; 													:}
+    				;
+
+type 		::=		TYPE_INT          												{: RESULT = new AstVarType("int", lexer.getLine()); 				:} // TODO Yamit: make sure "AstVarType" is the proper type
+					| TYPE_STRING     												{: RESULT = new AstVarType("string", lexer.getLine()); 				:} // Note that in skeleton, there is no "type" - these are all strings (IDs)
+    				| TYPE_VOID       												{: RESULT = new AstVarType("void", lexer.getLine()); 				:}
+    				| ID:name         												{: RESULT = new AstVarType(name, lexer.getLine()); 					:} // TODO Yamit: make sure this is the proper type. ID is a str - will that work?
+    				;
+
+varDec 		::= 	type:t ID:i ASSIGN exp:e SEMICOLON 								{: RESULT = new AstVarDec(t,new AstVarSimple(i, lexer.getLine()) ,e, lexer.getLine()); 			:}
+					| type:t ID:i SEMICOLON											{: RESULT = new AstVarDec(t,new AstVarSimple(i, lexer.getLine()) ,null, lexer.getLine()); 		:}
+					| type:t ID:i ASSIGN newExp:nE SEMICOLON						{: RESULT = new AstVarDec(t,new AstVarSimple(i, lexer.getLine()) ,nE, lexer.getLine()); 		:}
+					;
+
+stmtList	::=		stmt:s	stmtList:l												{: RESULT = new AstStmtList(s,l, lexer.getLine());    				:}
+					| stmt:s														{: RESULT = new AstStmtList(s,null, lexer.getLine()); 				:}
+					;
+
+funcDec 	::= 	type:t ID:i LPAREN typeIdList:l RPAREN LBRACE stmtList:s RBRACE {: RESULT = new AstDecFunc(t,i,l,s, lexer.getLine());    			:}
+					| type:t ID:i LPAREN RPAREN LBRACE stmtList:s RBRACE			{: RESULT = new AstDecFunc(t,i,null,s, lexer.getLine());    		:}
+					;
+
+typeIdList	::=		type:t ID:i COMMA typeIdList:l									{: RESULT = new AstTypeIdList(t,i,l, lexer.getLine());    			:}
+					| type:t ID:i													{: RESULT = new AstTypeIdList(t,i,null, lexer.getLine());    		:}
+					;
+
+classDec 	::= 	CLASS ID:name EXTENDS ID:parentName LBRACE cFieldList:l RBRACE	{: RESULT = new AstDecClass(name,parentName,l, lexer.getLine()); 	:}
+					| CLASS ID:name LBRACE cFieldList:l RBRACE						{: RESULT = new AstDecClass(name,null,l, lexer.getLine()); 			:}
+					;
+
+cFieldList	::=		cField:c	cFieldList:l										{: RESULT = new AstDecList(c,l, lexer.getLine());    				:}
+					| cField:c														{: RESULT = new AstDecList(c,null, lexer.getLine()); 				:}
+					;
+
+cField 		::= 	varDec:vDec 													{: RESULT = vDec; 													:}
+					| funcDec:fDec													{: RESULT = fDec; 													:}
+					;
+
+arrayTypedef ::= 	ARRAY ID:i EQ type:t LBRACK RBRACK SEMICOLON					{: RESULT = new AstDecArray(i,t, lexer.getLine()); 					:}
+					;
+
+exp 		::= 	var:v															{: RESULT = new AstExpVar(v, lexer.getLine()); 						:}
+					| LPAREN exp:e RPAREN											{: RESULT = e; 														:}
+					| exp:e1 PLUS exp:e2											{: RESULT = new AstExpBinop(e1, e2, 0, lexer.getLine()); 			:}
+					| exp:e1 MINUS exp:e2											{: RESULT = new AstExpBinop(e1, e2, 1, lexer.getLine()); 			:}
+					| exp:e1 TIMES exp:e2											{: RESULT = new AstExpBinop(e1, e2, 2, lexer.getLine()); 			:}
+					| exp:e1 DIVIDE exp:e2											{: RESULT = new AstExpBinop(e1, e2, 3, lexer.getLine()); 			:}
+					| exp:e1 LT exp:e2												{: RESULT = new AstExpBinop(e1, e2, 4, lexer.getLine()); 			:}
+					| exp:e1 GT exp:e2												{: RESULT = new AstExpBinop(e1, e2, 5, lexer.getLine()); 			:}
+					| exp:e1 EQ exp:e2												{: RESULT = new AstExpBinop(e1, e2, 6, lexer.getLine()); 			:}
+					| callExp:c														{: RESULT = c; 														:}
+					| MINUS INT:i													{: RESULT = new AstExpInt(i, true, lexer.getLine()); 				:}
+					| INT:i 														{: RESULT = new AstExpInt(i, false, lexer.getLine()); 				:}
+					| NIL															{: RESULT = new AstExpNIL(lexer.getLine()); 						:}
+					| STRING:s														{: RESULT = new AstExpString(s, lexer.getLine()); 					:}
+					;
+
+newExp 		::= 	NEW type:t 														{: RESULT = new AstNewExp(t, null, lexer.getLine()); 				:}
+					| NEW type:t LBRACK exp:e RBRACK								{: RESULT = new AstNewExp(t, e, lexer.getLine()); 					:}
+					;
+
+callExp 	::= 	var:v DOT ID:i LPAREN expList:l RPAREN 							{: RESULT = new AstExpCall(v,i,l, lexer.getLine());    				:}
+					| var:v DOT ID:i LPAREN RPAREN									{: RESULT = new AstExpCall(v,i,null, lexer.getLine());    			:}
+					| ID:i LPAREN expList:l RPAREN 									{: RESULT = new AstExpCall(null,i,l, lexer.getLine());    			:}
+					| ID:i LPAREN RPAREN											{: RESULT = new AstExpCall(null,i,null, lexer.getLine());    		:}
+					;
+
+expList		::=		exp:e COMMA expList:l											{: RESULT = new AstExpList(e,l, lexer.getLine());    				:}
+					| exp:e															{: RESULT = new AstExpList(e,null, lexer.getLine());    			:}
+					;
+
+var			::=		ID:name															{: RESULT = new AstVarSimple(name, lexer.getLine());       			:} // TODO Yamit: make sure "AstVarSimple" is the proper type
+					| var:v DOT ID:fieldName										{: RESULT = new AstVarField(v,fieldName, lexer.getLine()); 			:}
+					| var:v LBRACK exp:e RBRACK										{: RESULT = new AstVarSubscript(v,e, lexer.getLine());     			:}
+					;
+
+stmt 		::= 	varDec:vDec														{: RESULT = vDec; 													:} // so varDec must implement stmt
+					| var:v ASSIGN exp:e SEMICOLON									{: RESULT = new AstStmtAssign(v,e, lexer.getLine()); 				:}
+					| var:v ASSIGN newExp:nExp SEMICOLON							{: RESULT = new AstStmtAssignNew(v,nExp, lexer.getLine()); 			:} // check if right logic wise
+					| RETURN exp:e SEMICOLON										{: RESULT = new AstStmtReturn(e, lexer.getLine()); 					:}
+					| RETURN SEMICOLON												{: RESULT = new AstStmtReturn(null, lexer.getLine()); 				:}
+					| IF LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE
+					  ELSE LBRACE stmtList:elseBody RBRACE 							{: RESULT = new AstStmtIf(cond,body,elseBody, lexer.getLine()); 	:} // if-else must come before if
+					| IF LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE 		{: RESULT = new AstStmtIf(cond,body, lexer.getLine()); 				:}
+					| WHILE LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE 		{: RESULT = new AstStmtWhile(cond,body, lexer.getLine()); 			:}
+					| callExp:c SEMICOLON											{: RESULT = new AstStmtCall(c, lexer.getLine()); 					:}
+					;
