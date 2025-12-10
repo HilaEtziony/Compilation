@@ -1,8 +1,8 @@
 package ast;
 
-import types.*;
-import symboltable.*;
 import semanticError.SemanticErrorException;
+import symboltable.*;
+import types.*;
 
 /*
 USAGE:
@@ -59,24 +59,27 @@ public class AstDecFunc extends AstDec
 	public Type semantMe()
 	{
 		Type t;
-		Type returnType = null;
-		TypeList type_list = null;
+		Type returnType = this.return_type.semantMe();
+		TypeList type_list =null;
+
+		// System.out.format("FUNCTION DECLARATION: %s RETURNS %s\n", identifier, returnType);
 
 		/*******************/
 		/* [0] return type */
 		/*******************/
-		returnType = SymbolTable.getInstance().find(return_type.type);
+		// returnType = SymbolTable.getInstance().find(return_type.type);
 		// returnType = SymbolTable.getInstance().find(return_type); // TODO change AstVarType
 		if (returnType == null)
 		{
 			System.out.format(">> ERROR: non existing return type %s\n",returnType);
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");				
 		}
-	
+
 		/****************************/
 		/* [1] Begin Function Scope */
 		/****************************/
 		SymbolTable.getInstance().beginScope();
+		SymbolTable.getInstance().enter(identifier, new TypeFunction(returnType, identifier, null)); // sentinal for return type
 
 		/***************************/
 		/* [2] Semant Input func_input */
@@ -96,6 +99,8 @@ public class AstDecFunc extends AstDec
 			}
 		}
 
+		// SymbolTable.getInstance().enter(identifier, t);
+
 		/*******************/
 		/* [3] Semant Body */
 		/*******************/
@@ -109,7 +114,8 @@ public class AstDecFunc extends AstDec
 		/***************************************************/
 		/* [5] Enter the Function Type to the Symbol Table */
 		/***************************************************/
-		SymbolTable.getInstance().enter(identifier,new TypeFunction(returnType,identifier,type_list));
+		TypeFunction funcType = new TypeFunction(returnType,identifier,type_list);
+		SymbolTable.getInstance().enter(identifier, funcType);
 
 		/************************************************************/
 		/* [6] Return value is irrelevant for function declarations */

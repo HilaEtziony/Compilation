@@ -78,7 +78,7 @@ public class AstDecList extends AstStmt
 		/*************************************/
 		/* RECURSIVELY PRINT HEAD + TAIL ... */
 		/*************************************/
-		System.out.println("Semanting class data member declaration " + head + " "+ head.lineNumber + " for class " + theirClassType.name);
+		// System.out.println("Semanting class data member declaration " + head + " "+ head.lineNumber + " for class " + theirClassType.name);
 		if (head != null) head.semantMe(theirClassType);
 		if (tail != null) tail.semantMe(theirClassType);
 	}

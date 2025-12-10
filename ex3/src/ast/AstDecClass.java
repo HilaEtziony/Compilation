@@ -95,10 +95,8 @@ public class AstDecClass extends AstDec
 		/***************************/
 		/* [2] Semant Data Members */
 		/***************************/
-		System.out.println("Semanting class data members for class " + name);
+		// System.out.println("Semanting class data members for class " + name);
 		this.cFieldList.semantMe(t);
-
-		this.printTypeList(t.dataMembers);
 	
 
 		/*****************/

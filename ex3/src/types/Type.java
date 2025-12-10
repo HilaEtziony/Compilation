@@ -62,6 +62,13 @@ public abstract class Type
 			}
 		}
 
+		// if class var
+		if(other instanceof TypeClassVarDec){
+			TypeClassVarDec otherVar = (TypeClassVarDec)other;
+			// System.out.println("Checking compatibility of class var dec: " + this.name + " and " + otherVar.t.name + " " + this + " "+ otherVar.t);
+			return this.isCompatible(otherVar.t);
+		}
+
 		return false;
 	}
 }

@@ -69,7 +69,7 @@ public class AstVarField extends AstVar
 	{
 		// Get the type of the base variable
 		Type varType = var.semantMe();
-		System.out.println("Base variable type: " + varType);
+		// System.out.println("Base variable type: " + varType);
 		// Check that the base variable is of a class type
 		if (!(varType instanceof TypeClass))
 		{
@@ -77,18 +77,18 @@ public class AstVarField extends AstVar
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 		TypeClass classType = (TypeClass) varType;
-		System.out.println("Class type: " + classType.name);
+		// System.out.println("Class type: " + classType.name);
 		// Look for the field in the class
 		TypeList fieldList = classType.dataMembers;
-		System.out.println("Looking for field: " + fieldName + " " + fieldList);
+		// System.out.println("Looking for field: " + fieldName + " " + fieldList);
 
 		while (fieldList != null)
 		{
 			Type field = fieldList.head;
-			System.out.println("Checking field: " + field.name);
+			// System.out.println("Checking field: " + field.name);
 			if (field.name.equals(fieldName))
 			{
-				System.out.println("Field found: " + field.name + " of type " + field);
+				// System.out.println("Field found: " + field.name + " of type " + field);
 				return field;
 			}
 			fieldList = fieldList.tail;

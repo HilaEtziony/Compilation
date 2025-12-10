@@ -56,14 +56,16 @@ public class AstStmtReturn extends AstStmt
 		Type funcRetType = SymbolTable.getInstance().getCurrentFunctionReturnType();
 		Type expType = (exp == null) ? TypeVoid.getInstance() : exp.semantMe();
 
-		// System.out.println(funcRetType + " " + expType + " " + this.exp + " " + this.exp.semantMe());
-
+		// System.out.println("Func Dec: " + funcRetType + " " + expType + " " + this.exp + " " + this.exp.semantMe());
+		SymbolTable.getInstance().printStackTopDown(5);
 		// return statements can only be found inside functions.
 		if (!SymbolTable.getInstance().isInFunction())
 		{
 			System.out.format("ERROR: return statement is not inside a function\n");
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
+		// System.out.println("After isInFunction check");
+		// SymbolTable.getInstance().printStackTopDown(5);
 
 		// If a function has return type void, its return statements must be empty (return;).
 		if (exp != null && funcRetType == TypeVoid.getInstance())
@@ -71,6 +73,7 @@ public class AstStmtReturn extends AstStmt
 			System.out.format("ERROR: return with a value in a void function\n");
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
+		// SymbolTable.getInstance().printStackTopDown(5);
 
 		// If a function has a non-void return type T, then every return statement must return an expression
 		if (exp == null && funcRetType != TypeVoid.getInstance())
@@ -78,6 +81,8 @@ public class AstStmtReturn extends AstStmt
 			System.out.format("ERROR: missing return value in a non-void function\n");
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
+		// SymbolTable.getInstance().printStackTopDown(5);
+
 
 		// If a function has a non-void return type T, then every return statement must return an expression
 		// whose type is compatible with type T.
@@ -90,7 +95,8 @@ public class AstStmtReturn extends AstStmt
 		-> SymbolTableEntry of function should have a field of return!
 		A function/method may have control flow paths without a return statement, even if the return type of
 		the function is not void. */
-
+		// System.out.println("Return statement semanted successfully");
+		// SymbolTable.getInstance().printStackTopDown(5);
 		return expType;
 	}
 }

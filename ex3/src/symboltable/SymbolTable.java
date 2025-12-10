@@ -59,7 +59,8 @@ public class SymbolTable
 		/**************************/
 		/* [6] Print Symbol Table */
 		/**************************/
-		printMe();
+		// printMe();
+		this.printStackTopDown(5);
 	}
 
 	/***********************************************/
@@ -104,6 +105,7 @@ public class SymbolTable
 	/***************************************************************************/
 	public void beginScope()
 	{
+		// this.printStackTopDown(7);
 		/************************************************************************/
 		/* Though <SCOPE-BOUNDARY> entries are present inside the symbol table, */
 		/* they are not really types. In order to be able to debug print them,  */
@@ -114,10 +116,12 @@ public class SymbolTable
 			SCOPE_BOUNDARY,
 			new TypeForScopeBoundaries("NONE"));
 
+		// System.out.println("BEGINNING NEW SCOPE" + " of type: " + top.type + " with name: " + top.name);
 		/*********************************************/
 		/* Print the symbol table after every change */
 		/*********************************************/
 		printMe();
+		// this.printStackTopDown(7);
 	}
 
 	/********************************************************************************/
@@ -126,26 +130,33 @@ public class SymbolTable
 	/********************************************************************************/
 	public void endScope()
 	{
+		System.out.println("ENDING SCOPE");
+		this.printStackTopDown(5);
+		printMe();
 		/**************************************************************************/
 		/* Pop elements from the symbol table stack until a SCOPE-BOUNDARY is hit */		
-		/**************************************************************************/
+		/**************************************************************************/		
 		while (!top.name.equals(SCOPE_BOUNDARY))
 		{
+			//System.out.println("Popping symbol: " + top.name + " of type: " + top.type);
 			table[top.index] = top.next;
-			topIndex = topIndex -1;
+			topIndex--;
 			top = top.prevtop;
 		}
 		/**************************************/
 		/* Pop the SCOPE-BOUNDARY sign itself */		
 		/**************************************/
+		//System.out.println("Popping SCOPE BOUNDARY" + " of type: " + top.type + " with name: " + top.name);
 		table[top.index] = top.next;
-		topIndex = topIndex -1;
+		topIndex = top.index;
 		top = top.prevtop;
 
 		/*********************************************/
 		/* Print the symbol table after every change */		
 		/*********************************************/
 		printMe();
+		this.printStackTopDown(5);
+		System.out.println("SCOPE ENDED" );
 	}
 	
 	public static int n=0;
@@ -258,7 +269,7 @@ public class SymbolTable
 			/* [2] How should we handle void ??? */
 			/*************************************/
 
-			// TODO
+			instance.enter("void",  TypeVoid.getInstance());
 
 			/***************************************/
 			/* [3] Enter library functions */
@@ -286,29 +297,45 @@ public class SymbolTable
 	}
 
 	public boolean isInFunction(){
-		SymbolTable temp = this;
-		while (temp.top != null){
-			if (temp.top.type instanceof TypeFunction){
+		SymbolTableEntry temp = this.top;
+		while (temp != null){
+			if (temp.type instanceof TypeFunction){
 				return true;
 			}
 
-			temp.top = temp.top.prevtop;
+			temp = temp.prevtop;
 		}
 
 		return false;
 	}
 
 	public Type getCurrentFunctionReturnType() {
-		SymbolTable temp = this;
-		while (temp.top != null){
-			if (temp.top.type instanceof TypeFunction){
-				TypeFunction funcType = (TypeFunction) temp.top.type;
+		SymbolTableEntry temp = this.top;
+		// System.out.println("Getting current function return type...");
+		while (temp != null){
+			// System.out.println("Checking symbol: " + temp.name + " of type: " + temp.type);
+			if (temp.type instanceof TypeFunction){
+				TypeFunction funcType = (TypeFunction) temp.type;
+				// System.out.println("Found function: " + funcType.name + " with return type: " + funcType.returnType);
 				return funcType.returnType;
 			}
 
-			temp.top = temp.top.prevtop;
+			temp = temp.prevtop;
 		}
-
 		return TypeVoid.getInstance();
+	}
+
+	// Debug utility: print the top N entries of the stack
+	public void printStackTopDown(int n) {
+		SymbolTableEntry curr = top;
+		int count = 0;
+		System.out.print("[STACK] Top-down: ");
+		while (curr != null && count < n) {
+			System.out.print(curr.name + " (" + curr.type.name + ")");
+			curr = curr.prevtop;
+			count++;
+			if (curr != null && count < n) System.out.print(" -> ");
+		}
+		System.out.println();
 	}
 }

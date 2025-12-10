@@ -1,8 +1,7 @@
 package ast;
 
-import types.*;
-import symboltable.*;
 import semanticError.SemanticErrorException;
+import types.*;
 
 /*
 USAGE:
@@ -56,7 +55,17 @@ public class AstTypeIdList extends AstDec
 
 	public Type semantMe()
 	{
-		// TODO
 		return null;
+	}
+
+	public TypeList getTypeList() throws SemanticErrorException
+	{
+		TypeList type_list_tail = null;
+		if (this.tail != null){
+			type_list_tail = this.tail.getTypeList();
+		}
+
+		Type head_type = this.head.semantMe();
+		return new TypeList(head_type, type_list_tail);
 	}
 }
