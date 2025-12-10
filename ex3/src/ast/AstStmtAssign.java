@@ -1,8 +1,7 @@
 package ast;
 
-import types.*;
-import symboltable.*;
 import semanticError.SemanticErrorException;
+import types.*;
 
 /*
 USAGE:
@@ -74,6 +73,9 @@ public class AstStmtAssign extends AstStmt
 	{
 		Type t_exp = exp.semantMe();
 		Type t_var = var.semantMe();
+
+		if(t_var != null && t_var instanceof TypeClassVarDec) t_var = ((TypeClassVarDec)t_var).t;
+		if(t_exp != null && t_exp instanceof TypeClassVarDec) t_exp = ((TypeClassVarDec)t_exp).t;
 
 		/**************************************/
 		/* [1] Check assignment of nil        */

@@ -91,11 +91,11 @@ public class AstDecClass extends AstDec
 		/* [1a] Semant Class ...  */
 		/*******************************/
 		TypeClass t = new TypeClass((TypeClass)parentType,name, null);
-
+		SymbolTable.getInstance().enter(name, t);
 		/***************************/
 		/* [2] Semant Data Members */
 		/***************************/
-		// System.out.println("Semanting class data members for class " + name);
+		System.out.println("Semanting class data members for class " + name + " " + this.cFieldList );
 		this.cFieldList.semantMe(t);
 	
 

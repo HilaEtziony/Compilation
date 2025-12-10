@@ -1,8 +1,8 @@
 package ast;
 
-import types.*;
-import symboltable.*;
 import semanticError.SemanticErrorException;
+import symboltable.*;
+import types.*;
 
 /*
 USAGE:
@@ -86,7 +86,7 @@ public class AstExpCall extends AstExp
 		/* [2] Check number of arguments if expList    */
 		/***********************************************/
 		TypeList paramTypes = funcType.getParamTypes(); 
-		int nParams = paramTypes.length();
+		int nParams = (paramTypes == null) ? 0 : paramTypes.length();
 		int nArgs = (expList != null) ? expList.size() : 0;
 
 		if (nArgs != nParams) {

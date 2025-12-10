@@ -50,9 +50,10 @@ public class Main
 				/*************************/
 				/* [6] Print the AST ... */
 				/*************************/
-				ast.printMe();
+				// commented for testing purposes
+				// ast.printMe();  
 
-				AstGraphviz.getInstance().finalizeFile();
+				// AstGraphviz.getInstance().finalizeFile();
 
 				/**************************/
 				/* [7] Semant the AST ... */

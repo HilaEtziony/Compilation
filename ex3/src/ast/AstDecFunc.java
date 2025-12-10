@@ -98,7 +98,8 @@ public class AstDecFunc extends AstDec
 				SymbolTable.getInstance().enter(it.identifier,t);
 			}
 		}
-
+		//moved sentinal enter after processing input params
+		SymbolTable.getInstance().enter(identifier, new TypeFunction(returnType, identifier, type_list));
 		// SymbolTable.getInstance().enter(identifier, t);
 
 		/*******************/

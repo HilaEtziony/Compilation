@@ -1,8 +1,7 @@
 package ast;
 
-import types.*;
-import symboltable.*;
 import semanticError.SemanticErrorException;
+import types.*;
 
 /*
 USAGE:
@@ -97,6 +96,10 @@ public class AstExpBinop extends AstExp
 		if (left  != null) t1 = left.semantMe();
 		if (right != null) t2 = right.semantMe();
 
+		// if class variables, extract their types
+		if(t1 != null && t1 instanceof TypeClassVarDec) t1 = ((TypeClassVarDec)t1).t;
+		if(t2 != null && t2 instanceof TypeClassVarDec) t2 = ((TypeClassVarDec)t2).t;
+
 		// + is allowed in TypeInt, TypeString
 		// *, -, /, <, >, == are allowed in TypeInt only
 		if ((t1 == TypeInt.getInstance()) && (t2 == TypeInt.getInstance()))
@@ -139,6 +142,20 @@ public class AstExpBinop extends AstExp
 			}
 		}
 
+		if(t1 instanceof TypeClass || t2 instanceof TypeClass) {
+			if(op != 6 /* == */) {
+				System.out.format(">> ERROR: Invalid operation on class types\n");
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+			}
+			if(t1 instanceof TypeClass && t2 instanceof TypeClass && ((TypeClass)t1).name.equals(((TypeClass)t2).name)){
+				return TypeInt.getInstance();
+			}
+			if(t1 == TypeNil.getInstance() || t2 == TypeNil.getInstance()) {
+				if(op == 6 /* == */) {
+					return TypeInt.getInstance();
+				}
+			}
+		}
 		throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 	}
 }
