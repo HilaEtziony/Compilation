@@ -163,12 +163,7 @@ public class AstVarDec extends AstDec
 		/************************************************/
 		/* [4] Enter the Identifier to the Class Data Members */
 		/************************************************/
-		TypeList prev = theirClassType.dataMembers;
-		// if (prev != null) prev.print();
 		TypeClassVarDec enter = new TypeClassVarDec(t, id.name); // set the name of the type to the variable's name
-		// if (prev != null) prev.print();
-		TypeList curr = new TypeList((Type)enter, prev);
-		// curr.print();
 		theirClassType.dataMembers = new TypeList((Type)enter, theirClassType.dataMembers);
 	}
 }

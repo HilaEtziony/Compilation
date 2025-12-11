@@ -51,6 +51,7 @@ public class AstDecClass extends AstDec
 
 	public Type semantMe()
 	{
+		TypeList parentDataMembers = null;
 		/* [0a] Make sure class doesn't already exist */
 		if (SymbolTable.getInstance().find(name) != null) {
 			System.out.format("ERROR: class %s already exists in symbol table\n",name);
@@ -80,6 +81,7 @@ public class AstDecClass extends AstDec
 
 				curr = curr.father;
 			}
+			parentDataMembers = ((TypeClass) parentType).dataMembers;
 		}
 
 		/*************************/
@@ -90,7 +92,7 @@ public class AstDecClass extends AstDec
 		/*******************************/
 		/* [1a] Semant Class ...  */
 		/*******************************/
-		TypeClass t = new TypeClass((TypeClass)parentType,name, null);
+		TypeClass t = new TypeClass((TypeClass)parentType,name, parentDataMembers);
 		SymbolTable.getInstance().enter(name, t);
 		/***************************/
 		/* [2] Semant Data Members */
