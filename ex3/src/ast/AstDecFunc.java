@@ -123,4 +123,44 @@ public class AstDecFunc extends AstDec
 		/************************************************************/
 		return null;		
 	}
+
+	public void semantMe(TypeClass theirClassType){
+		// similar to above, but enter to theirClassType's data members instead of symbol table
+		Type t;
+		Type returnType = this.return_type.semantMe();
+		TypeList type_list =null;
+
+		/*******************/
+		/* [0] return type */
+		/*******************/
+		if (returnType == null)
+		{
+			System.out.format(">> ERROR: non existing return type %s\n",returnType);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");				
+		}
+
+		/***************************/
+		/* [1] Semant Input func_input */
+		/***************************/
+		for (AstTypeIdList it = func_input; it  != null; it = it.tail)
+		{
+			t = SymbolTable.getInstance().find(it.head.type);
+			if (t == null)
+			{
+				System.out.format(">> ERROR: non existing type %s\n",it.head.type);	
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");			
+			}
+			else
+			{
+				type_list = new TypeList(t,type_list);
+				// SymbolTable.getInstance().enter(it.identifier,t);
+			}
+		}
+
+		/***************************************************/
+		/* [2] Enter the Function Type to theirClassType's data members */
+		/***************************************************/
+		TypeFunction funcType = new TypeFunction(returnType,this.identifier,type_list);
+		theirClassType.dataMembers = new TypeList(funcType, theirClassType.dataMembers);
+	}
 }

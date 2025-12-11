@@ -92,7 +92,7 @@ public class AstDecClass extends AstDec
 		/*******************************/
 		/* [1a] Semant Class ...  */
 		/*******************************/
-		TypeClass t = new TypeClass((TypeClass)parentType,name, parentDataMembers);
+		TypeClass t = new TypeClass((TypeClass)parentType,name, null);
 		SymbolTable.getInstance().enter(name, t);
 		/***************************/
 		/* [2] Semant Data Members */

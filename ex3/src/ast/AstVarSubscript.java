@@ -1,8 +1,7 @@
 package ast;
 
-import types.*;
-import symboltable.*;
 import semanticError.SemanticErrorException;
+import types.*;
 
 /*
 USAGE:
@@ -74,6 +73,8 @@ public class AstVarSubscript extends AstVar
 		/**********************************/
 		Type varType = var.semantMe();
 
+		if(varType != null && varType instanceof TypeClassVarDec) varType = ((TypeClassVarDec)varType).t;
+
 		if (varType == null || !varType.isArray())
 		{
 			System.out.format(">> ERROR: variable is not an array type\n");
@@ -84,6 +85,7 @@ public class AstVarSubscript extends AstVar
 		/* [2] Evaluate index expression  */
 		/**********************************/
 		Type subType = subscript.semantMe();
+		if(subType != null && subType instanceof TypeClassVarDec) subType = ((TypeClassVarDec)subType).t;
 
 		if (subType != TypeInt.getInstance())
 		{

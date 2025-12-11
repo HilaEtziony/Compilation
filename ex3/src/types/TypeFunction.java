@@ -2,7 +2,6 @@ package types;
 
 public class TypeFunction extends Type
 {
-	public String name;
 	/***********************************/
 	/* The return type of the function */
 	/***********************************/

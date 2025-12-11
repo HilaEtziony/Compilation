@@ -77,24 +77,24 @@ public class AstVarField extends AstVar
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 		TypeClass classType = (TypeClass) varType;
-		// System.out.println("Class type: " + classType.name);
-		// Look for the field in the class
-		TypeList fieldList = classType.dataMembers;
-		// System.out.println("Looking for field: " + fieldName + " " + fieldList);
 
-		while (fieldList != null)
-		{
-			Type field = fieldList.head;
-			// System.out.println("Checking field: " + field.name);
-			if (field.name.equals(fieldName))
+		while(classType != null){
+			// Look for the field in the class
+			TypeList fieldList = classType.dataMembers;
+
+			while (fieldList != null)
 			{
-				// System.out.println("Field found: " + field.name + " of type " + field);
-				return field;
-			}
-			fieldList = fieldList.tail;
-		}	
+				Type field = fieldList.head;
+				if (field.name.equals(fieldName))
+				{
+					return field;
+				}
+				fieldList = fieldList.tail;
+			}	
 
-		// Field not found
+			// Field not found - check in parent classes
+			classType = classType.father;
+		}
 		System.out.format("ERROR: field %s does not exist in class %s\n", fieldName, classType.name);
 		throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 	}
