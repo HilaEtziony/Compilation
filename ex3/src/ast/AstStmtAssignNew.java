@@ -1,8 +1,7 @@
 package ast;
 
-import types.*;
-import symboltable.*;
 import semanticError.SemanticErrorException;
+import types.*;
 
 /*
 USAGE:
@@ -74,6 +73,8 @@ public class AstStmtAssignNew extends AstStmt
 	{
 		Type t_var = var.semantMe();
 		Type t_new = exp.semantMe(); // Can be array or class type
+
+		if(t_var != null && t_var instanceof TypeClassVarDec) t_var = ((TypeClassVarDec)t_var).t;
 
 		/******************************/
 		/* [1] Check assignment for new (means class or array) */

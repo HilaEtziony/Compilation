@@ -1,8 +1,8 @@
 package ast;
 
-import types.*;
-import symboltable.*;
 import semanticError.SemanticErrorException;
+import symboltable.*;
+import types.*;
 
 /*
 USAGE:
@@ -53,6 +53,7 @@ public class AstNewExp extends AstExp
 
 	public Type semantMe()
 	{
+		System.out.println(this.exp + ", " + this.type + ", " + this.type.type);
 		/****************************/
 		/* [1] Check If Type exists */
 		/****************************/
@@ -63,48 +64,34 @@ public class AstNewExp extends AstExp
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
-		/********************************************/
-		/* [2] Require array or class type  */
-		/********************************************/
-		if (!(t.isArray() || t.isClass()))
-		{
-			System.out.format(">> ERROR: new can only be used on array or class types (%s is not array or class)\n",type.type);
-			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
-
-		}
-
-		if(t.isClass() && exp != null) {
-			System.out.format(">> ERROR: new of class type cannot have size expression\n");
+		if (t == TypeVoid.getInstance()){
+			System.out.format(">> ERROR: cannot allocate void type %s\n",type.type);
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
-		/******************************/
-		/* [3] Check exp type is int  */
-		/******************************/
-		Type sizeType = exp.semantMe();
-		if (t.isArray() && sizeType != TypeInt.getInstance())
-		{
-			System.out.format(">> ERROR: array size must be int\n");
+		if (t.isFunction()){
+			System.out.format(">> ERROR: cannot allocate function type %s\n",type.type);
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
-		/************************************************************/
-		/* [4] If size is a constant int literal must be > 0      */
-		/************************************************************/
-		if (t.isArray() && exp.isConstant())
-		{
-			int val = ((AstExpInt)exp).value;
-			if (val <= 0)
-			{
-				System.out.format(">> ERROR: array size must be > 0\n");
+		if (t.isNil()){
+			System.out.format(">> ERROR: cannot allocate nil type %s\n",type.type);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+		}
+
+		// if no [exp] then must be class
+		if (exp == null){
+			// allocating class type
+			if (!t.isClass()){
+				System.out.format(">> ERROR: new without size expression must be of class type (%s is not class)\n",type.type);
 				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 			}
+			return t;
 		}
-
-		/*********************************************/
-		/* [5] Return type = array of that base type */
-		/*********************************************/
-		return t; // which is already an array type
+		// else must be array of the type
+		else{
+			return new TypeArray("new array", t);
+		}
 	}
 }
 

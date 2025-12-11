@@ -106,7 +106,6 @@ public class AstVarDec extends AstDec
 	public void semantMe(TypeClass theirClassType) {
 		// same as above, but enter to theirClassType's data members instead of symbol table
 		Type t; // placeholder
-
 		/****************************/
 		/* [1] Check If Type exists */
 		/****************************/
@@ -147,13 +146,18 @@ public class AstVarDec extends AstDec
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 		else {
-			// must be a class type
-			Type classType = SymbolTable.getInstance().find(this.type.type);
-			if (classType == null || !(classType instanceof TypeClass)) {
+			// must be a class type or array type
+			Type classArrayType = SymbolTable.getInstance().find(this.type.type);
+			//check if array
+			if(classArrayType != null && classArrayType instanceof TypeArray){
+				t = classArrayType;
+			}
+			// else must be class or error
+			else if (classArrayType == null || !(classArrayType instanceof TypeClass)) {
 				System.out.format(">> ERROR: non existing type %s\n",this.type.type);
 				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 			}
-			t = classType;
+			t = classArrayType;
 		}
 
 		/************************************************/
