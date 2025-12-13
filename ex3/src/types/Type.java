@@ -41,16 +41,18 @@ public abstract class Type
 
 				curr = curr.father;
 			}
+		
+			// pretty sure we don't need this part - only one direction inheritance check
+			// as we for example: T1 := T2 - okay, T2 := T1 - not okay
+			// curr = (TypeClass)this;
+			// while (curr != null){ // if this is instance of other
+			// 	if (curr.name.equals(other.name))
+			// 	{
+			// 		return true;
+			// 	}
 
-			curr = (TypeClass)this;
-			while (curr != null){ // if this is instance of other
-				if (curr.name.equals(other.name))
-				{
-					return true;
-				}
-
-				curr = curr.father;
-			}
+			// 	curr = curr.father;
+			// }
 		}
 
 		// Arrays: only compatible if element types are exactly the same

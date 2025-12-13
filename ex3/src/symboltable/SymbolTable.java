@@ -60,7 +60,7 @@ public class SymbolTable
 		/* [6] Print Symbol Table */
 		/**************************/
 		// printMe();
-		this.printStackTopDown(5);
+		// this.printStackTopDown(5);
 	}
 
 	/***********************************************/
@@ -130,9 +130,9 @@ public class SymbolTable
 	/********************************************************************************/
 	public void endScope()
 	{
-		System.out.println("ENDING SCOPE");
-		this.printStackTopDown(5);
-		printMe();
+		// System.out.println("ENDING SCOPE");
+		// this.printStackTopDown(5);
+		// printMe();
 		/**************************************************************************/
 		/* Pop elements from the symbol table stack until a SCOPE-BOUNDARY is hit */		
 		/**************************************************************************/		
@@ -155,8 +155,8 @@ public class SymbolTable
 		/* Print the symbol table after every change */		
 		/*********************************************/
 		printMe();
-		this.printStackTopDown(5);
-		System.out.println("SCOPE ENDED" );
+		// this.printStackTopDown(5);
+		// System.out.println("SCOPE ENDED" );
 	}
 	
 	public static int n=0;

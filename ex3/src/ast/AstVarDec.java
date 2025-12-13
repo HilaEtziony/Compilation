@@ -97,9 +97,17 @@ public class AstVarDec extends AstDec
 		/************************************************/
 		SymbolTable.getInstance().enter(id.name,t);
 
-		/************************************************************/
-		/* [5] Return value is irrelevant for variable declarations */
-		/************************************************************/
+		// check the assignment expression, if exists
+		if(expr != null) {
+			Type t_expr = expr.semantMe();
+			// check assignment compatibility
+			if(!t.isCompatible(t_expr)) {
+				System.out.format(">> ERROR: cannot assign %s to %s\n", t_expr.name, t.name);
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+			}
+		}
+			
+
 		return null;
 	}
 
@@ -165,5 +173,15 @@ public class AstVarDec extends AstDec
 		/************************************************/
 		TypeClassVarDec enter = new TypeClassVarDec(t, id.name); // set the name of the type to the variable's name
 		theirClassType.dataMembers = new TypeList((Type)enter, theirClassType.dataMembers);
+
+		// check the assignment expression, if exists
+		if(expr != null) {
+			Type t_expr = expr.semantMe();
+			// check assignment compatibility
+			if(!t.isCompatible(t_expr)) {
+				System.out.format(">> ERROR: cannot assign %s to %s\n", t_expr.name, t.name);
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");		
+			}
+		}
 	}
 }

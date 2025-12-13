@@ -69,7 +69,7 @@ public class AstVarField extends AstVar
 	{
 		// Get the type of the base variable
 		Type varType = var.semantMe();
-		// System.out.println("Base variable type: " + varType);
+
 		// Check that the base variable is of a class type
 		if (!(varType instanceof TypeClass))
 		{
