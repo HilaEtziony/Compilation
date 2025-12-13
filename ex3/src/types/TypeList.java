@@ -46,4 +46,27 @@ public class TypeList
         }
         System.out.println();
     }
+
+    public static boolean sameTypes(TypeList a, TypeList b)
+    {
+        // Both are empty
+        if (a == null && b == null)
+            return true;
+
+        // One is empty, the other is not
+        if (a == null || b == null)
+            return false;
+
+        while (a != null && b != null)
+        {
+            if (a.head != b.head)
+                return false;
+
+            a = a.tail;
+            b = b.tail;
+        }
+
+        return a == null && b == null;
+    }
+
 }
