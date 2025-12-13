@@ -15,10 +15,9 @@ public class AstExpList extends AstDec
     public AstExp head;
     public AstExpList tail;
 
-    public AstExpList(AstExp head, AstExpList tail, int lineNumber)
+    public AstExpList(AstExp head, AstExpList tail)
     {
         serialNumber = AstNodeSerialNumber.getFresh();
-		this.lineNumber = lineNumber;
         this.head = head;
         this.tail = tail;
     }

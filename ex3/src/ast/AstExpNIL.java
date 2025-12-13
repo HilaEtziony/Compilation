@@ -6,10 +6,9 @@ import semanticError.SemanticErrorException;
 
 public class AstExpNIL extends AstExp
 {
-    public AstExpNIL(int lineNumber)
+    public AstExpNIL()
     {
         serialNumber = AstNodeSerialNumber.getFresh();
-        this.lineNumber = lineNumber;
     }
 
     public void printMe()

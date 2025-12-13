@@ -21,10 +21,9 @@ public class AstDecList extends AstStmt
     /******************/
     /* CONSTRUCTOR(S) */
     /******************/
-    public AstDecList(AstDec head, AstDecList tail, int lineNumber)
+    public AstDecList(AstDec head, AstDecList tail)
     {
         serialNumber = AstNodeSerialNumber.getFresh();
-		this.lineNumber = lineNumber;
         if (tail != null) System.out.print("====================== decList -> dec decList\n");
         if (tail == null) System.out.print("====================== decList -> dec         \n");
 
@@ -78,7 +77,6 @@ public class AstDecList extends AstStmt
 		/*************************************/
 		/* RECURSIVELY PRINT HEAD + TAIL ... */
 		/*************************************/
-		// System.out.println("Semanting class data member declaration " + head + " "+ head.lineNumber + " for class " + theirClassType.name);
 		if (head != null) head.semantMe(theirClassType);
 		if (tail != null) tail.semantMe(theirClassType);
 	}

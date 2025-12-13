@@ -137,8 +137,8 @@ start with program;
 program 	::= 	decList:l	 													{: RESULT = l; 														:}
 					;
 
-decList		::=		dec:d	decList:l												{: RESULT = new AstDecList(d,l, lexer.getLine());    				:}
-					| dec:d															{: RESULT = new AstDecList(d,null, lexer.getLine()); 				:}
+decList		::=		dec:d	decList:l												{: RESULT = new AstDecList(d,l);    								:}
+					| dec:d															{: RESULT = new AstDecList(d,null); 								:}
 					;
 
 dec 		::=		varDec:vDec          											{: RESULT = vDec; 													:}
@@ -147,87 +147,87 @@ dec 		::=		varDec:vDec          											{: RESULT = vDec; 													:}
     				| arrayTypedef:aDec  											{: RESULT = aDec; 													:}
     				;
 
-type 		::=		TYPE_INT          												{: RESULT = new AstVarType("int", lexer.getLine()); 				:} // TODO Yamit: make sure "AstVarType" is the proper type
-					| TYPE_STRING     												{: RESULT = new AstVarType("string", lexer.getLine()); 				:} // Note that in skeleton, there is no "type" - these are all strings (IDs)
-    				| TYPE_VOID       												{: RESULT = new AstVarType("void", lexer.getLine()); 				:}
-    				| ID:name         												{: RESULT = new AstVarType(name, lexer.getLine()); 					:} // TODO Yamit: make sure this is the proper type. ID is a str - will that work?
+type 		::=		TYPE_INT:t        												{: RESULT = new AstVarType("int", tleft+1); 									:} // TODO Yamit: make sure "AstVarType" is the proper type
+					| TYPE_STRING:t     											{: RESULT = new AstVarType("string", tleft+1); 								:} // Note that in skeleton, there is no "type" - these are all strings (IDs)
+    				| TYPE_VOID:t       											{: RESULT = new AstVarType("void", tleft+1); 								:}
+    				| ID:name         												{: RESULT = new AstVarType(name, nameleft+1); 									:} // TODO Yamit: make sure this is the proper type. ID is a str - will that work?
     				;
 
-varDec 		::= 	type:t ID:i ASSIGN exp:e SEMICOLON 								{: RESULT = new AstVarDec(t,new AstVarSimple(i, lexer.getLine()) ,e, lexer.getLine()); 			:}
-					| type:t ID:i SEMICOLON											{: RESULT = new AstVarDec(t,new AstVarSimple(i, lexer.getLine()) ,null, lexer.getLine()); 		:}
-					| type:t ID:i ASSIGN newExp:nE SEMICOLON						{: RESULT = new AstVarDec(t,new AstVarSimple(i, lexer.getLine()) ,nE, lexer.getLine()); 		:}
+varDec 		::= 	type:t ID:i ASSIGN exp:e SEMICOLON 								{: RESULT = new AstVarDec(t,new AstVarSimple(i, ileft+1) ,e, tleft+1); 			:}
+					| type:t ID:i SEMICOLON											{: RESULT = new AstVarDec(t,new AstVarSimple(i, ileft+1) ,null, tleft+1); 		:}
+					| type:t ID:i ASSIGN newExp:nE SEMICOLON						{: RESULT = new AstVarDec(t,new AstVarSimple(i, ileft+1) ,nE, tleft+1); 		:}
 					;
 
-stmtList	::=		stmt:s	stmtList:l												{: RESULT = new AstStmtList(s,l, lexer.getLine());    				:}
-					| stmt:s														{: RESULT = new AstStmtList(s,null, lexer.getLine()); 				:}
+stmtList	::=		stmt:s	stmtList:l												{: RESULT = new AstStmtList(s,l);    								:}
+					| stmt:s														{: RESULT = new AstStmtList(s,null); 								:}
 					;
 
-funcDec 	::= 	type:t ID:i LPAREN typeIdList:l RPAREN LBRACE stmtList:s RBRACE {: RESULT = new AstDecFunc(t,i,l,s, lexer.getLine());    			:}
-					| type:t ID:i LPAREN RPAREN LBRACE stmtList:s RBRACE			{: RESULT = new AstDecFunc(t,i,null,s, lexer.getLine());    		:}
+funcDec 	::= 	type:t ID:i LPAREN typeIdList:l RPAREN LBRACE stmtList:s RBRACE {: RESULT = new AstDecFunc(t,i,l,s, tleft+1);    					:}
+					| type:t ID:i LPAREN RPAREN LBRACE stmtList:s RBRACE			{: RESULT = new AstDecFunc(t,i,null,s, tleft+1);    				:}
 					;
 
-typeIdList	::=		type:t ID:i COMMA typeIdList:l									{: RESULT = new AstTypeIdList(t,i,l, lexer.getLine());    			:}
-					| type:t ID:i													{: RESULT = new AstTypeIdList(t,i,null, lexer.getLine());    		:}
+typeIdList	::=		type:t ID:i COMMA typeIdList:l									{: RESULT = new AstTypeIdList(t,i,l, tleft+1);    					:}
+					| type:t ID:i													{: RESULT = new AstTypeIdList(t,i,null, tleft+1);    				:}
 					;
 
-classDec 	::= 	CLASS ID:name EXTENDS ID:parentName LBRACE cFieldList:l RBRACE	{: RESULT = new AstDecClass(name,parentName,l, lexer.getLine()); 	:}
-					| CLASS ID:name LBRACE cFieldList:l RBRACE						{: RESULT = new AstDecClass(name,null,l, lexer.getLine()); 			:}
+classDec 	::= 	CLASS ID:name EXTENDS ID:parentName LBRACE cFieldList:l RBRACE	{: RESULT = new AstDecClass(name,parentName,l, nameleft+1); 		:}
+					| CLASS ID:name LBRACE cFieldList:l RBRACE						{: RESULT = new AstDecClass(name,null,l, nameleft+1); 				:}
 					;
 
-cFieldList	::=		cField:c	cFieldList:l										{: RESULT = new AstDecList(c,l, lexer.getLine());    				:}
-					| cField:c														{: RESULT = new AstDecList(c,null, lexer.getLine()); 				:}
+cFieldList	::=		cField:c	cFieldList:l										{: RESULT = new AstDecList(c,l);    								:}
+					| cField:c														{: RESULT = new AstDecList(c,null); 								:}
 					;
 
 cField 		::= 	varDec:vDec 													{: RESULT = vDec; 													:}
 					| funcDec:fDec													{: RESULT = fDec; 													:}
 					;
 
-arrayTypedef ::= 	ARRAY ID:i EQ type:t LBRACK RBRACK SEMICOLON					{: RESULT = new AstDecArray(i,t, lexer.getLine()); 					:}
+arrayTypedef ::= 	ARRAY ID:i EQ type:t LBRACK RBRACK SEMICOLON					{: RESULT = new AstDecArray(i,t, ileft+1); 					:}
 					;
 
-exp 		::= 	var:v															{: RESULT = new AstExpVar(v, lexer.getLine()); 						:}
-					| LPAREN exp:e RPAREN											{: RESULT = e; 														:}
-					| exp:e1 PLUS exp:e2											{: RESULT = new AstExpBinop(e1, e2, 0, lexer.getLine()); 			:}
-					| exp:e1 MINUS exp:e2											{: RESULT = new AstExpBinop(e1, e2, 1, lexer.getLine()); 			:}
-					| exp:e1 TIMES exp:e2											{: RESULT = new AstExpBinop(e1, e2, 2, lexer.getLine()); 			:}
-					| exp:e1 DIVIDE exp:e2											{: RESULT = new AstExpBinop(e1, e2, 3, lexer.getLine()); 			:}
-					| exp:e1 LT exp:e2												{: RESULT = new AstExpBinop(e1, e2, 4, lexer.getLine()); 			:}
-					| exp:e1 GT exp:e2												{: RESULT = new AstExpBinop(e1, e2, 5, lexer.getLine()); 			:}
-					| exp:e1 EQ exp:e2												{: RESULT = new AstExpBinop(e1, e2, 6, lexer.getLine()); 			:}
-					| callExp:c														{: RESULT = c; 														:}
-					| MINUS INT:i													{: RESULT = new AstExpInt(i, true, lexer.getLine()); 				:}
-					| INT:i 														{: RESULT = new AstExpInt(i, false, lexer.getLine()); 				:}
-					| NIL															{: RESULT = new AstExpNIL(lexer.getLine()); 						:}
-					| STRING:s														{: RESULT = new AstExpString(s, lexer.getLine()); 					:}
+exp 		::= 	var:v															{: RESULT = new AstExpVar(v, vleft+1); 						:}
+					| LPAREN exp:e RPAREN											{: RESULT = e; 												:}
+					| exp:e1 PLUS exp:e2											{: RESULT = new AstExpBinop(e1, e2, 0, e1left+1); 			:}
+					| exp:e1 MINUS exp:e2											{: RESULT = new AstExpBinop(e1, e2, 1, e1left+1); 			:}
+					| exp:e1 TIMES exp:e2											{: RESULT = new AstExpBinop(e1, e2, 2, e1left+1); 			:}
+					| exp:e1 DIVIDE exp:e2											{: RESULT = new AstExpBinop(e1, e2, 3, e1left+1); 			:}
+					| exp:e1 LT exp:e2												{: RESULT = new AstExpBinop(e1, e2, 4, e1left+1); 			:}
+					| exp:e1 GT exp:e2												{: RESULT = new AstExpBinop(e1, e2, 5, e1left+1); 			:}
+					| exp:e1 EQ exp:e2												{: RESULT = new AstExpBinop(e1, e2, 6, e1left+1); 			:}
+					| callExp:c														{: RESULT = c; 												:}
+					| MINUS INT:i													{: RESULT = new AstExpInt(i, true, ileft+1); 				:}
+					| INT:i 														{: RESULT = new AstExpInt(i, false, ileft+1); 				:}
+					| NIL															{: RESULT = new AstExpNIL(); 								:}
+					| STRING:s														{: RESULT = new AstExpString(s, sleft+1); 					:}
 					;
 
-newExp 		::= 	NEW type:t 														{: RESULT = new AstNewExp(t, null, lexer.getLine()); 				:}
-					| NEW type:t LBRACK exp:e RBRACK								{: RESULT = new AstNewExp(t, e, lexer.getLine()); 					:}
+newExp 		::= 	NEW type:t 														{: RESULT = new AstNewExp(t, null, tleft+1); 				:}
+					| NEW type:t LBRACK exp:e RBRACK								{: RESULT = new AstNewExp(t, e, tleft+1); 					:}
 					;
 
-callExp 	::= 	var:v DOT ID:i LPAREN expList:l RPAREN 							{: RESULT = new AstExpCall(v,i,l, lexer.getLine());    				:}
-					| var:v DOT ID:i LPAREN RPAREN									{: RESULT = new AstExpCall(v,i,null, lexer.getLine());    			:}
-					| ID:i LPAREN expList:l RPAREN 									{: RESULT = new AstExpCall(null,i,l, lexer.getLine());    			:}
-					| ID:i LPAREN RPAREN											{: RESULT = new AstExpCall(null,i,null, lexer.getLine());    		:}
+callExp 	::= 	var:v DOT ID:i LPAREN expList:l RPAREN 							{: RESULT = new AstExpCall(v,i,l, ileft+1);    				:}
+					| var:v DOT ID:i LPAREN RPAREN									{: RESULT = new AstExpCall(v,i,null, ileft+1);    			:}
+					| ID:i LPAREN expList:l RPAREN 									{: RESULT = new AstExpCall(null,i,l, ileft+1);    			:}
+					| ID:i LPAREN RPAREN											{: RESULT = new AstExpCall(null,i,null, ileft+1);    		:}
 					;
 
-expList		::=		exp:e COMMA expList:l											{: RESULT = new AstExpList(e,l, lexer.getLine());    				:}
-					| exp:e															{: RESULT = new AstExpList(e,null, lexer.getLine());    			:}
+expList		::=		exp:e COMMA expList:l											{: RESULT = new AstExpList(e,l);    						:}
+					| exp:e															{: RESULT = new AstExpList(e,null);    						:}
 					;
 
-var			::=		ID:name															{: RESULT = new AstVarSimple(name, lexer.getLine());       			:} // TODO Yamit: make sure "AstVarSimple" is the proper type
-					| var:v DOT ID:fieldName										{: RESULT = new AstVarField(v,fieldName, lexer.getLine()); 			:}
-					| var:v LBRACK exp:e RBRACK										{: RESULT = new AstVarSubscript(v,e, lexer.getLine());     			:}
+var			::=		ID:name															{: RESULT = new AstVarSimple(name, nameleft+1);       				:} // TODO Yamit: make sure "AstVarSimple" is the proper type
+					| var:v DOT ID:fieldName										{: RESULT = new AstVarField(v,fieldName, fieldNameleft+1); 			:}
+					| var:v LBRACK exp:e RBRACK										{: RESULT = new AstVarSubscript(v,e, eleft+1);     					:}
 					;
 
 stmt 		::= 	varDec:vDec														{: RESULT = vDec; 													:} // so varDec must implement stmt
-					| var:v ASSIGN exp:e SEMICOLON									{: RESULT = new AstStmtAssign(v,e, lexer.getLine()); 				:}
-					| var:v ASSIGN newExp:nExp SEMICOLON							{: RESULT = new AstStmtAssignNew(v,nExp, lexer.getLine()); 			:} // check if right logic wise
-					| RETURN exp:e SEMICOLON										{: RESULT = new AstStmtReturn(e, lexer.getLine()); 					:}
-					| RETURN SEMICOLON												{: RESULT = new AstStmtReturn(null, lexer.getLine()); 				:}
+					| var:v ASSIGN exp:e SEMICOLON									{: RESULT = new AstStmtAssign(v,e, eleft+1); 						:}
+					| var:v ASSIGN newExp:nExp SEMICOLON							{: RESULT = new AstStmtAssignNew(v,nExp, nExpleft+1); 				:} // check if right logic wise
+					| RETURN exp:e SEMICOLON										{: RESULT = new AstStmtReturn(e, eleft+1); 							:}
+					| RETURN:r SEMICOLON											{: RESULT = new AstStmtReturn(null, rleft+1); 						:}
 					| IF LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE
-					  ELSE LBRACE stmtList:elseBody RBRACE 							{: RESULT = new AstStmtIf(cond,body,elseBody, lexer.getLine()); 	:} // if-else must come before if
-					| IF LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE 		{: RESULT = new AstStmtIf(cond,body, lexer.getLine()); 				:}
-					| WHILE LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE 		{: RESULT = new AstStmtWhile(cond,body, lexer.getLine()); 			:}
-					| callExp:c SEMICOLON											{: RESULT = new AstStmtCall(c, lexer.getLine()); 					:}
+					  ELSE LBRACE stmtList:elseBody RBRACE 							{: RESULT = new AstStmtIf(cond,body,elseBody, condleft+1); 			:} // if-else must come before if
+					| IF LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE 		{: RESULT = new AstStmtIf(cond,body, condleft+1); 					:}
+					| WHILE LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE 		{: RESULT = new AstStmtWhile(cond,body, condleft+1); 				:}
+					| callExp:c SEMICOLON											{: RESULT = new AstStmtCall(c, cleft+1); 							:}
 					;
