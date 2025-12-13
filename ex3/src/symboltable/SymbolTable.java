@@ -60,7 +60,7 @@ public class SymbolTable
 		/* [6] Print Symbol Table */
 		/**************************/
 		// printMe();
-		// this.printStackTopDown(5);
+		this.printStackTopDown(5);
 	}
 
 	/***********************************************/

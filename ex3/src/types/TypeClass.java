@@ -58,7 +58,7 @@ public class TypeClass extends Type
         return null;
     }
 
-	public boolean hasDataMember(String id)
+	public boolean hasDataMemberInClass(String id)
 	{
 		TypeList current = dataMembers;
 		while (current != null)
@@ -72,5 +72,25 @@ public class TypeClass extends Type
 		}
 		// Not found
 		return false;
+	}
+
+	public Type getDataMemberInClass(String id)
+	{	
+		TypeClass curr_class = this;
+		while (curr_class != null)
+		{
+			TypeList current_members = curr_class.dataMembers;
+			while (current_members != null)
+			{
+				Type t = current_members.head;
+				if (t.name.equals(id))
+				{
+					return t;
+				}
+				current_members = current_members.tail;
+			}
+			curr_class = curr_class.father;
+		}
+		return null;
 	}
 }

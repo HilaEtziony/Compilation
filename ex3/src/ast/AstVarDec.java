@@ -134,9 +134,9 @@ public class AstVarDec extends AstDec
 		}
 
 		/**************************************/
-		/* [3] Check That Name does NOT exist */
+		/* [3] Check Shadowing */
 		/**************************************/
-		if (theirClassType.hasDataMember(id.name))
+		if (theirClassType.getDataMemberInClass(id.name) != null)
 		{
 			System.out.format(">> ERROR: variable %s already exists in class %s\n",id.name, theirClassType.name);
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
@@ -173,6 +173,7 @@ public class AstVarDec extends AstDec
 		/************************************************/
 		TypeClassVarDec enter = new TypeClassVarDec(t, id.name); // set the name of the type to the variable's name
 		theirClassType.dataMembers = new TypeList((Type)enter, theirClassType.dataMembers);
+		SymbolTable.getInstance().enter(id.name,t);
 
 		// check the assignment expression, if exists
 		if(expr != null) {

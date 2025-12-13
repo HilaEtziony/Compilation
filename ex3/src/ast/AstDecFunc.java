@@ -161,59 +161,46 @@ public class AstDecFunc extends AstDec
 		/* [2] Enter the Function Type to theirClassType's data members */
 		/***************************************************/
 		TypeFunction funcType = new TypeFunction(returnType,this.identifier,type_list);
-		TypeClass curr = theirClassType.father;
-
-		while (curr != null)
-		{
-			boolean foundHere = false;
-
-			for (TypeList it = curr.dataMembers; it != null; it = it.tail)
+		System.out.println("Function declaration in class: " + theirClassType.name + " function name: " + this.identifier+ ", " + "return type: " + returnType.name);
+		/* Check for overriding */
+		Type existingMember = theirClassType.getDataMemberInClass(identifier);
+		if (existingMember != null){
+			if (!existingMember.isFunction() || theirClassType.hasDataMemberInClass(identifier))
 			{
-				if (it.head.name.equals(this.identifier))
-				{
-					foundHere = true;
+				System.out.format(
+					">> ERROR: Overshadowing\\Overloading is not allowed in L\n",
+					this.identifier
+				);
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+			}
+			// else, check override correctness
+			TypeFunction parentFunc = (TypeFunction) existingMember;
 
-					if (!(it.head instanceof TypeFunction))
-					{
-						System.out.format(
-							">> ERROR: %s overrides non-function member\n",
-							this.identifier
-						);
-						throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
-					}
-
-					TypeFunction parentFunc = (TypeFunction) it.head;
-
-					/* return type must match exactly */
-					if (parentFunc.returnType != funcType.returnType)
-					{
-						System.out.format(
-							">> ERROR: return type mismatch in override of %s\n",
-							this.identifier
-						);
-						throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
-					}
-
-					/* parameters must match exactly */
-					if (!TypeList.sameTypes(parentFunc.paramTypes, funcType.paramTypes))
-					{
-						System.out.format(
-							">> ERROR: parameter list mismatch in override of %s\n",
-							this.identifier
-						);
-						throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
-					}
-
-					break; // no need to check further in this class
-				}
+			/* return type must match exactly */
+			if (parentFunc.returnType != funcType.returnType)
+			{
+				System.out.format(
+					">> ERROR: return type mismatch in override of %s\n",
+					this.identifier
+				);
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 			}
 
-			if (foundHere)
-				break;   // no need to check further up the hierarchy
-
-			curr = curr.father;
+			/* parameters must match exactly */
+			if (!TypeList.sameTypes(parentFunc.paramTypes, funcType.paramTypes))
+			{
+				System.out.format(
+					">> ERROR: parameter list mismatch in override of %s\n",
+					this.identifier
+				);
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+			}
 		}
-
+		SymbolTable.getInstance().beginScope();
+		SymbolTable.getInstance().enter(identifier, funcType);
+		stmnts_of_funs.semantMe();
+		SymbolTable.getInstance().endScope();
+		
 		theirClassType.dataMembers = new TypeList(funcType, theirClassType.dataMembers);
 	}
 
