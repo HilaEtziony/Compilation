@@ -95,7 +95,7 @@ public class AstVarField extends AstVar
 			// Field not found - check in parent classes
 			classType = classType.father;
 		}
-		System.out.format("ERROR: field %s does not exist in class %s\n", fieldName, classType.name);
+		System.out.format("ERROR: field %s does not exist in class %s\n", fieldName, ((TypeClass)varType).name);
 		throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 	}
 }
