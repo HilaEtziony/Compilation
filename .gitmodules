@@ -1,6 +1,6 @@
 [submodule "compilation-ex2-testers"]
 	path = tests for all exercises/compilation-ex2-testers
 	url = https://github.com/amitnovick/compilation-ex2-testers
-[submodule "compilation-ex3-testers"]
+[submodule "tests for all exercises/compilation-ex3-testers"]
 	path = tests for all exercises/compilation-ex3-testers
-	url =	https://github.com/amitnovick/compilation-ex3-testers
+	url = https://github.com/amitnovick/compilation-ex3-testers
