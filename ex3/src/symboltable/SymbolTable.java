@@ -22,7 +22,7 @@ public class SymbolTable
 	private int hash(String s)
 	{
 		if (s == null) return 0;
-		return Math.abs(s.hashCode()) % hashArraySize;
+		return (s.hashCode() & 0x7fffffff) % hashArraySize;
 	}
 
 	/****************************************************************************/

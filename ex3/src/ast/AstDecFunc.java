@@ -153,7 +153,7 @@ public class AstDecFunc extends AstDec
 			else
 			{
 				type_list = new TypeList(t,type_list);
-				// SymbolTable.getInstance().enter(it.identifier,t);
+				SymbolTable.getInstance().enter(it.identifier,t);
 			}
 		}
 
@@ -161,7 +161,6 @@ public class AstDecFunc extends AstDec
 		/* [2] Enter the Function Type to theirClassType's data members */
 		/***************************************************/
 		TypeFunction funcType = new TypeFunction(returnType,this.identifier,type_list);
-		System.out.println("Function declaration in class: " + theirClassType.name + " function name: " + this.identifier+ ", " + "return type: " + returnType.name);
 		/* Check for overriding */
 		Type existingMember = theirClassType.getDataMemberInClass(identifier);
 		if (existingMember != null){
