@@ -51,7 +51,6 @@ public class AstDecClass extends AstDec
 
 	public Type semantMe()
 	{
-		TypeList parentDataMembers = null;
 		/* [0a] Make sure class doesn't already exist */
 		if (SymbolTable.getInstance().find(name) != null) {
 			System.out.format("ERROR: class %s already exists in symbol table\n",name);
@@ -78,10 +77,14 @@ public class AstDecClass extends AstDec
 					System.out.format("ERROR: class %s cannot extend itself, directly nor indirectly\n",name);
 					throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 				}
-
+				TypeList existingDataMembers = curr.dataMembers;
+				for (TypeList it = existingDataMembers; it != null; it = it.tail) {
+					if(!it.head.isFunction()){
+						SymbolTable.getInstance().enter(it.head.name, it.head);
+					}
+				}
 				curr = curr.father;
 			}
-			parentDataMembers = ((TypeClass) parentType).dataMembers;
 		}
 
 		/*************************/
