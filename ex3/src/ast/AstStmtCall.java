@@ -1,8 +1,6 @@
 package ast;
 
 import types.*;
-import symboltable.*;
-import semanticError.SemanticErrorException;
 
 /*
 USAGE:
@@ -58,7 +56,6 @@ public class AstStmtCall extends AstStmt
 
 	public Type semantMe()
 	{
-		// TODO
-		return null;
+		return expCall.semantMe();
 	}
 }

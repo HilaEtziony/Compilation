@@ -62,8 +62,6 @@ public class AstDecFunc extends AstDec
 		Type returnType = this.return_type.semantMe();
 		TypeList type_list =null;
 
-		// System.out.format("FUNCTION DECLARATION: %s RETURNS %s\n", identifier, returnType);
-
 		/*******************/
 		/* [0] return type */
 		/*******************/
@@ -87,7 +85,7 @@ public class AstDecFunc extends AstDec
 		for (AstTypeIdList it = func_input; it  != null; it = it.tail)
 		{
 			t = SymbolTable.getInstance().find(it.head.type);
-			if (t == null)
+			if (t == null || t == TypeVoid.getInstance())
 			{
 				System.out.format(">> ERROR: non existing type %s\n",it.head.type);	
 				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");			
@@ -98,6 +96,13 @@ public class AstDecFunc extends AstDec
 				SymbolTable.getInstance().enter(it.identifier,t);
 			}
 		}
+		// reverse type_list to maintain order
+		TypeList reversed = null;
+		while (type_list != null) {
+			reversed = new TypeList(type_list.head, reversed);
+			type_list = type_list.tail;
+		}
+		type_list = reversed;
 		//moved sentinal enter after processing input params
 		SymbolTable.getInstance().enter(identifier, new TypeFunction(returnType, identifier, type_list));
 		// SymbolTable.getInstance().enter(identifier, t);
@@ -145,7 +150,7 @@ public class AstDecFunc extends AstDec
 		for (AstTypeIdList it = func_input; it  != null; it = it.tail)
 		{
 			t = SymbolTable.getInstance().find(it.head.type);
-			if (t == null)
+			if (t == null || t == TypeVoid.getInstance())
 			{
 				System.out.format(">> ERROR: non existing type %s\n",it.head.type);	
 				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");			
@@ -156,6 +161,13 @@ public class AstDecFunc extends AstDec
 				SymbolTable.getInstance().enter(it.identifier,t);
 			}
 		}
+		// reverse type_list to maintain order
+		TypeList reversed = null;
+		while (type_list != null) {
+			reversed = new TypeList(type_list.head, reversed);
+			type_list = type_list.tail;
+		}
+		type_list = reversed;
 
 		/***************************************************/
 		/* [2] Enter the Function Type to theirClassType's data members */

@@ -53,7 +53,6 @@ public class AstNewExp extends AstExp
 
 	public Type semantMe()
 	{
-		System.out.println(this.exp + ", " + this.type + ", " + this.type.type);
 		/****************************/
 		/* [1] Check If Type exists */
 		/****************************/
