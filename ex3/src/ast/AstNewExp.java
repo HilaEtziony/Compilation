@@ -87,9 +87,23 @@ public class AstNewExp extends AstExp
 			}
 			return t;
 		}
-		// else must be array of the type
+		// else must be array of the type, and exp of type int
 		else{
-			return new TypeArray("new array", t);
+			Type expType = exp.semantMe();
+			if (expType != TypeInt.getInstance()){
+				System.out.format(">> ERROR: new with size expression must be of type int (not %s)\n",expType.name);
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+			}
+			if (exp.isConstant())
+			{
+				int expValue = exp.getConstantValue();
+				if (expValue <= 0)
+				{
+					System.out.format(">> ERROR: Array size must be positive (not %d)\n", expValue);
+					throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+				}
+			}
+			return new TypeArray("new", t);
 		}
 	}
 }

@@ -137,7 +137,7 @@ public class AstExpBinop extends AstExp
 				return TypeString.getInstance();
 			}
 
-			if (op == 4 /* < */ || op == 5 /* > */ || op == 6 /* == */){
+			if (op == 6 /* == */){
 				return TypeInt.getInstance();
 			}
 		}
@@ -147,7 +147,7 @@ public class AstExpBinop extends AstExp
 				System.out.format(">> ERROR: Invalid operation on class types\n");
 				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 			}
-			if(t1 instanceof TypeClass && t2 instanceof TypeClass && ((TypeClass)t1).name.equals(((TypeClass)t2).name)){
+			if(t1 instanceof TypeClass && t2 instanceof TypeClass && (t1.isCompatible(t2) || t2.isCompatible(t1))) {
 				return TypeInt.getInstance();
 			}
 			if(t1 == TypeNil.getInstance() || t2 == TypeNil.getInstance()) {

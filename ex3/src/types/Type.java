@@ -60,8 +60,14 @@ public abstract class Type
 			TypeArray thisArr = (TypeArray)this;
 			TypeArray otherArr = (TypeArray)other;
 			if (thisArr.type_of_array == otherArr.type_of_array) {
-				return true;
+				if(thisArr.name.equals(otherArr.name)){
+					return true;
+				}
+				if(otherArr.name.equals("new")){
+					return true;
+				}
 			}
+			return false;
 		}
 
 		// if class var
