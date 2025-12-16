@@ -1,33 +1,26 @@
-string left := "LEFT";
-string right := "RIGHT";
+// Tests SCOPE-013 - Inherited members accessible in derived class
+// Valid - Accessing superclass members from subclass
 
-class Person
-{
-    int left;
-    int right;
-}
+class Base {
+    int baseValue;
 
-int foo(int d, int k)
-{
-    int left := 50;
-    int right := 40;
-	
-    if (d+k = 17)
-    {
-        Person left;
-        Person right;
-		
-        return left.left;
-    }
-	
-    return left;
-}
-
-void main()
-{
-    if (foo(2,4))
-    {
-        PrintInt(800);
+    int getBase() {
+        return baseValue;
     }
 }
 
+class Derived extends Base {
+    int derivedValue;
+
+    void process() {
+        baseValue := 10;
+        derivedValue := 20;
+        int sum := getBase() + derivedValue;
+        PrintInt(sum);
+    }
+}
+
+void main() {
+    Derived d := new Derived;
+    d.process();
+}

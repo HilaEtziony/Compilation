@@ -156,6 +156,21 @@ public class AstExpBinop extends AstExp
 				}
 			}
 		}
+		if (t1 instanceof TypeArray || t2 instanceof TypeArray) {
+			if (op != 6 /* == */) {
+				System.out.format(">> ERROR: Invalid operation on array types\n");
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+			}
+			if (t1 instanceof TypeArray && t2 instanceof TypeArray && (t1.isCompatible(t2) || t2.isCompatible(t1))) {
+				return TypeInt.getInstance();
+			}
+			if (t1 == TypeNil.getInstance() || t2 == TypeNil.getInstance()) {
+				if (op == 6 /* == */) {
+					return TypeInt.getInstance();
+				}
+			}
+		}
+
 		throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 	}
 }

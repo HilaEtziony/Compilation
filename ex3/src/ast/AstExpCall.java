@@ -57,6 +57,14 @@ public class AstExpCall extends AstExp
 
 	public Type semantMe()
 	{
+		// if in class, first check if method exists in class
+		TypeClass currentClass = SymbolTable.getInstance().currentClass;
+		if (currentClass != null && var == null) {
+			Type funcType = currentClass.getMethod(id);
+			if (funcType != null) {
+				return funcType.getReturnType();
+			}
+		}		
 		/**************************************/
 		/* [1] Find function in symbol table  */
 		/**************************************/

@@ -97,6 +97,7 @@ public class AstDecClass extends AstDec
 		/*******************************/
 		TypeClass t = new TypeClass((TypeClass)parentType,name, null);
 		SymbolTable.getInstance().enter(name, t);
+		SymbolTable.getInstance().currentClass = t;
 		/***************************/
 		/* [2] Semant Data Members */
 		/***************************/
@@ -108,6 +109,7 @@ public class AstDecClass extends AstDec
 		/* [3] End Scope */
 		/*****************/
 		SymbolTable.getInstance().endScope();
+		SymbolTable.getInstance().currentClass = null;
 
 		/************************************************/
 		/* [4] Enter the Class Type to the Symbol Table */

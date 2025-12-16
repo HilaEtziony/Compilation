@@ -73,6 +73,13 @@ public class AstDecFunc extends AstDec
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");				
 		}
 
+		// check if function name already exists in current scope
+		if (SymbolTable.getInstance().findInCurrentScope(identifier) != null)
+		{
+			System.out.format(">> ERROR: function name %s already exists in current scope\n",identifier);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+		}
+
 		/****************************/
 		/* [1] Begin Function Scope */
 		/****************************/
@@ -88,6 +95,11 @@ public class AstDecFunc extends AstDec
 			if (t == null || t == TypeVoid.getInstance())
 			{
 				System.out.format(">> ERROR: non existing type %s\n",it.head.type);	
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");			
+			}
+			else if (SymbolTable.getInstance().findInCurrentScope(it.identifier) != null)
+			{
+				System.out.format(">> ERROR: duplicate variable name %s\n",it.identifier);	
 				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");			
 			}
 			else
@@ -144,15 +156,29 @@ public class AstDecFunc extends AstDec
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");				
 		}
 
+		// check if function name already exists in current scope
+		if (SymbolTable.getInstance().findInCurrentScope(identifier) != null)
+		{
+			System.out.format(">> ERROR: function name %s already exists in current scope\n",identifier);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+		}
+
 		/***************************/
 		/* [1] Semant Input func_input */
 		/***************************/
+		SymbolTable.getInstance().beginScope();
+
 		for (AstTypeIdList it = func_input; it  != null; it = it.tail)
 		{
 			t = SymbolTable.getInstance().find(it.head.type);
 			if (t == null || t == TypeVoid.getInstance())
 			{
 				System.out.format(">> ERROR: non existing type %s\n",it.head.type);	
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");			
+			}
+			else if (SymbolTable.getInstance().findInCurrentScope(it.identifier) != null)
+			{
+				System.out.format(">> ERROR: duplicate variable name %s in function %s\n",it.identifier,this.identifier);	
 				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");			
 			}
 			else
@@ -207,12 +233,12 @@ public class AstDecFunc extends AstDec
 				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 			}
 		}
-		SymbolTable.getInstance().beginScope();
 		SymbolTable.getInstance().enter(identifier, funcType);
 		stmnts_of_funs.semantMe();
 		SymbolTable.getInstance().endScope();
 		
 		theirClassType.dataMembers = new TypeList(funcType, theirClassType.dataMembers);
+		SymbolTable.getInstance().enter(identifier, funcType);
 	}
 
 
