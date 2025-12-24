@@ -116,10 +116,12 @@ public class AstStmtWhile extends AstStmt
 				getInstance().
 				AddIrCommand(new IrCommandJumpIfEqToZero(condTemp,labelEnd));
 
-		/*******************/
-		/* [5] body.IRme() */
-		/*******************/
-		body.irMe();
+		/***************************************/
+		/* [5] body.IRme() if body is not null */
+		/***************************************/
+		if (body != null) {
+            body.irMe();
+        }
 
 		/******************************/
 		/* [6] Jump to the loop entry */
