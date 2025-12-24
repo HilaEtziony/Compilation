@@ -104,10 +104,14 @@ public class AstStmtAssign extends AstStmt
 	public Temp irMe()
 	{
 		Temp src = exp.irMe();
-		Ir.
-				getInstance().
-				AddIrCommand(new IrCommandStore(((AstVarSimple) var).name,src));
-
+		if (var instanceof AstVarSimple)
+		{
+			Ir.getInstance().AddIrCommand(new IrCommandStore(((AstVarSimple) var).name,src));
+		}
+		else
+		{
+			var.irMe();
+		}
 		return null;
 	}
 }
