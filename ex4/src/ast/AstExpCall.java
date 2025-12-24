@@ -132,13 +132,38 @@ public class AstExpCall extends AstExp
 
 	public Temp irMe()
 	{
-		Temp t = null;
+		Temp varTemp = null;
+        TempList tempArgsList = null;
 
-		if (expList != null) { t = expList.head.irMe(); }
+        if (var != null) {
+            varTemp = var.irMe();
+        }
 
-		Ir.getInstance().AddIrCommand(new IrCommandPrintInt(t));
+        /*******************************************************************/
+        /* [1] Evaluate function arguments from the expList.               */
+        /*******************************************************************/
+        if (expList != null) {
+            int numArgs = expList.size();
+            for (int i = numArgs - 1; i >= 0; i--) {
+                Temp t = expList.get(i).irMe();
+                tempArgsList = new TempList(t, tempArgsList);
+            }
+        }
 
-		return null;
+        /*******************************************************************/
+        /* [2] Allocate a result Temp and add the Call command to the IR.  */
+        /*******************************************************************/
+        Temp resultTemp = TempFactory.getInstance().getFreshTemp();
+        
+		/*******************************************************************/
+        /* [3] Create the IR Call command and add it to the IR list.       */
+        /*******************************************************************/
+        Ir.getInstance().AddIrCommand(new IrCommandCall(resultTemp, varTemp, id, tempArgsList));
+
+		/******************************************************/
+        /* [4] Return the Temp that will hold the return value */
+        /******************************************************/
+        return resultTemp;
 	}
 }
 
