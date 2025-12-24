@@ -186,30 +186,35 @@ public class AstExpBinop extends AstExp
 		if (left  != null) t1 = left.irMe();
 		if (right != null) t2 = right.irMe();
 
-		if (op == 0)
-		{
-			Ir.
-					getInstance().
-					AddIrCommand(new IrCommandBinopAddIntegers(dst,t1,t2));
-		}
-		if (op == 2)
-		{
-			Ir.
-					getInstance().
-					AddIrCommand(new IrCommandBinopMulIntegers(dst,t1,t2));
-		}
-		if (op == 3)
-		{
-			Ir.
-					getInstance().
-					AddIrCommand(new IrCommandBinopEqIntegers(dst,t1,t2));
-		}
-		if (op == 4)
-		{
-			Ir.
-					getInstance().
-					AddIrCommand(new IrCommandBinopLtIntegers(dst,t1,t2));
-		}
+		if (op == 0) // PLUS
+        {
+            Ir.getInstance().AddIrCommand(new IrCommandBinopAddIntegers(dst, t1, t2));
+        }
+        else if (op == 1) // MINUS
+        {
+            Ir.getInstance().AddIrCommand(new IrCommandBinopSubIntegers(dst, t1, t2));
+        }
+        else if (op == 2) // TIMES (*)
+        {
+            Ir.getInstance().AddIrCommand(new IrCommandBinopMulIntegers(dst, t1, t2));
+        }
+        else if (op == 3) // DIVIDE (/)
+        {
+            Ir.getInstance().AddIrCommand(new IrCommandBinopDivIntegers(dst, t1, t2));
+        }
+        else if (op == 4) // LT (<)
+        {
+            Ir.getInstance().AddIrCommand(new IrCommandBinopLtIntegers(dst, t1, t2));
+        }
+        else if (op == 5) // GT (>)
+        {
+            Ir.getInstance().AddIrCommand(new IrCommandBinopGtIntegers(dst, t1, t2));
+        }
+        else if (op == 6) // EQ (==)
+        {
+            Ir.getInstance().AddIrCommand(new IrCommandBinopEqIntegers(dst, t1, t2));
+        }
+
 		return dst;
 	}
 
