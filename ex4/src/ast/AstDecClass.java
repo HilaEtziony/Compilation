@@ -1,35 +1,31 @@
 package ast;
 
-import types.*;
+import semanticError.SemanticErrorException;
 import symboltable.*;
+import types.*;
+
+/*
+USAGE:
+	| CLASS ID:name EXTENDS ID:parentName LBRACE cFieldList:l RBRACE	{: RESULT = new AstDecClass(name,parentName,l); 	:}
+	| CLASS ID:name LBRACE cFieldList:l RBRACE							{: RESULT = new AstDecClass(name,null,l); 			:}
+*/
 
 public class AstDecClass extends AstDec
 {
-	/********/
-	/* NAME */
-	/********/
-	public String name;
+    public String name;
+    public String parentName;
+    public AstDecList cFieldList;
 
-	/****************/
-	/* DATA MEMBERS */
-	/****************/
-	public AstTypeNameList dataMembers;
-	
-	/******************/
-	/* CONSTRUCTOR(S) */
-	/******************/
-	public AstDecClass(String name, AstTypeNameList dataMembers)
-	{
-		/******************************/
-		/* SET A UNIQUE SERIAL NUMBER */
-		/******************************/
-		serialNumber = AstNodeSerialNumber.getFresh();
-	
-		this.name = name;
-		this.dataMembers = dataMembers;
-	}
+    public AstDecClass(String name, String parentName, AstDecList cFieldList, int lineNumber)
+    {
+        serialNumber = AstNodeSerialNumber.getFresh();
+		this.lineNumber = lineNumber;
+        this.name = name;
+        this.parentName = parentName;
+        this.cFieldList = cFieldList;
+    }
 
-	/*********************************************************/
+    /*********************************************************/
 	/* The printing message for a class declaration AST node */
 	/*********************************************************/
 	public void printMe()
@@ -38,7 +34,7 @@ public class AstDecClass extends AstDec
 		/* RECURSIVELY PRINT HEAD + TAIL ... */
 		/*************************************/
 		System.out.format("CLASS DEC = %s\n",name);
-		if (dataMembers != null) dataMembers.printMe();
+		if (cFieldList != null) cFieldList.printMe();
 		
 		/***************************************/
 		/* PRINT Node to AST GRAPHVIZ DOT file */
@@ -50,25 +46,70 @@ public class AstDecClass extends AstDec
 		/****************************************/
 		/* PRINT Edges to AST GRAPHVIZ DOT file */
 		/****************************************/
-		AstGraphviz.getInstance().logEdge(serialNumber, dataMembers.serialNumber);
+		AstGraphviz.getInstance().logEdge(serialNumber, cFieldList.serialNumber);
 	}
-	
+
 	public Type semantMe()
-	{	
+	{
+		/* [0a] Make sure class doesn't already exist */
+		if (SymbolTable.getInstance().find(name) != null) {
+			System.out.format("ERROR: class %s already exists in symbol table\n",name);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+		}
+
+		Type parentType = SymbolTable.getInstance().find(parentName);
+		/* [0b] Make sure father exist */
+		if (parentName != null) {
+			if (parentType == null || !(parentType instanceof TypeClass)) {
+				System.out.format("ERROR: parent class %s of class %s doesn't exist\n",parentName,name);
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+			}
+		}
+
+		/* [0c] Prevent circular dependencies */
+		if (parentName != null) {
+			// if got here, then parentType exists and is TypeClass
+
+			TypeClass curr = (TypeClass) parentType;
+			while (curr != null){
+				if (curr.name.equals(this.name))
+				{
+					System.out.format("ERROR: class %s cannot extend itself, directly nor indirectly\n",name);
+					throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+				}
+				TypeList existingDataMembers = curr.dataMembers;
+				for (TypeList it = existingDataMembers; it != null; it = it.tail) {
+					if(!it.head.isFunction()){
+						SymbolTable.getInstance().enter(it.head.name, it.head);
+					}
+				}
+				curr = curr.father;
+			}
+		}
+
 		/*************************/
 		/* [1] Begin Class Scope */
 		/*************************/
 		SymbolTable.getInstance().beginScope();
 
+		/*******************************/
+		/* [1a] Semant Class ...  */
+		/*******************************/
+		TypeClass t = new TypeClass((TypeClass)parentType,name, null);
+		SymbolTable.getInstance().enter(name, t);
+		SymbolTable.getInstance().currentClass = t;
 		/***************************/
 		/* [2] Semant Data Members */
 		/***************************/
-		TypeClass t = new TypeClass(null,name, dataMembers.semantMe());
+		// System.out.println("Semanting class data members for class " + name + " " + this.cFieldList );
+		this.cFieldList.semantMe(t);
+	
 
 		/*****************/
 		/* [3] End Scope */
 		/*****************/
 		SymbolTable.getInstance().endScope();
+		SymbolTable.getInstance().currentClass = null;
 
 		/************************************************/
 		/* [4] Enter the Class Type to the Symbol Table */
@@ -78,6 +119,15 @@ public class AstDecClass extends AstDec
 		/*********************************************************/
 		/* [5] Return value is irrelevant for class declarations */
 		/*********************************************************/
-		return null;		
+		return null;
+	}
+
+	private void printTypeList(TypeList tl) {
+		System.out.print("TypeList: ");
+		for (TypeList it = tl; it != null; it = it.tail) {
+			System.out.print(it.head.name + " ");
+		}
+		System.out.println();
 	}
 }
+

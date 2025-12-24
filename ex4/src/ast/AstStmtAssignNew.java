@@ -2,26 +2,24 @@ package ast;
 
 import semanticError.SemanticErrorException;
 import types.*;
-import temp.*;
-import ir.*;
 
 /*
 USAGE:
-	| var:v ASSIGN exp:e SEMICOLON									{: RESULT = new AstStmtAssign(v,e); 				:}
+	| var:v ASSIGN newExp:nExp SEMICOLON							{: RESULT = new AstStmtAssignNew(v,nExp); 			:}
 */
 
-public class AstStmtAssign extends AstStmt
+public class AstStmtAssignNew extends AstStmt
 {
 	/***************/
 	/*  var := exp */
 	/***************/
 	public AstVar var;
-	public AstExp exp;
+	public AstNewExp exp;
 
 	/*******************/
 	/*  CONSTRUCTOR(S) */
 	/*******************/
-	public AstStmtAssign(AstVar var, AstExp exp, int lineNumber)
+	public AstStmtAssignNew(AstVar var, AstNewExp exp, int lineNumber)
 	{
 		/******************************/
 		/* SET A UNIQUE SERIAL NUMBER */
@@ -49,7 +47,7 @@ public class AstStmtAssign extends AstStmt
 		/********************************************/
 		/* AST NODE TYPE = AST ASSIGNMENT STATEMENT */
 		/********************************************/
-		System.out.print("AST NODE ASSIGN STMT\n");
+		System.out.print("AST NODE ASSIGN STMT NEW\n");
 
 		/***********************************/
 		/* RECURSIVELY PRINT VAR + EXP ... */
@@ -61,7 +59,7 @@ public class AstStmtAssign extends AstStmt
 		/* PRINT Node to AST GRAPHVIZ DOT file */
 		/***************************************/
 		AstGraphviz.getInstance().logNode(
-                serialNumber,
+				serialNumber,
 			"ASSIGN\nleft := right\n");
 		
 		/****************************************/
@@ -73,41 +71,18 @@ public class AstStmtAssign extends AstStmt
 
 	public Type semantMe()
 	{
-		Type t_exp = exp.semantMe();
 		Type t_var = var.semantMe();
+		Type t_new = exp.semantMe(); // Can be array or class type
 
 		if(t_var != null && t_var instanceof TypeClassVarDec) t_var = ((TypeClassVarDec)t_var).t;
-		if(t_exp != null && t_exp instanceof TypeClassVarDec) t_exp = ((TypeClassVarDec)t_exp).t;
 
-		/**************************************/
-		/* [1] Check assignment of nil        */
-		/**************************************/
-		if (t_exp.isNil() && !(t_var.isClass() || t_var.isArray())) {
-			System.out.format(">> ERROR: cannot assign nil to %s\n", t_var.name);
+		/******************************/
+		/* [1] Check assignment for new (means class or array) */
+		/******************************/
+		if (!t_var.isCompatible(t_new)) {
+			System.out.format(">> ERROR: cannot assign %s to %s\n", t_new.name, t_var.name);
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
-
-		/**************************************/
-		/* [2] Check assignment compatibility */
-		/**************************************/
-		if (!t_var.isCompatible(t_exp)) {
-			System.out.format(">> ERROR: cannot assign %s to %s\n", t_exp.name, t_var.name);
-			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
-		}
-
-		/************************************************************/
-		/* [3] Return value is irrelevant for statements          */
-		/************************************************************/
-		return null;
-	}
-
-	public Temp irMe()
-	{
-		Temp src = exp.irMe();
-		Ir.
-				getInstance().
-				AddIrCommand(new IrCommandStore(((AstVarSimple) var).name,src));
-
 		return null;
 	}
 }

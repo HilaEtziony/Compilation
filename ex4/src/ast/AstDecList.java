@@ -4,27 +4,34 @@ import types.*;
 import temp.*;
 import ir.*;
 
-public class AstDecList extends AstNode
+/*
+USAGE:
+	| dec:d	decList:l												{: RESULT = new AstDecList(d,l);    				:}
+	| dec:d															{: RESULT = new AstDecList(d,null); 				:}
+	| cField:c	cFieldList:l										{: RESULT = new AstDecList(c,l);    				:}
+	| cField:c														{: RESULT = new AstDecList(c,null); 				:}
+*/
+
+public class AstDecList extends AstStmt
 {
-	/****************/
-	/* DATA MEMBERS */
-	/****************/
-	public AstDec head;
-	public AstDecList tail;
+    /****************/
+    /* DATA MEMBERS */
+    /****************/
+    public AstDec head;
+    public AstDecList tail;
 
-	/******************/
-	/* CONSTRUCTOR(S) */
-	/******************/
-	public AstDecList(AstDec head, AstDecList tail)
-	{
-		/******************************/
-		/* SET A UNIQUE SERIAL NUMBER */
-		/******************************/
-		serialNumber = AstNodeSerialNumber.getFresh();
+    /******************/
+    /* CONSTRUCTOR(S) */
+    /******************/
+    public AstDecList(AstDec head, AstDecList tail)
+    {
+        serialNumber = AstNodeSerialNumber.getFresh();
+        if (tail != null) System.out.print("====================== decList -> dec decList\n");
+        if (tail == null) System.out.print("====================== decList -> dec         \n");
 
-		this.head = head;
-		this.tail = tail;
-	}
+        this.head = head;
+        this.tail = tail;
+    }
 
 	/********************************************************/
 	/* The printing message for a declaration list AST node */
@@ -48,7 +55,7 @@ public class AstDecList extends AstNode
 		AstGraphviz.getInstance().logNode(
 				serialNumber,
 			"DEC\nLIST\n");
-				
+
 		/****************************************/
 		/* PRINT Edges to AST GRAPHVIZ DOT file */
 		/****************************************/
@@ -67,6 +74,15 @@ public class AstDecList extends AstNode
 		return null;
 	}
 
+	public void semantMe(TypeClass theirClassType) // Dec list of a class = cFieldList. Yamit: Not sure if needed
+	{
+		/*************************************/
+		/* RECURSIVELY PRINT HEAD + TAIL ... */
+		/*************************************/
+		if (head != null) head.semantMe(theirClassType);
+		if (tail != null) tail.semantMe(theirClassType);
+	}
+
 	public Temp irMe()
 	{
 		if (head != null) head.irMe();
@@ -74,4 +90,5 @@ public class AstDecList extends AstNode
 
 		return null;
 	}
+
 }

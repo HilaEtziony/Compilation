@@ -1,29 +1,29 @@
 package ast;
 
+import types.*;
+import symboltable.*;
+import semanticError.SemanticErrorException;
 import temp.*;
 
-public class AstExpList extends AstNode
+/*
+USAGE:
+	| exp:e COMMA expList:l											{: RESULT = new AstExpList(e,l);    				:}
+	| exp:e															{: RESULT = new AstExpList(e,null);    				:}
+*/
+
+public class AstExpList extends AstDec
 {
-	/****************/
-	/* DATA MEMBERS */
-	/****************/
-	public AstExp head;
-	public AstExpList tail;
+    public AstExp head;
+    public AstExpList tail;
 
-	/******************/
-	/* CONSTRUCTOR(S) */
-	/******************/
-	public AstExpList(AstExp head, AstExpList tail)
-	{
-		/******************************/
-		/* SET A UNIQUE SERIAL NUMBER */
-		/******************************/
-		serialNumber = AstNodeSerialNumber.getFresh();
+    public AstExpList(AstExp head, AstExpList tail)
+    {
+        serialNumber = AstNodeSerialNumber.getFresh();
+        this.head = head;
+        this.tail = tail;
+    }
 
-		this.head = head;
-		this.tail = tail;
-	}
-	/*******************************************************/
+    /*******************************************************/
 	/* The printing message for a expression list AST node */
 	/*******************************************************/
 	public void printMe()
@@ -53,8 +53,49 @@ public class AstExpList extends AstNode
 		if (tail != null) AstGraphviz.getInstance().logEdge(serialNumber,tail.serialNumber);
 	}
 
+    /***********************************************/
+    /* Return the i-th element in the list         */
+    /***********************************************/
+    public AstExp get(int i)
+    {
+        if (i == 0) return head;
+        return tail.get(i - 1);
+    }
+
+    /***********************************************/
+    /* Return the number of elements in the list  */
+    /***********************************************/
+    public int size()
+    {
+        if (tail == null) return 1;
+        return 1 + tail.size();
+    }
+
+	public Type semantMe()
+	{
+		/***********************************************/
+		/* [1] Evaluate the head expression           */
+		/***********************************************/
+		if (head != null)
+			head.semantMe();
+
+		/***********************************************/
+		/* [2] Recursively evaluate the tail list     */
+		/***********************************************/
+		if (tail != null)
+			tail.semantMe();
+
+		/***********************************************/
+		/* [3] Return null because the list itself    */
+		/* does not have a single type               */
+		/***********************************************/
+		return null;
+	}
+
 	public Temp irMe()
 	{
 		return head.irMe();
 	}
+
 }
+
