@@ -2,6 +2,7 @@ package ast;
 
 import semanticError.SemanticErrorException;
 import symboltable.*;
+import temp.Temp;
 import types.*;
 
 /*
@@ -91,6 +92,11 @@ public class AstDecArray extends AstDec
 		/************************************************************/
 		/* [5] Return value is irrelevant for type declarations     */
 		/************************************************************/
+		return null;
+	}
+
+	public Temp irMe()
+	{
 		return null;
 	}
 }

@@ -1,7 +1,10 @@
 package ast;
 
+import ir.*;
 import semanticError.SemanticErrorException;
 import symboltable.*;
+import temp.Temp;
+import temp.TempFactory;
 import types.*;
 
 /*
@@ -105,6 +108,20 @@ public class AstNewExp extends AstExp
 			}
 			return new TypeArray("new", t);
 		}
+	}
+
+	public Temp irMe() {
+		Temp dst = TempFactory.getInstance().getFreshTemp();
+
+		if (exp == null) {
+			// Class allocation
+			Ir.getInstance().AddIrCommand(new IrCommandNew(dst, type.type));
+		} else {
+			// Array allocation
+			Temp sizeTemp = exp.irMe();
+			Ir.getInstance().AddIrCommand(new IrCommandNew(dst, sizeTemp));
+		}
+		return dst;
 	}
 }
 

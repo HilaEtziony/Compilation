@@ -2,6 +2,10 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import temp.Temp;
+import temp.TempFactory;
+import ir.Ir;
+import ir.IrCommandConstString;
 import semanticError.SemanticErrorException;
 
 /*
@@ -41,5 +45,12 @@ public class AstExpString extends AstExp
 	public Type semantMe()
 	{
 		return TypeString.getInstance();
+	}
+
+	public Temp irMe()
+	{
+		Temp dst = TempFactory.getInstance().getFreshTemp();
+		Ir.getInstance().AddIrCommand(new IrCommandConstString(dst, this.string));
+		return dst;
 	}
 }

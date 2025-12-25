@@ -1,6 +1,9 @@
 package ast;
 
+import ir.Ir;
+import ir.IrCommandStore;
 import semanticError.SemanticErrorException;
+import temp.Temp;
 import types.*;
 
 /*
@@ -83,6 +86,17 @@ public class AstStmtAssignNew extends AstStmt
 			System.out.format(">> ERROR: cannot assign %s to %s\n", t_new.name, t_var.name);
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
+		return null;
+	}
+
+	@Override
+	public Temp irMe() {
+		Temp src = exp.irMe();
+
+		String path = var.getPath();
+
+		Ir.getInstance().AddIrCommand(new IrCommandStore(path, src));
+
 		return null;
 	}
 }

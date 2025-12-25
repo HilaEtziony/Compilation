@@ -245,8 +245,12 @@ public class AstDecFunc extends AstDec
 
 	public Temp irMe()
 	{
-		Ir.getInstance().AddIrCommand(new IrCommandLabel("main"));
+		Ir.getInstance().AddIrCommand(new IrCommandLabel(identifier));
 		if (stmnts_of_funs != null) stmnts_of_funs.irMe();
+
+		//for void return functions
+		Ir.getInstance().AddIrCommand(new IrCommandReturn(null));
+
 
 		return null;
 	}

@@ -54,7 +54,10 @@ public class AstExpCall extends AstExp
 		/****************************************/
 		/* PRINT Edges to AST GRAPHVIZ DOT file */
 		/****************************************/
-		AstGraphviz.getInstance().logEdge(serialNumber,expList.serialNumber);
+		if (expList != null) 
+		{
+			AstGraphviz.getInstance().logEdge(serialNumber,expList.serialNumber);
+		}
 	}
 
 	public Type semantMe()
@@ -149,6 +152,19 @@ public class AstExpCall extends AstExp
                 tempArgsList = new TempList(t, tempArgsList);
             }
         }
+
+		
+		/*******************************************/
+		/* Special case: call to PrintInt          */
+		/*******************************************/
+		if (id.equals("PrintInt")) {
+			// expecting one argument
+			Temp arg = (tempArgsList != null) ? tempArgsList.head : null;
+			Ir.getInstance().AddIrCommand(new IrCommandPrintInt(arg));
+			
+			// PrintInt returns void
+			return null; 
+		}
 
         /*******************************************************************/
         /* [2] Allocate a result Temp and add the Call command to the IR.  */

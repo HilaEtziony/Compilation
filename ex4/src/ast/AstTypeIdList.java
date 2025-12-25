@@ -1,6 +1,7 @@
 package ast;
 
 import semanticError.SemanticErrorException;
+import temp.Temp;
 import types.*;
 
 /*
@@ -67,5 +68,10 @@ public class AstTypeIdList extends AstDec
 
 		Type head_type = this.head.semantMe();
 		return new TypeList(head_type, type_list_tail);
+	}
+
+	public Temp irMe()
+	{
+		return null;
 	}
 }

@@ -2,6 +2,7 @@ package ast;
 
 import semanticError.SemanticErrorException;
 import symboltable.*;
+import temp.Temp;
 import types.*;
 
 /*
@@ -122,12 +123,15 @@ public class AstDecClass extends AstDec
 		return null;
 	}
 
-	private void printTypeList(TypeList tl) {
-		System.out.print("TypeList: ");
-		for (TypeList it = tl; it != null; it = it.tail) {
-			System.out.print(it.head.name + " ");
+	public Temp irMe()
+	{
+		if (cFieldList != null)
+		{
+			cFieldList.irMe();
 		}
-		System.out.println();
+		
+		return null;
 	}
+
 }
 

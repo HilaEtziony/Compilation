@@ -83,4 +83,8 @@ public class AstVarSimple extends AstVar
 		Ir.getInstance().AddIrCommand(new IrCommandLoad(t,name));
 		return t;
 	}
+
+	public String getPath() {
+		return this.name;
+	}
 }

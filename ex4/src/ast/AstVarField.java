@@ -1,6 +1,10 @@
 package ast;
 
+import ir.Ir;
+import ir.IrCommandLoad;
 import semanticError.SemanticErrorException;
+import temp.Temp;
+import temp.TempFactory;
 import types.*;
 
 /*
@@ -98,4 +102,43 @@ public class AstVarField extends AstVar
 		System.out.format("ERROR: field %s does not exist in class %s\n", fieldName, ((TypeClass)varType).name);
 		throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 	}
+
+	public Temp irMe()
+	{
+		Temp dst = TempFactory.getInstance().getFreshTemp();
+
+		/*******************************************************************/
+		/* Build the path. Starting with the current field name.           */
+		/*******************************************************************/
+		String fullPath = this.fieldName;
+		AstVar tempVar = this.var;
+
+		while (tempVar != null) 
+		{
+			if (tempVar instanceof AstVarSimple) {
+				fullPath = ((AstVarSimple) tempVar).name + "." + fullPath;
+				break;
+			} 
+			else if (tempVar instanceof AstVarField) {
+				fullPath = ((AstVarField) tempVar).fieldName + "." + fullPath;
+				tempVar = ((AstVarField) tempVar).var;
+			} 
+			else if (tempVar instanceof AstVarSubscript) {
+				// Ensure index is calculated if a field is accessed from an array
+				((AstVarSubscript) tempVar).subscript.irMe();
+				fullPath = "[]" + "." + fullPath;
+				tempVar = ((AstVarSubscript) tempVar).var;
+			} 
+			else { break; }
+		}
+
+		Ir.getInstance().AddIrCommand(new IrCommandLoad(dst, fullPath));
+
+		return dst;
+	}
+
+	public String getPath() {
+		return var.getPath() + "." + fieldName;
+	}
 }
+

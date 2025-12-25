@@ -10,4 +10,8 @@ public abstract class AstVar extends AstNode
 	{
 		return null;
 	}
+
+	public String getPath() {
+		return null;
+	}
 }

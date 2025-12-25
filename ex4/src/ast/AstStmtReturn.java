@@ -1,7 +1,10 @@
 package ast;
 
+import ir.Ir;
+import ir.IrCommandReturn;
 import semanticError.SemanticErrorException;
 import symboltable.*;
+import temp.Temp;
 import types.*;
 
 /*
@@ -98,5 +101,29 @@ public class AstStmtReturn extends AstStmt
 		// System.out.println("Return statement semanted successfully");
 		// SymbolTable.getInstance().printStackTopDown(5);
 		return expType;
+	}
+
+	public Temp irMe()
+	{
+		Temp t = null;
+
+		/*******************************************************************/
+		/* [1] If there is a return expression, calculate it to get a Temp */
+		/*******************************************************************/
+		if (exp != null)
+		{
+			t = exp.irMe();
+		}
+
+		/*******************************************************************/
+		/* [2] Add the Return IR command.                                  */
+		/* This is MANDATORY to signal the end of function execution.      */
+		/*******************************************************************/
+		Ir.getInstance().AddIrCommand(new IrCommandReturn(t));
+
+		/*******************************************************************/
+		/* [3] Statements always return null as they don't have a value    */
+		/*******************************************************************/
+		return null;
 	}
 }

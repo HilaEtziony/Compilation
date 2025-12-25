@@ -94,8 +94,12 @@ public class AstExpList extends AstDec
 
 	public Temp irMe()
 	{
-		return head.irMe();
+		if (head != null) head.irMe();
+		if (tail != null) tail.irMe();
+
+		return null;
 	}
 
 }
+
 
