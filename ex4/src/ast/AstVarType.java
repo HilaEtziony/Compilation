@@ -2,6 +2,7 @@ package ast;
 
 import semanticError.SemanticErrorException;
 import symboltable.*;
+import temp.Temp;
 import types.*;
 
 /*
@@ -51,5 +52,10 @@ public class AstVarType extends AstDec
 		}
 
 		return t;
+	}
+
+	public Temp irMe()
+	{
+		return null;
 	}
 }
