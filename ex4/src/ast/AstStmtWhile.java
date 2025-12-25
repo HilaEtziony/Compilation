@@ -94,8 +94,8 @@ public class AstStmtWhile extends AstStmt
 		/*******************************/
 		/* [1] Allocate 2 fresh labels */
 		/*******************************/
-		String labelEnd   = IrCommand.getFreshLabel("end");
-		String labelStart = IrCommand.getFreshLabel("start");
+		String labelEnd   = IrCommand.getFreshLabel("while_end");
+		String labelStart = IrCommand.getFreshLabel("while_start");
 
 		/*********************************/
 		/* [2] entry label for the while */
