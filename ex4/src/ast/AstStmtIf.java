@@ -2,6 +2,12 @@ package ast;
 
 import types.*;
 import symboltable.*;
+import temp.Temp;
+import ir.Ir;
+import ir.IrCommand;
+import ir.IrCommandJumpIfEqToZero;
+import ir.IrCommandJumpLabel;
+import ir.IrCommandLabel;
 import semanticError.SemanticErrorException;
 
 /*
@@ -113,4 +119,57 @@ public class AstStmtIf extends AstStmt
 		/**************************************************/
 		return null;
 	}
+
+    public Temp irMe() {
+        /*******************************************************************/
+        /* [1] Create fresh labels for the 'else' block and the 'end' block */
+        /*******************************************************************/
+        String labelElse = IrCommand.getFreshLabel("if_else");
+        String labelEnd  = IrCommand.getFreshLabel("if_end");
+
+        /*******************************************************************/
+        /* [2] Generate IR for the condition. It returns a Temp with 1 or 0 */
+        /*******************************************************************/
+        Temp condTemp = cond.irMe();
+
+        /*******************************************************************/
+        /* [3] If condition is false (0), jump to the 'else' label.         */
+        /* If there is no else, it will jump to the end of the if.     */
+        /*******************************************************************/
+        Ir.getInstance().AddIrCommand(new IrCommandJumpIfEqToZero(condTemp, labelElse));
+
+        /*******************************************************************/
+        /* [4] Generate IR for the 'then' body (if the condition was true)  */
+        /*******************************************************************/
+        if (body != null) {
+            body.irMe();
+        }
+
+        /*******************************************************************/
+        /* [5] After 'then' body, jump to the end to skip the 'else' block  */
+        /*******************************************************************/
+        Ir.getInstance().AddIrCommand(new IrCommandJumpLabel(labelEnd));
+
+        /*******************************************************************/
+        /* [6] Place the 'else' label here.                                */
+        /*******************************************************************/
+        Ir.getInstance().AddIrCommand(new IrCommandLabel(labelElse));
+
+        /*******************************************************************/
+        /* [7] Generate IR for the 'else' body (if it exists)              */
+        /*******************************************************************/
+        if (elseBody != null) {
+            elseBody.irMe();
+        }
+
+        /*******************************************************************/
+        /* [8] Place the 'end' label to mark the exit of the if-else block */
+        /*******************************************************************/
+        Ir.getInstance().AddIrCommand(new IrCommandLabel(labelEnd));
+
+        /*******************************************************************/
+        /* [9] Statements do not produce a value, so we return null        */
+        /*******************************************************************/
+        return null;
+    }
 }
