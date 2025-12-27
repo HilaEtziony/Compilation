@@ -1,6 +1,7 @@
 package ast;
 
 import ir.Ir;
+import ir.IrCommandJumpLabel;
 import ir.IrCommandReturn;
 import semanticError.SemanticErrorException;
 import symboltable.*;
@@ -122,7 +123,15 @@ public class AstStmtReturn extends AstStmt
 		Ir.getInstance().AddIrCommand(new IrCommandReturn(t));
 
 		/*******************************************************************/
-		/* [3] Statements always return null as they don't have a value    */
+		/* [3] Jump to function exit label                                 */
+		/*******************************************************************/
+		String exitLabel = SymbolTable.getInstance().getCurrentFunctionExitLabel();
+		if (exitLabel != null) {
+			Ir.getInstance().AddIrCommand(new IrCommandJumpLabel(exitLabel));
+		}
+
+		/*******************************************************************/
+		/* [4] Statements always return null as they don't have a value    */
 		/*******************************************************************/
 		return null;
 	}

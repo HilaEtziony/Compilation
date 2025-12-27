@@ -6,6 +6,12 @@ import types.*;
 public class SymbolTable
 {
 	private int hashArraySize = 13;
+
+	private int scopeLevel = 0;         // 0 = Global, 1+ = Local
+	private int globalOffsetCounter = 0;
+	private int localOffsetCounter = 0;
+	private int localCount = 0;
+	private String currentFunctionExitLabel = null;
 	
 	public static final String SCOPE_BOUNDARY = "SCOPE-BOUNDARY";
 
@@ -16,6 +22,40 @@ public class SymbolTable
 	private SymbolTableEntry top;
 	private int topIndex = 0;
 	public TypeClass currentClass = null;
+
+	public boolean isGlobalScope() {
+		return scopeLevel == 0;
+	}
+
+	// Calculate new offset and update counters
+	public int calculateNewOffset(boolean isGlobal) {
+		if (isGlobal) {
+			int current = globalOffsetCounter;
+			globalOffsetCounter += 4; // Every global variable takes 4 bytes
+			return current;
+		} else {
+			// In the stack, offsets decrease from the Frame Pointer ($fp)
+			localOffsetCounter -= 4; 
+			return localOffsetCounter;
+		}
+	}
+
+	public void resetLocalOffset() {
+		this.localCount = 0;
+	}
+
+	public int getLocalCount() {
+		return this.localCount;
+	}
+
+	public void setCurrentFunctionExitLabel(String label) {
+		this.currentFunctionExitLabel = label;
+	}
+
+	public String getCurrentFunctionExitLabel() {
+		return this.currentFunctionExitLabel;
+	}
+
 	/**************************************************************/
 	/* A very primitive hash function for exposition purposes ... */
 	/**************************************************************/
@@ -26,9 +66,18 @@ public class SymbolTable
 	}
 
 	/****************************************************************************/
+	/* Original version - for types, functions, and scope boundaries        */
+	/****************************************************************************/
+	public void enter(String name, Type t) {
+		boolean isGlobal = isGlobalScope();
+		int offset = calculateNewOffset(isGlobal);
+		enter(name, t, offset, isGlobal);
+	}
+
+	/****************************************************************************/
 	/* Enter a variable, function, class type or array type to the symbol table */
 	/****************************************************************************/
-	public void enter(String name, Type t)
+	public void enter(String name, Type t, int offset, boolean isGlobal)
 	{
 		/*************************************************/
 		/* [1] Compute the hash value for this new entry */
@@ -44,7 +93,7 @@ public class SymbolTable
 		/**************************************************************************/
 		/* [3] Prepare a new symbol table entry with name, type, next and prevtop */
 		/**************************************************************************/
-		SymbolTableEntry e = new SymbolTableEntry(name,t,hashValue,next,top, topIndex++);
+		SymbolTableEntry e = new SymbolTableEntry(name,t,hashValue,next,top, topIndex++, offset, isGlobal);
 
 		/**********************************************/
 		/* [4] Update the top of the symbol table ... */
@@ -61,6 +110,9 @@ public class SymbolTable
 		/**************************/
 		// printMe();
 		// this.printStackTopDown(5);
+		if (!isGlobal && offset < 0) { 
+			localCount++;
+		}
 	}
 
 	/***********************************************/
@@ -80,6 +132,30 @@ public class SymbolTable
 		}
 		
 		return null;
+	}
+
+	/*****************************************************************/
+	/* Find the inner-most scope element with name and return entry */
+	/*****************************************************************/
+	public SymbolTableEntry findEntry(String name) {
+		if (name == null) return null;
+
+		for (SymbolTableEntry e = table[hash(name)]; e != null; e = e.next) {
+			if (name.equals(e.name)) {
+				return e; // Return the entire entry
+			}
+		}
+		return null;
+	}
+
+	public int getOffset(String name) {
+		SymbolTableEntry e = findEntry(name);
+		return (e != null) ? e.offset : -1;
+	}
+
+	public boolean isGlobal(String name) {
+		SymbolTableEntry e = findEntry(name);
+		return (e != null) ? e.isGlobal : false;
 	}
 
 	/*****************************************************************/
@@ -105,6 +181,14 @@ public class SymbolTable
 	/***************************************************************************/
 	public void beginScope()
 	{
+		scopeLevel++; // update scope level
+			
+		// Reset local offset counter at the beginning of a new local scope
+		if (scopeLevel == 1) {
+			localOffsetCounter = 0;
+			localCount = 0;
+		}
+
 		// this.printStackTopDown(7);
 		/************************************************************************/
 		/* Though <SCOPE-BOUNDARY> entries are present inside the symbol table, */
@@ -154,6 +238,7 @@ public class SymbolTable
 		/*********************************************/
 		/* Print the symbol table after every change */		
 		/*********************************************/
+		scopeLevel--; // update scope level
 		printMe();
 		// this.printStackTopDown(5);
 		// System.out.println("SCOPE ENDED" );

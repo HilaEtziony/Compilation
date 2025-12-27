@@ -27,6 +27,9 @@ public abstract class AstDec extends AstStmt
     public abstract Type semantMe();
 
     public void semantMe(TypeClass theirClassType){} // // Dec of a class = cField. Yamit: Not sure if needed, David: Needed
+
+    public int semantMe(TypeClass theirClassType, int offset){return offset;} 
+
 }
 
 /*

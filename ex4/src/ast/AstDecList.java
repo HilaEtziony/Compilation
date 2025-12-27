@@ -74,13 +74,18 @@ public class AstDecList extends AstStmt
 		return null;
 	}
 
-	public void semantMe(TypeClass theirClassType) // Dec list of a class = cFieldList. Yamit: Not sure if needed
-	{
-		/*************************************/
-		/* RECURSIVELY PRINT HEAD + TAIL ... */
-		/*************************************/
-		if (head != null) head.semantMe(theirClassType);
-		if (tail != null) tail.semantMe(theirClassType);
+	public int semantMe(TypeClass container, int offset) {
+		int currentOffset = offset;
+
+		if (head != null) {
+			currentOffset = head.semantMe(container, currentOffset);
+		}
+		
+		if (tail != null) {
+			return tail.semantMe(container, currentOffset);
+		}
+		
+		return currentOffset;
 	}
 
 	public Temp irMe()

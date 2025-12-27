@@ -79,8 +79,9 @@ public class AstVarSimple extends AstVar
 
 	public Temp irMe()
 	{
+		SymbolTableEntry entry = SymbolTable.getInstance().findEntry(name);
 		Temp t = TempFactory.getInstance().getFreshTemp();
-		Ir.getInstance().AddIrCommand(new IrCommandLoad(t,name));
+		Ir.getInstance().AddIrCommand(new IrCommandLoad(t,name, entry.offset, entry.isGlobal));
 		return t;
 	}
 

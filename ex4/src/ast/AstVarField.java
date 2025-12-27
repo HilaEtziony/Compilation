@@ -1,6 +1,7 @@
 package ast;
 
 import ir.Ir;
+import ir.IrCommandFieldLoad;
 import ir.IrCommandLoad;
 import semanticError.SemanticErrorException;
 import temp.Temp;
@@ -16,6 +17,7 @@ public class AstVarField extends AstVar
 {
 	public AstVar var;
 	public String fieldName;
+	public int fieldOffset;
 	
 	/******************/
 	/* CONSTRUCTOR(S) */
@@ -88,9 +90,11 @@ public class AstVarField extends AstVar
 
 			while (fieldList != null)
 			{
-				Type field = fieldList.head;
+				TypeClassVarDec field = (TypeClassVarDec) fieldList.head;
 				if (field.name.equals(fieldName))
 				{
+
+					this.fieldOffset = field.offset;
 					return field;
 				}
 				fieldList = fieldList.tail;
@@ -105,34 +109,11 @@ public class AstVarField extends AstVar
 
 	public Temp irMe()
 	{
+		Temp base = var.irMe();
+
 		Temp dst = TempFactory.getInstance().getFreshTemp();
 
-		/*******************************************************************/
-		/* Build the path. Starting with the current field name.           */
-		/*******************************************************************/
-		String fullPath = this.fieldName;
-		AstVar tempVar = this.var;
-
-		while (tempVar != null) 
-		{
-			if (tempVar instanceof AstVarSimple) {
-				fullPath = ((AstVarSimple) tempVar).name + "." + fullPath;
-				break;
-			} 
-			else if (tempVar instanceof AstVarField) {
-				fullPath = ((AstVarField) tempVar).fieldName + "." + fullPath;
-				tempVar = ((AstVarField) tempVar).var;
-			} 
-			else if (tempVar instanceof AstVarSubscript) {
-				// Ensure index is calculated if a field is accessed from an array
-				((AstVarSubscript) tempVar).subscript.irMe();
-				fullPath = "[]" + "." + fullPath;
-				tempVar = ((AstVarSubscript) tempVar).var;
-			} 
-			else { break; }
-		}
-
-		Ir.getInstance().AddIrCommand(new IrCommandLoad(dst, fullPath));
+		Ir.getInstance().AddIrCommand(new IrCommandFieldLoad(dst, base, this.fieldOffset));
 
 		return dst;
 	}

@@ -114,14 +114,22 @@ public class AstNewExp extends AstExp
 		Temp dst = TempFactory.getInstance().getFreshTemp();
 
 		if (exp == null) {
-			// Class allocation
-			Ir.getInstance().AddIrCommand(new IrCommandNew(dst, type.type));
-		} else {
-			// Array allocation
+			Type t = symboltable.SymbolTable.getInstance().find(type.type);
+			TypeClass tc = (TypeClass) t;
+			
+			int numberOfFields = tc.calcTotalFields();
+			
+			int sizeInBytes = (numberOfFields + 1) * 4; 
+
+			Ir.getInstance().AddIrCommand(new IrCommandNewClass(dst, sizeInBytes));
+		} 
+		else {
 			Temp sizeTemp = exp.irMe();
-			Ir.getInstance().AddIrCommand(new IrCommandNew(dst, sizeTemp));
+			Ir.getInstance().AddIrCommand(new IrCommandNewArray(dst, sizeTemp));
 		}
+		
 		return dst;
 	}
+
 }
 

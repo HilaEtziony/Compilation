@@ -1,7 +1,11 @@
 package ast;
 
 import ir.Ir;
+import ir.IrCommandBinopAddIntegers;
+import ir.IrCommandBinopMulIntegers;
+import ir.IrCommandConstInt;
 import ir.IrCommandLoad;
+import ir.IrCommandArrayLoad;
 import semanticError.SemanticErrorException;
 import temp.Temp;
 import temp.TempFactory;
@@ -125,48 +129,16 @@ public class AstVarSubscript extends AstVar
 		return elementType;
 	}
 
+
 	public Temp irMe()
 	{
-		/*******************************************************************/
-		/* [1] IMPORTANT: Trigger the IR generation for the index expression. */
-		/* This adds the calculation commands to the IR list BEFORE the Load. */
-		/*******************************************************************/
-		this.subscript.irMe(); 
+		Temp arrayBase = var.irMe();
 
-		/*******************************************************************/
-		/* [2] Create a fresh Temp for the value we are about to load      */
-		/*******************************************************************/
+		Temp index = subscript.irMe();
+
 		Temp dst = TempFactory.getInstance().getFreshTemp();
 
-		/*******************************************************************/
-		/* [3] Build the path. Since this is a subscript, we start with [] */
-		/*******************************************************************/
-		String fullPath = "[]";
-		AstVar tempVar = this.var;
-
-		while (tempVar != null) 
-		{
-			if (tempVar instanceof AstVarSimple) {
-				fullPath = ((AstVarSimple) tempVar).name + "." + fullPath;
-				break;
-			} 
-			else if (tempVar instanceof AstVarField) {
-				fullPath = ((AstVarField) tempVar).fieldName + "." + fullPath;
-				tempVar = ((AstVarField) tempVar).var;
-			} 
-			else if (tempVar instanceof AstVarSubscript) {
-				// Recursive index calculation for nested arrays like a[i][j]
-				((AstVarSubscript) tempVar).subscript.irMe();
-				fullPath = "[]" + "." + fullPath;
-				tempVar = ((AstVarSubscript) tempVar).var;
-			} 
-			else { break; }
-		}
-
-		/*******************************************************************/
-		/* [4] Generate the Load command using the symbolic path           */
-		/*******************************************************************/
-		Ir.getInstance().AddIrCommand(new IrCommandLoad(dst, fullPath));
+		Ir.getInstance().AddIrCommand(new IrCommandArrayLoad(dst, arrayBase, index));
 
 		return dst;
 	}

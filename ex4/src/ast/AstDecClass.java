@@ -91,6 +91,11 @@ public class AstDecClass extends AstDec
 		/*************************/
 		/* [1] Begin Class Scope */
 		/*************************/
+
+		int startOffset = 4; 
+		if (parentType != null) {
+			startOffset = ((TypeClass)parentType).size; 
+		}
 		SymbolTable.getInstance().beginScope();
 
 		/*******************************/
@@ -103,7 +108,7 @@ public class AstDecClass extends AstDec
 		/* [2] Semant Data Members */
 		/***************************/
 		// System.out.println("Semanting class data members for class " + name + " " + this.cFieldList );
-		this.cFieldList.semantMe(t);
+		t.size = this.cFieldList.semantMe(t, startOffset);
 	
 
 		/*****************/

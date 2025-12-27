@@ -6,6 +6,7 @@ public abstract class Type
 	/*  Every type has a name ... */
 	/******************************/
 	public String name;
+	public int offset;
 
 	/***************/
     /* Default implementations */

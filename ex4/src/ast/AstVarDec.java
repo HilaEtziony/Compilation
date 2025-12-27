@@ -22,6 +22,9 @@ public class AstVarDec extends AstDec
     public AstVarType type;
     public AstVarSimple id;
     public AstExp expr;
+	public boolean isClassField = false; // to distinguish between class field and local/global variable
+	public int offset;
+    public boolean isGlobal;
 
     public AstVarDec(AstVarType type, AstVarSimple id, AstExp expr, int lineNumber)
     {
@@ -98,9 +101,15 @@ public class AstVarDec extends AstDec
 		}
 
 		/************************************************/
-		/* [4] Enter the Identifier to the Symbol Table */
+		/* [4] Calculate offset and enter to Table */
 		/************************************************/
-		SymbolTable.getInstance().enter(id.name,t);
+		this.isGlobal = SymbolTable.getInstance().isGlobalScope();
+		this.offset = SymbolTable.getInstance().calculateNewOffset(this.isGlobal);
+
+		/************************************************/
+		/* [5] Enter the Identifier to the Symbol Table */
+		/************************************************/
+		SymbolTable.getInstance().enter(id.name, t, this.offset, this.isGlobal);
 
 		// check the assignment expression, if exists
 		if(expr != null) {
@@ -111,12 +120,12 @@ public class AstVarDec extends AstDec
 				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 			}
 		}
-			
 
 		return null;
 	}
 
-	public void semantMe(TypeClass theirClassType) {
+	public int semantMe(TypeClass theirClassType, int offset) {
+		this.isClassField = true;
 		// same as above, but enter to theirClassType's data members instead of symbol table
 		Type t; // placeholder
 		/****************************/
@@ -176,9 +185,9 @@ public class AstVarDec extends AstDec
 		/************************************************/
 		/* [4] Enter the Identifier to the Class Data Members */
 		/************************************************/
-		TypeClassVarDec enter = new TypeClassVarDec(t, id.name); // set the name of the type to the variable's name
-		theirClassType.dataMembers = new TypeList((Type)enter, theirClassType.dataMembers);
-		SymbolTable.getInstance().enter(id.name,t);
+		TypeClassVarDec fieldDescriptor = new TypeClassVarDec(t, id.name, offset); // set the name of the type to the variable's name
+		theirClassType.dataMembers = new TypeList((Type)fieldDescriptor, theirClassType.dataMembers);
+		SymbolTable.getInstance().enter(id.name,t, offset, false); 
 
 		// check the assignment expression, if exists
 		if(expr != null) {
@@ -189,15 +198,21 @@ public class AstVarDec extends AstDec
 				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");		
 			}
 		}
+
+		return offset + 4; // assuming each variable takes 4 bytes
 	}
 
 	public Temp irMe()
 	{
+		if (this.isClassField) {
+			return null; 
+		}
 		Ir.getInstance().AddIrCommand(new IrCommandAllocate(id.name));
 
 		if (expr != null)
 		{
-			Ir.getInstance().AddIrCommand(new IrCommandStore(id.name ,expr.irMe()));
+			Temp valueTemp = expr.irMe();
+			Ir.getInstance().AddIrCommand(new IrCommandStore(id.name, valueTemp, this.offset, this.isGlobal));
 		}
 		return null;
 	}

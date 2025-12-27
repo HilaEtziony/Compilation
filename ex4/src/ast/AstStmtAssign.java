@@ -1,6 +1,8 @@
 package ast;
 
 import semanticError.SemanticErrorException;
+import symboltable.SymbolTable;
+import symboltable.SymbolTableEntry;
 import types.*;
 import temp.*;
 import ir.*;
@@ -101,13 +103,28 @@ public class AstStmtAssign extends AstStmt
 		return null;
 	}
 
-public Temp irMe() {
-    Temp src = exp.irMe();
+	public Temp irMe() {
+		Temp srcTemp = exp.irMe();
 
-    String path = var.getPath();
+		if (var instanceof AstVarSimple) {
+			AstVarSimple v = (AstVarSimple) var;
+			SymbolTableEntry entry = SymbolTable.getInstance().findEntry(v.name);
+			Ir.getInstance().AddIrCommand(new IrCommandStore(v.name, srcTemp, entry.offset, entry.isGlobal));
+		} 
+		else if (var instanceof AstVarField) {
+			AstVarField v = (AstVarField) var;
+			Temp baseTemp = v.var.irMe(); 
+			Ir.getInstance().AddIrCommand(new IrCommandFieldStore(baseTemp, v.fieldOffset, srcTemp));
+		}
+		else if (var instanceof AstVarSubscript) {
+			AstVarSubscript v = (AstVarSubscript) var;
+			
+			Temp baseTemp = v.var.irMe();     
+			Temp indexTemp = v.subscript.irMe(); 
+			
+			Ir.getInstance().AddIrCommand(new IrCommandArrayStore(baseTemp, indexTemp, srcTemp));
+		}
 
-    Ir.getInstance().AddIrCommand(new IrCommandStore(path, src));
-
-    return null;
-}
+		return null;
+	}
 }

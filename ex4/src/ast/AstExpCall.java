@@ -154,6 +154,10 @@ public class AstExpCall extends AstExp
         }
 
 		
+		if (varTemp != null) {
+			tempArgsList = new TempList(varTemp, tempArgsList);
+		}
+
 		/*******************************************/
 		/* Special case: call to PrintInt          */
 		/*******************************************/

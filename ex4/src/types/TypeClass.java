@@ -6,6 +6,7 @@ public class TypeClass extends Type
 	/* If this class does not extend a father class this should be null  */
 	/*********************************************************************/
 	public TypeClass father;
+	public int size;
 
 	/**************************************************/
 	/* Gather up all data members in one place        */
@@ -22,6 +23,7 @@ public class TypeClass extends Type
 		this.name = name;
 		this.father = father; // may be null
 		this.dataMembers = dataMembers;
+		this.size = 0;
 	}
 
 	/****************/
@@ -72,6 +74,28 @@ public class TypeClass extends Type
 		}
 		// Not found
 		return false;
+	}
+
+	public int calcTotalFields()
+	{
+		int count = 0;
+		
+		TypeList current = dataMembers;
+		while (current != null)
+		{
+			if (!current.head.isFunction())
+			{
+				count++;
+			}
+			current = current.tail;
+		}
+
+		if (father != null)
+		{
+			count += father.calcTotalFields();
+		}
+
+		return count;
 	}
 
 	public Type getDataMemberInClass(String id)

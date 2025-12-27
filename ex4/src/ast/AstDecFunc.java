@@ -18,6 +18,7 @@ public class AstDecFunc extends AstDec
     public String identifier;
     public AstTypeIdList func_input; // might be null - don't forget to check whenever using
     public AstStmtList stmnts_of_funs;
+	public int numLocals = 0;
 
     public AstDecFunc(AstVarType return_type, String identifier, AstTypeIdList func_input, AstStmtList stmnts_of_funs, int lineNumber){
         serialNumber = AstNodeSerialNumber.getFresh();
@@ -88,6 +89,8 @@ public class AstDecFunc extends AstDec
 		SymbolTable.getInstance().beginScope();
 		SymbolTable.getInstance().enter(identifier, new TypeFunction(returnType, identifier, null)); // sentinal for return type
 
+
+		int paramOffset = 8;
 		/***************************/
 		/* [2] Semant Input func_input */
 		/***************************/
@@ -107,7 +110,9 @@ public class AstDecFunc extends AstDec
 			else
 			{
 				type_list = new TypeList(t,type_list);
-				SymbolTable.getInstance().enter(it.identifier,t);
+				SymbolTable.getInstance().enter(it.identifier, t, paramOffset, false);
+        
+        		paramOffset += 4; // assuming each parameter takes 4 bytes
 			}
 		}
 		// reverse type_list to maintain order
@@ -124,7 +129,9 @@ public class AstDecFunc extends AstDec
 		/*******************/
 		/* [3] Semant Body */
 		/*******************/
+		SymbolTable.getInstance().resetLocalOffset();
 		stmnts_of_funs.semantMe();
+		this.numLocals = SymbolTable.getInstance().getLocalCount();
 
 		/*****************/
 		/* [4] End Scope */
@@ -170,6 +177,8 @@ public class AstDecFunc extends AstDec
 		/***************************/
 		SymbolTable.getInstance().beginScope();
 
+		int paramOffset = 8;
+
 		for (AstTypeIdList it = func_input; it  != null; it = it.tail)
 		{
 			t = SymbolTable.getInstance().find(it.head.type);
@@ -186,7 +195,9 @@ public class AstDecFunc extends AstDec
 			else
 			{
 				type_list = new TypeList(t,type_list);
-				SymbolTable.getInstance().enter(it.identifier,t);
+				SymbolTable.getInstance().enter(it.identifier, t, paramOffset, false);
+				
+				paramOffset += 4; // assuming each parameter takes 4 bytes
 			}
 		}
 		// reverse type_list to maintain order
@@ -236,7 +247,13 @@ public class AstDecFunc extends AstDec
 			}
 		}
 		SymbolTable.getInstance().enter(identifier, funcType);
+		
+		SymbolTable.getInstance().resetLocalOffset();
+
 		stmnts_of_funs.semantMe();
+
+		this.numLocals = SymbolTable.getInstance().getLocalCount();
+
 		SymbolTable.getInstance().endScope();
 		
 		theirClassType.dataMembers = new TypeList(funcType, theirClassType.dataMembers);
@@ -246,14 +263,24 @@ public class AstDecFunc extends AstDec
 	public Temp irMe()
 	{
 		Ir.getInstance().AddIrCommand(new IrCommandLabel(identifier));
-		if (stmnts_of_funs != null) stmnts_of_funs.irMe();
 
-		//for void return functions
+		int frameSize = this.numLocals * 4;
+		Ir.getInstance().AddIrCommand(new IrCommandPrologue(identifier, frameSize));
+
+		String exitLabel = identifier + "_exit";
+		SymbolTable.getInstance().setCurrentFunctionExitLabel(exitLabel);
+
+		if (stmnts_of_funs != null) {
+			stmnts_of_funs.irMe();
+		}
+
+		Ir.getInstance().AddIrCommand(new IrCommandLabel(exitLabel));
+
+		Ir.getInstance().AddIrCommand(new IrCommandEpilogue(identifier));
+
 		Ir.getInstance().AddIrCommand(new IrCommandReturn(null));
-
 
 		return null;
 	}
-
 
 }
