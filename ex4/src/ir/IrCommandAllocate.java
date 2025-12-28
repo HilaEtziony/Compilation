@@ -14,7 +14,7 @@ package ir;
 public class IrCommandAllocate extends IrCommand
 {
 	String varName;
-	
+
 	public IrCommandAllocate(String varName)
 	{
 		this.varName = varName;

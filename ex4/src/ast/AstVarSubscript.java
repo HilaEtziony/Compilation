@@ -20,7 +20,7 @@ public class AstVarSubscript extends AstVar
 {
 	public AstVar var;
 	public AstExp subscript;
-	
+
 	/******************/
 	/* CONSTRUCTOR(S) */
 	/******************/
@@ -59,14 +59,14 @@ public class AstVarSubscript extends AstVar
 		/****************************************/
 		if (var != null) var.printMe();
 		if (subscript != null) subscript.printMe();
-		
+
 		/***************************************/
 		/* PRINT Node to AST GRAPHVIZ DOT file */
 		/***************************************/
 		AstGraphviz.getInstance().logNode(
 				serialNumber,
 			"SUBSCRIPT\nVAR\n...[...]");
-		
+
 		/****************************************/
 		/* PRINT Edges to AST GRAPHVIZ DOT file */
 		/****************************************/
@@ -117,7 +117,7 @@ public class AstVarSubscript extends AstVar
 		/************************************************************/
 		/* [4] Return element type of array (explicit check)       */
 		/************************************************************/
-		TypeArray arrayType = (TypeArray) varType; 
+		TypeArray arrayType = (TypeArray) varType;
 		Type elementType = arrayType.type_of_array;
 
 		if (elementType == null)
@@ -133,18 +133,15 @@ public class AstVarSubscript extends AstVar
 	public Temp irMe()
 	{
 		Temp arrayBase = var.irMe();
-
 		Temp index = subscript.irMe();
-
 		Temp dst = TempFactory.getInstance().getFreshTemp();
-
-		Ir.getInstance().AddIrCommand(new IrCommandArrayLoad(dst, arrayBase, index));
+		addIrCommand(new IrCommandArrayLoad(dst, arrayBase, index));
 
 		return dst;
 	}
 
 	public String getPath() {
-		this.subscript.irMe(); 
+		this.subscript.irMe();
 		return var.getPath() + ".[]";
 	}
 }

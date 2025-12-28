@@ -4,7 +4,7 @@ import temp.Temp;
 
 public class IrCommandArrayStore extends IrCommand
 {
-    public Temp base;    
+    public Temp base;
     public Temp index;
     public Temp src;
 

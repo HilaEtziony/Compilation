@@ -11,9 +11,9 @@ import temp.*;
 
 public class IrCommandFieldStore extends IrCommand
 {
-    public Temp base;   
-    public int offset;  
-    public Temp src;    
+    public Temp base;
+    public int offset;
+    public Temp src;
 
     public IrCommandFieldStore(Temp base, int offset, Temp src)
     {

@@ -65,7 +65,7 @@ public class AstStmtAssign extends AstStmt
 		AstGraphviz.getInstance().logNode(
                 serialNumber,
 			"ASSIGN\nleft := right\n");
-		
+
 		/****************************************/
 		/* PRINT Edges to AST GRAPHVIZ DOT file */
 		/****************************************/
@@ -108,21 +108,24 @@ public class AstStmtAssign extends AstStmt
 
 		if (var instanceof AstVarSimple) {
 			AstVarSimple v = (AstVarSimple) var;
-			SymbolTableEntry entry = SymbolTable.getInstance().findEntry(v.name);
-			Ir.getInstance().AddIrCommand(new IrCommandStore(v.name, srcTemp, entry.offset, entry.isGlobal));
-		} 
+			SymbolTableEntry entry = getSymbolTable().findEntry(v.name);
+			addIrCommand(new IrCommandStore(v.name, srcTemp, entry.offset, entry.isGlobal));
+		}
 		else if (var instanceof AstVarField) {
 			AstVarField v = (AstVarField) var;
-			Temp baseTemp = v.var.irMe(); 
-			Ir.getInstance().AddIrCommand(new IrCommandFieldStore(baseTemp, v.fieldOffset, srcTemp));
+			Temp baseTemp = v.var.irMe();
+			addIrCommand(new IrCommandFieldStore(baseTemp, v.fieldOffset, srcTemp));
 		}
 		else if (var instanceof AstVarSubscript) {
 			AstVarSubscript v = (AstVarSubscript) var;
-			
-			Temp baseTemp = v.var.irMe();     
-			Temp indexTemp = v.subscript.irMe(); 
-			
-			Ir.getInstance().AddIrCommand(new IrCommandArrayStore(baseTemp, indexTemp, srcTemp));
+
+			Temp baseTemp = v.var.irMe();
+			Temp indexTemp = v.subscript.irMe();
+
+			addIrCommand(new IrCommandArrayStore(baseTemp, indexTemp, srcTemp));
+		}
+		else {
+			throw new UnsupportedOperationException("Unsupported variable type in assignment");
 		}
 
 		return null;

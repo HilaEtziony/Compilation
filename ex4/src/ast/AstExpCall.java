@@ -63,7 +63,7 @@ public class AstExpCall extends AstExp
 	public Type semantMe()
 	{
 		// if in class, first check if method exists in class
-		TypeClass currentClass = SymbolTable.getInstance().currentClass;
+		TypeClass currentClass = getSymbolTable().currentClass;
 		if (currentClass != null && var == null) {
 			Type funcType = currentClass.getMethod(id);
 			if (funcType != null) {
@@ -88,7 +88,7 @@ public class AstExpCall extends AstExp
 			}
 		} else {
 			// Global function call
-			funcType = SymbolTable.getInstance().find(id);
+			funcType = getSymbolTable().find(id);
 			if (funcType == null || !funcType.isFunction()) {
 				System.out.format(">> ERROR: function %s does not exist\n", id);
 				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
@@ -153,7 +153,6 @@ public class AstExpCall extends AstExp
             }
         }
 
-		
 		if (varTemp != null) {
 			tempArgsList = new TempList(varTemp, tempArgsList);
 		}
@@ -164,21 +163,22 @@ public class AstExpCall extends AstExp
 		if (id.equals("PrintInt")) {
 			// expecting one argument
 			Temp arg = (tempArgsList != null) ? tempArgsList.head : null;
-			Ir.getInstance().AddIrCommand(new IrCommandPrintInt(arg));
-			
+			// TODO Hila if expectation fails, throw err?
+			addIrCommand(new IrCommandPrintInt(arg));
+
 			// PrintInt returns void
-			return null; 
+			return null;
 		}
 
         /*******************************************************************/
-        /* [2] Allocate a result Temp and add the Call command to the IR.  */
+        /* [2] Allocate a result Temp                                      */
         /*******************************************************************/
         Temp resultTemp = TempFactory.getInstance().getFreshTemp();
-        
+
 		/*******************************************************************/
         /* [3] Create the IR Call command and add it to the IR list.       */
         /*******************************************************************/
-        Ir.getInstance().AddIrCommand(new IrCommandCall(resultTemp, varTemp, id, tempArgsList));
+        addIrCommand(new IrCommandCall(resultTemp, varTemp, id, tempArgsList));
 
 		/******************************************************/
         /* [4] Return the Temp that will hold the return value */

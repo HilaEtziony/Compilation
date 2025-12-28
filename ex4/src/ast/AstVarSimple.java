@@ -17,7 +17,7 @@ public class AstVarSimple extends AstVar
 	/* simple variable name */
 	/************************/
 	public String name;
-	
+
 	/******************/
 	/* CONSTRUCTOR(S) */
 	/******************/
@@ -27,7 +27,7 @@ public class AstVarSimple extends AstVar
 		/* SET A UNIQUE SERIAL NUMBER */
 		/******************************/
 		serialNumber = AstNodeSerialNumber.getFresh();
-	
+
 		/***************************************/
 		/* PRINT CORRESPONDING DERIVATION RULE */
 		/***************************************/
@@ -63,7 +63,7 @@ public class AstVarSimple extends AstVar
 		/******************************/
 		/* [1] Try finding var in ST */
 		/******************************/
-		Type t = SymbolTable.getInstance().find(name);
+		Type t = getSymbolTable().find(name);
 
 		if (t == null)
 		{
@@ -79,9 +79,9 @@ public class AstVarSimple extends AstVar
 
 	public Temp irMe()
 	{
-		SymbolTableEntry entry = SymbolTable.getInstance().findEntry(name);
+		SymbolTableEntry entry = getSymbolTable().findEntry(name);
 		Temp t = TempFactory.getInstance().getFreshTemp();
-		Ir.getInstance().AddIrCommand(new IrCommandLoad(t,name, entry.offset, entry.isGlobal));
+		addIrCommand(new IrCommandLoad(t,name, entry.offset, entry.isGlobal));
 		return t;
 	}
 

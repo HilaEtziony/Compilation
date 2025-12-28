@@ -58,7 +58,7 @@ public class AstDecArray extends AstDec
 		/****************************/
 		/* [1] Check If Type exists */
 		/****************************/
-		t = SymbolTable.getInstance().find(type.type); 
+		t = getSymbolTable().find(type.type); 
 		if (t == null)
 		{
 			System.out.format(">> ERROR: type %s does not exist\n",type.type);
@@ -77,7 +77,7 @@ public class AstDecArray extends AstDec
 		/**************************************/
 		/* [3] Check That Name does NOT exist */
 		/**************************************/
-		if (SymbolTable.getInstance().find(identifier) != null)
+		if (getSymbolTable().find(identifier) != null)
 		{
 			System.out.format(">> ERROR: array %s already exists in scope\n",identifier);
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
@@ -87,7 +87,7 @@ public class AstDecArray extends AstDec
 		/* [4] Create new array type and enter to table */
 		/************************************************/
 		Type arrayType = new TypeArray(identifier, t);
-		SymbolTable.getInstance().enter(identifier, arrayType);
+		getSymbolTable().enter(identifier, arrayType);
 
 		/************************************************************/
 		/* [5] Return value is irrelevant for type declarations     */

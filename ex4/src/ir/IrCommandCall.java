@@ -2,6 +2,14 @@ package ir;
 
 import temp.*;
 
+/*
+USAGE:
+	| var:v DOT ID:i LPAREN expList:l RPAREN 							{: RESULT = new AstExpCall(v,i,l);    				:}
+	| var:v DOT ID:i LPAREN RPAREN									{: RESULT = new AstExpCall(v,i,null);    			:}
+	| ID:i LPAREN expList:l RPAREN 									{: RESULT = new AstExpCall(null,i,l);    			:}
+	| ID:i LPAREN RPAREN											{: RESULT = new AstExpCall(null,i,null);    		:}
+*/
+
 public class IrCommandCall extends IrCommand {
     public Temp res;
     public Temp varTemp;

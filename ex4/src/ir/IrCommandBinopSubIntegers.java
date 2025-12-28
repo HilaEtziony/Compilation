@@ -17,7 +17,7 @@ public class IrCommandBinopSubIntegers extends IrCommand
 	public Temp t1;
 	public Temp t2;
 	public Temp dst;
-	
+
 	public IrCommandBinopSubIntegers(Temp dst, Temp t1, Temp t2)
 	{
 		this.dst = dst;

@@ -68,8 +68,8 @@ public class AstDecFunc extends AstDec
 		/*******************/
 		/* [0] return type */
 		/*******************/
-		// returnType = SymbolTable.getInstance().find(return_type.type);
-		// returnType = SymbolTable.getInstance().find(return_type); // TODO change AstVarType
+		// returnType = getSymbolTable().find(return_type.type);
+		// returnType = getSymbolTable().find(return_type); // TODO change AstVarType
 		if (returnType == null)
 		{
 			System.out.format(">> ERROR: non existing return type %s\n",returnType);
@@ -77,7 +77,7 @@ public class AstDecFunc extends AstDec
 		}
 
 		// check if function name already exists in current scope
-		if (SymbolTable.getInstance().findInCurrentScope(identifier) != null)
+		if (getSymbolTable().findInCurrentScope(identifier) != null)
 		{
 			System.out.format(">> ERROR: function name %s already exists in current scope\n",identifier);
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
@@ -86,8 +86,8 @@ public class AstDecFunc extends AstDec
 		/****************************/
 		/* [1] Begin Function Scope */
 		/****************************/
-		SymbolTable.getInstance().beginScope();
-		SymbolTable.getInstance().enter(identifier, new TypeFunction(returnType, identifier, null)); // sentinal for return type
+		getSymbolTable().beginScope();
+		getSymbolTable().enter(identifier, new TypeFunction(returnType, identifier, null)); // sentinal for return type
 
 
 		int paramOffset = 8;
@@ -96,13 +96,13 @@ public class AstDecFunc extends AstDec
 		/***************************/
 		for (AstTypeIdList it = func_input; it  != null; it = it.tail)
 		{
-			t = SymbolTable.getInstance().find(it.head.type);
+			t = getSymbolTable().find(it.head.type);
 			if (t == null || t == TypeVoid.getInstance())
 			{
 				System.out.format(">> ERROR: non existing type %s\n",it.head.type);	
 				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");			
 			}
-			else if (SymbolTable.getInstance().findInCurrentScope(it.identifier) != null)
+			else if (getSymbolTable().findInCurrentScope(it.identifier) != null)
 			{
 				System.out.format(">> ERROR: duplicate variable name %s\n",it.identifier);	
 				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");			
@@ -110,7 +110,7 @@ public class AstDecFunc extends AstDec
 			else
 			{
 				type_list = new TypeList(t,type_list);
-				SymbolTable.getInstance().enter(it.identifier, t, paramOffset, false);
+				getSymbolTable().enter(it.identifier, t, paramOffset, false);
         
         		paramOffset += 4; // assuming each parameter takes 4 bytes
 			}
@@ -123,26 +123,26 @@ public class AstDecFunc extends AstDec
 		}
 		type_list = reversed;
 		//moved sentinal enter after processing input params
-		SymbolTable.getInstance().enter(identifier, new TypeFunction(returnType, identifier, type_list));
-		// SymbolTable.getInstance().enter(identifier, t);
+		getSymbolTable().enter(identifier, new TypeFunction(returnType, identifier, type_list));
+		// getSymbolTable().enter(identifier, t);
 
 		/*******************/
 		/* [3] Semant Body */
 		/*******************/
-		SymbolTable.getInstance().resetLocalOffset();
+		getSymbolTable().resetLocalOffset();
 		stmnts_of_funs.semantMe();
-		this.numLocals = SymbolTable.getInstance().getLocalCount();
+		this.numLocals = getSymbolTable().getLocalCount();
 
 		/*****************/
 		/* [4] End Scope */
 		/*****************/
-		SymbolTable.getInstance().endScope();
+		getSymbolTable().endScope();
 
 		/***************************************************/
 		/* [5] Enter the Function Type to the Symbol Table */
 		/***************************************************/
 		TypeFunction funcType = new TypeFunction(returnType,identifier,type_list);
-		SymbolTable.getInstance().enter(identifier, funcType);
+		getSymbolTable().enter(identifier, funcType);
 
 		/************************************************************/
 		/* [6] Return value is irrelevant for function declarations */
@@ -166,7 +166,7 @@ public class AstDecFunc extends AstDec
 		}
 
 		// check if function name already exists in current scope
-		if (SymbolTable.getInstance().findInCurrentScope(identifier) != null)
+		if (getSymbolTable().findInCurrentScope(identifier) != null)
 		{
 			System.out.format(">> ERROR: function name %s already exists in current scope\n",identifier);
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
@@ -175,19 +175,19 @@ public class AstDecFunc extends AstDec
 		/***************************/
 		/* [1] Semant Input func_input */
 		/***************************/
-		SymbolTable.getInstance().beginScope();
+		getSymbolTable().beginScope();
 
 		int paramOffset = 8;
 
 		for (AstTypeIdList it = func_input; it  != null; it = it.tail)
 		{
-			t = SymbolTable.getInstance().find(it.head.type);
+			t = getSymbolTable().find(it.head.type);
 			if (t == null || t == TypeVoid.getInstance())
 			{
 				System.out.format(">> ERROR: non existing type %s\n",it.head.type);	
 				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");			
 			}
-			else if (SymbolTable.getInstance().findInCurrentScope(it.identifier) != null)
+			else if (getSymbolTable().findInCurrentScope(it.identifier) != null)
 			{
 				System.out.format(">> ERROR: duplicate variable name %s in function %s\n",it.identifier,this.identifier);	
 				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");			
@@ -195,7 +195,7 @@ public class AstDecFunc extends AstDec
 			else
 			{
 				type_list = new TypeList(t,type_list);
-				SymbolTable.getInstance().enter(it.identifier, t, paramOffset, false);
+				getSymbolTable().enter(it.identifier, t, paramOffset, false);
 				
 				paramOffset += 4; // assuming each parameter takes 4 bytes
 			}
@@ -246,39 +246,37 @@ public class AstDecFunc extends AstDec
 				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 			}
 		}
-		SymbolTable.getInstance().enter(identifier, funcType);
+		getSymbolTable().enter(identifier, funcType);
 		
-		SymbolTable.getInstance().resetLocalOffset();
+		getSymbolTable().resetLocalOffset();
 
 		stmnts_of_funs.semantMe();
 
-		this.numLocals = SymbolTable.getInstance().getLocalCount();
+		this.numLocals = getSymbolTable().getLocalCount();
 
-		SymbolTable.getInstance().endScope();
+		getSymbolTable().endScope();
 		
 		theirClassType.dataMembers = new TypeList(funcType, theirClassType.dataMembers);
-		SymbolTable.getInstance().enter(identifier, funcType);
+		getSymbolTable().enter(identifier, funcType);
 	}
 
 	public Temp irMe()
 	{
-		Ir.getInstance().AddIrCommand(new IrCommandLabel(identifier));
+		addIrCommand(new IrCommandLabel(identifier));
 
 		int frameSize = this.numLocals * 4;
-		Ir.getInstance().AddIrCommand(new IrCommandPrologue(identifier, frameSize));
+		addIrCommand(new IrCommandPrologue(identifier, frameSize));
 
 		String exitLabel = identifier + "_exit";
-		SymbolTable.getInstance().setCurrentFunctionExitLabel(exitLabel);
+		getSymbolTable().setCurrentFunctionExitLabel(exitLabel);
 
 		if (stmnts_of_funs != null) {
 			stmnts_of_funs.irMe();
 		}
 
-		Ir.getInstance().AddIrCommand(new IrCommandLabel(exitLabel));
-
-		Ir.getInstance().AddIrCommand(new IrCommandEpilogue(identifier));
-
-		Ir.getInstance().AddIrCommand(new IrCommandReturn(null));
+		addIrCommand(new IrCommandLabel(exitLabel));
+		addIrCommand(new IrCommandEpilogue(identifier));
+		addIrCommand(new IrCommandReturn(null));
 
 		return null;
 	}

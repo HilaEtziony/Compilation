@@ -79,8 +79,8 @@ public class TypeClass extends Type
 	public int calcTotalFields()
 	{
 		int count = 0;
-		
 		TypeList current = dataMembers;
+
 		while (current != null)
 		{
 			if (!current.head.isFunction())
@@ -99,7 +99,7 @@ public class TypeClass extends Type
 	}
 
 	public Type getDataMemberInClass(String id)
-	{	
+	{
 		TypeClass curr_class = this;
 		while (curr_class != null)
 		{

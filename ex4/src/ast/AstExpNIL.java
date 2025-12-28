@@ -37,7 +37,7 @@ public class AstExpNIL extends AstExp
         /* [2] NIL is represented as the constant integer 0              */
         /* We use IrCommandConstInt to load 0 into our destination Temp */
         /****************************************************************/
-        Ir.getInstance().AddIrCommand(new IrCommandConstInt(dst, 0));
+        addIrCommand(new IrCommandConstInt(dst, 0));
 
         /****************************************************************/
         /* [3] Return the Temp containing the value 0                   */

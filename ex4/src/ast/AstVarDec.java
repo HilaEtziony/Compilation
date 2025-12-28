@@ -74,8 +74,8 @@ public class AstVarDec extends AstDec
 		/****************************/
 		/* [1] Check If Type exists */
 		/****************************/
-		t = SymbolTable.getInstance().find(type.type);
-		// t = SymbolTable.getInstance().find(type); // TODO change AstVarType
+		t = getSymbolTable().find(type.type);
+		// t = getSymbolTable().find(type); // TODO change AstVarType
 		if (t == null)
 		{
 			System.out.format(">> ERROR: non existing type %s\n",type.type);
@@ -94,7 +94,7 @@ public class AstVarDec extends AstDec
 		/**************************************/
 		/* [3] Check That Name does NOT exist */
 		/**************************************/
-		if (SymbolTable.getInstance().findInCurrentScope(id.name) != null)
+		if (getSymbolTable().findInCurrentScope(id.name) != null)
 		{
 			System.out.format(">> ERROR: variable %s already exists in scope\n",id.name);
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
@@ -103,13 +103,13 @@ public class AstVarDec extends AstDec
 		/************************************************/
 		/* [4] Calculate offset and enter to Table */
 		/************************************************/
-		this.isGlobal = SymbolTable.getInstance().isGlobalScope();
-		this.offset = SymbolTable.getInstance().calculateNewOffset(this.isGlobal);
+		this.isGlobal = getSymbolTable().isGlobalScope();
+		this.offset = getSymbolTable().calculateNewOffset(this.isGlobal);
 
 		/************************************************/
 		/* [5] Enter the Identifier to the Symbol Table */
 		/************************************************/
-		SymbolTable.getInstance().enter(id.name, t, this.offset, this.isGlobal);
+		getSymbolTable().enter(id.name, t, this.offset, this.isGlobal);
 
 		// check the assignment expression, if exists
 		if(expr != null) {
@@ -131,7 +131,7 @@ public class AstVarDec extends AstDec
 		/****************************/
 		/* [1] Check If Type exists */
 		/****************************/
-		t = SymbolTable.getInstance().find(type.type);
+		t = getSymbolTable().find(type.type);
 		if (t == null)
 		{
 			System.out.format(">> ERROR: non existing type %s\n",type.type);
@@ -169,7 +169,7 @@ public class AstVarDec extends AstDec
 		}
 		else {
 			// must be a class type or array type
-			Type classArrayType = SymbolTable.getInstance().find(this.type.type);
+			Type classArrayType = getSymbolTable().find(this.type.type);
 			//check if array
 			if(classArrayType != null && classArrayType instanceof TypeArray){
 				t = classArrayType;
@@ -187,7 +187,7 @@ public class AstVarDec extends AstDec
 		/************************************************/
 		TypeClassVarDec fieldDescriptor = new TypeClassVarDec(t, id.name, offset); // set the name of the type to the variable's name
 		theirClassType.dataMembers = new TypeList((Type)fieldDescriptor, theirClassType.dataMembers);
-		SymbolTable.getInstance().enter(id.name,t, offset, false); 
+		getSymbolTable().enter(id.name,t, offset, false);
 
 		// check the assignment expression, if exists
 		if(expr != null) {
@@ -195,7 +195,7 @@ public class AstVarDec extends AstDec
 			// check assignment compatibility
 			if(!t.isCompatible(t_expr)) {
 				System.out.format(">> ERROR: cannot assign %s to %s\n", t_expr.name, t.name);
-				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");		
+				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 			}
 		}
 
@@ -205,15 +205,17 @@ public class AstVarDec extends AstDec
 	public Temp irMe()
 	{
 		if (this.isClassField) {
-			return null; 
+			return null;
 		}
-		Ir.getInstance().AddIrCommand(new IrCommandAllocate(id.name));
+
+		addIrCommand(new IrCommandAllocate(id.name));
 
 		if (expr != null)
 		{
 			Temp valueTemp = expr.irMe();
-			Ir.getInstance().AddIrCommand(new IrCommandStore(id.name, valueTemp, this.offset, this.isGlobal));
+			addIrCommand(new IrCommandStore(id.name, valueTemp, this.offset, this.isGlobal));
 		}
+
 		return null;
 	}
 }

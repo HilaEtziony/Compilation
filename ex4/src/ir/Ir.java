@@ -6,6 +6,9 @@ package ir;
 /*******************/
 /* GENERAL IMPORTS */
 /*******************/
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /*******************/
 /* PROJECT IMPORTS */
@@ -64,4 +67,4 @@ public class Ir
 		}
 		return instance;
 	}
-}
+

@@ -49,7 +49,7 @@ public class AstStmtWhile extends AstStmt
 		AstGraphviz.getInstance().logNode(
                 serialNumber,
 			"WHILE\n(cond)\nDO");
-		
+
 		/****************************************/
 		/* PRINT Edges to AST GRAPHVIZ DOT file */
 		/****************************************/
@@ -67,11 +67,11 @@ public class AstStmtWhile extends AstStmt
 			System.out.format(">> ERROR: condition inside IF is not integral\n");
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
-		
+
 		/*************************/
 		/* [1] Begin If Scope */
 		/*************************/
-		SymbolTable.getInstance().beginScope();
+		getSymbolTable().beginScope();
 
 		/***************************/
 		/* [2] Semant Data Members */
@@ -81,12 +81,12 @@ public class AstStmtWhile extends AstStmt
 		/*****************/
 		/* [3] End Scope */
 		/*****************/
-		SymbolTable.getInstance().endScope();
-		
+		getSymbolTable().endScope();
+
 		/***************************************************/
 		/* [4] Return value is irrelevant for if statement */
 		/**************************************************/
-		return null;		
+		return null;
 	}
 
 	public Temp irMe()

@@ -47,7 +47,7 @@ public class AstNewExp extends AstExp
 		AstGraphviz.getInstance().logNode(
                 serialNumber,
 			String.format("NEW(%s)", type.type));
-		
+
 		/****************************************/
 		/* PRINT Edges to AST GRAPHVIZ DOT file */
 		/****************************************/
@@ -59,7 +59,7 @@ public class AstNewExp extends AstExp
 		/****************************/
 		/* [1] Check If Type exists */
 		/****************************/
-		Type t = SymbolTable.getInstance().find(type.type);
+		Type t = getSymbolTable().find(type.type);
 		if (t == null)
 		{
 			System.out.format(">> ERROR: non existing type %s\n",type.type);
@@ -113,21 +113,20 @@ public class AstNewExp extends AstExp
 	public Temp irMe() {
 		Temp dst = TempFactory.getInstance().getFreshTemp();
 
-		if (exp == null) {
-			Type t = symboltable.SymbolTable.getInstance().find(type.type);
+		if (exp == null) { // like "new int"
+			Type t = symboltable.getSymbolTable().find(type.type);
 			TypeClass tc = (TypeClass) t;
-			
 			int numberOfFields = tc.calcTotalFields();
-			
-			int sizeInBytes = (numberOfFields + 1) * 4; 
+			int sizeInBytes = (numberOfFields + 1) * 4;
 
-			Ir.getInstance().AddIrCommand(new IrCommandNewClass(dst, sizeInBytes));
-		} 
-		else {
-			Temp sizeTemp = exp.irMe();
-			Ir.getInstance().AddIrCommand(new IrCommandNewArray(dst, sizeTemp));
+			addIrCommand(new IrCommandNewClass(dst, sizeInBytes));
 		}
-		
+		else { // like "new int[x]"
+			Temp sizeTemp = exp.irMe();
+			addIrCommand(new IrCommandNewArray(dst, sizeTemp));
+			// TODO Hila why not handle like in "if" block, but just multiply by 4?
+		}
+
 		return dst;
 	}
 

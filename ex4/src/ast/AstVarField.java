@@ -18,7 +18,7 @@ public class AstVarField extends AstVar
 	public AstVar var;
 	public String fieldName;
 	public int fieldOffset;
-	
+
 	/******************/
 	/* CONSTRUCTOR(S) */
 	/******************/
@@ -64,7 +64,7 @@ public class AstVarField extends AstVar
 		AstGraphviz.getInstance().logNode(
 				serialNumber,
 			String.format("FIELD\nVAR\n...->%s",fieldName));
-		
+
 		/****************************************/
 		/* PRINT Edges to AST GRAPHVIZ DOT file */
 		/****************************************/
@@ -98,7 +98,7 @@ public class AstVarField extends AstVar
 					return field;
 				}
 				fieldList = fieldList.tail;
-			}	
+			}
 
 			// Field not found - check in parent classes
 			classType = classType.father;
@@ -110,11 +110,8 @@ public class AstVarField extends AstVar
 	public Temp irMe()
 	{
 		Temp base = var.irMe();
-
 		Temp dst = TempFactory.getInstance().getFreshTemp();
-
-		Ir.getInstance().AddIrCommand(new IrCommandFieldLoad(dst, base, this.fieldOffset));
-
+		addIrCommand(new IrCommandFieldLoad(dst, base, this.fieldOffset));
 		return dst;
 	}
 

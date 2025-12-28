@@ -57,19 +57,19 @@ public class AstStmtReturn extends AstStmt
 
 	public Type semantMe()
 	{
-		Type funcRetType = SymbolTable.getInstance().getCurrentFunctionReturnType();
+		Type funcRetType = getSymbolTable().getCurrentFunctionReturnType();
 		Type expType = (exp == null) ? TypeVoid.getInstance() : exp.semantMe();
 
 		// System.out.println("Func Dec: " + funcRetType + " " + expType + " " + this.exp + " " + this.exp.semantMe());
-		SymbolTable.getInstance().printStackTopDown(5);
+		getSymbolTable().printStackTopDown(5);
 		// return statements can only be found inside functions.
-		if (!SymbolTable.getInstance().isInFunction())
+		if (!getSymbolTable().isInFunction())
 		{
 			System.out.format("ERROR: return statement is not inside a function\n");
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 		// System.out.println("After isInFunction check");
-		// SymbolTable.getInstance().printStackTopDown(5);
+		// getSymbolTable().printStackTopDown(5);
 
 		// If a function has return type void, its return statements must be empty (return;).
 		if (exp != null && funcRetType == TypeVoid.getInstance())
@@ -77,7 +77,7 @@ public class AstStmtReturn extends AstStmt
 			System.out.format("ERROR: return with a value in a void function\n");
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
-		// SymbolTable.getInstance().printStackTopDown(5);
+		// getSymbolTable().printStackTopDown(5);
 
 		// If a function has a non-void return type T, then every return statement must return an expression
 		if (exp == null && funcRetType != TypeVoid.getInstance())
@@ -85,7 +85,7 @@ public class AstStmtReturn extends AstStmt
 			System.out.format("ERROR: missing return value in a non-void function\n");
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
-		// SymbolTable.getInstance().printStackTopDown(5);
+		// getSymbolTable().printStackTopDown(5);
 
 
 		// If a function has a non-void return type T, then every return statement must return an expression
@@ -100,7 +100,7 @@ public class AstStmtReturn extends AstStmt
 		A function/method may have control flow paths without a return statement, even if the return type of
 		the function is not void. */
 		// System.out.println("Return statement semanted successfully");
-		// SymbolTable.getInstance().printStackTopDown(5);
+		// getSymbolTable().printStackTopDown(5);
 		return expType;
 	}
 
@@ -120,14 +120,14 @@ public class AstStmtReturn extends AstStmt
 		/* [2] Add the Return IR command.                                  */
 		/* This is MANDATORY to signal the end of function execution.      */
 		/*******************************************************************/
-		Ir.getInstance().AddIrCommand(new IrCommandReturn(t));
+		addIrCommand(new IrCommandReturn(t));
 
 		/*******************************************************************/
 		/* [3] Jump to function exit label                                 */
 		/*******************************************************************/
-		String exitLabel = SymbolTable.getInstance().getCurrentFunctionExitLabel();
+		String exitLabel = getSymbolTable().getCurrentFunctionExitLabel();
 		if (exitLabel != null) {
-			Ir.getInstance().AddIrCommand(new IrCommandJumpLabel(exitLabel));
+			addIrCommand(new IrCommandJumpLabel(exitLabel));
 		}
 
 		/*******************************************************************/

@@ -36,14 +36,14 @@ public class AstDecClass extends AstDec
 		/*************************************/
 		System.out.format("CLASS DEC = %s\n",name);
 		if (cFieldList != null) cFieldList.printMe();
-		
+
 		/***************************************/
 		/* PRINT Node to AST GRAPHVIZ DOT file */
 		/***************************************/
 		AstGraphviz.getInstance().logNode(
                 serialNumber,
 			String.format("CLASS\n%s",name));
-		
+
 		/****************************************/
 		/* PRINT Edges to AST GRAPHVIZ DOT file */
 		/****************************************/
@@ -53,12 +53,12 @@ public class AstDecClass extends AstDec
 	public Type semantMe()
 	{
 		/* [0a] Make sure class doesn't already exist */
-		if (SymbolTable.getInstance().find(name) != null) {
+		if (getSymbolTable().find(name) != null) {
 			System.out.format("ERROR: class %s already exists in symbol table\n",name);
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
-		Type parentType = SymbolTable.getInstance().find(parentName);
+		Type parentType = getSymbolTable().find(parentName);
 		/* [0b] Make sure father exist */
 		if (parentName != null) {
 			if (parentType == null || !(parentType instanceof TypeClass)) {
@@ -81,7 +81,7 @@ public class AstDecClass extends AstDec
 				TypeList existingDataMembers = curr.dataMembers;
 				for (TypeList it = existingDataMembers; it != null; it = it.tail) {
 					if(!it.head.isFunction()){
-						SymbolTable.getInstance().enter(it.head.name, it.head);
+						getSymbolTable().enter(it.head.name, it.head);
 					}
 				}
 				curr = curr.father;
@@ -92,35 +92,35 @@ public class AstDecClass extends AstDec
 		/* [1] Begin Class Scope */
 		/*************************/
 
-		int startOffset = 4; 
+		int startOffset = 4;
 		if (parentType != null) {
-			startOffset = ((TypeClass)parentType).size; 
+			startOffset = ((TypeClass)parentType).size;
 		}
-		SymbolTable.getInstance().beginScope();
+		getSymbolTable().beginScope();
 
 		/*******************************/
 		/* [1a] Semant Class ...  */
 		/*******************************/
 		TypeClass t = new TypeClass((TypeClass)parentType,name, null);
-		SymbolTable.getInstance().enter(name, t);
-		SymbolTable.getInstance().currentClass = t;
+		getSymbolTable().enter(name, t);
+		getSymbolTable().currentClass = t;
 		/***************************/
 		/* [2] Semant Data Members */
 		/***************************/
 		// System.out.println("Semanting class data members for class " + name + " " + this.cFieldList );
 		t.size = this.cFieldList.semantMe(t, startOffset);
-	
+
 
 		/*****************/
 		/* [3] End Scope */
 		/*****************/
-		SymbolTable.getInstance().endScope();
-		SymbolTable.getInstance().currentClass = null;
+		getSymbolTable().endScope();
+		getSymbolTable().currentClass = null;
 
 		/************************************************/
 		/* [4] Enter the Class Type to the Symbol Table */
 		/************************************************/
-		SymbolTable.getInstance().enter(name,t);
+		getSymbolTable().enter(name,t);
 
 		/*********************************************************/
 		/* [5] Return value is irrelevant for class declarations */
@@ -134,7 +134,7 @@ public class AstDecClass extends AstDec
 		{
 			cFieldList.irMe();
 		}
-		
+
 		return null;
 	}
 

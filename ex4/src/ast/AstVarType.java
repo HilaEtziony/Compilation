@@ -45,7 +45,7 @@ public class AstVarType extends AstDec
 	public Type semantMe()
 	{
 		// check that type exists in symbol table
-		Type t = SymbolTable.getInstance().find(type);
+		Type t = getSymbolTable().find(type);
 		if (t == null) {
 			System.out.format("ERROR: type %s not found in symbol table\n",type);
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");

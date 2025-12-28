@@ -3,6 +3,7 @@ package ast;
 import types.*;
 import symboltable.*;
 import temp.*;
+import ir.*;
 
 public abstract class AstNode
 {
@@ -36,5 +37,15 @@ public abstract class AstNode
 	public Temp irMe()
 	{
 		return null;
+	}
+
+	protected SymbolTable getSymbolTable()
+	{
+		return symboltable.SymbolTable.getInstance();
+	}
+
+	protected void addIrCommand(IrCommand cmd)
+	{
+		ir.Ir.getInstance().AddIrCommand(cmd);
 	}
 }

@@ -50,7 +50,7 @@ public class AstExpString extends AstExp
 	public Temp irMe()
 	{
 		Temp dst = TempFactory.getInstance().getFreshTemp();
-		Ir.getInstance().AddIrCommand(new IrCommandConstString(dst, this.string));
+		addIrCommand(new IrCommandConstString(dst, this.string));
 		return dst;
 	}
 }

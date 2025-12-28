@@ -12,6 +12,11 @@ package ir;
 /*******************/
 import temp.*;
 
+/*
+USAGE:
+	| WHILE LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE 		{: RESULT = new AstStmtWhile(cond,body); 			:}
+*/
+
 public class IrCommandJumpIfEqToZero extends IrCommand
 {
 	Temp t;

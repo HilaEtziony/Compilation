@@ -84,7 +84,7 @@ public class AstStmtIf extends AstStmt
 		/*************************/
 		/* [1] Begin If Scope */
 		/*************************/
-		SymbolTable.getInstance().beginScope();
+		getSymbolTable().beginScope();
 
 		/***************************/
 		/* [2] Semant Data Members */
@@ -94,14 +94,14 @@ public class AstStmtIf extends AstStmt
 		/*****************/
 		/* [3] End Scope */
 		/*****************/
-		SymbolTable.getInstance().endScope();
+		getSymbolTable().endScope();
 
 		if (elseBody != null)
 		{
 			/*************************/
 			/* [1] Begin Else Scope */
 			/*************************/
-			SymbolTable.getInstance().beginScope();
+			getSymbolTable().beginScope();
 
 			/***************************/
 			/* [2] Semant Data Members */
@@ -111,7 +111,7 @@ public class AstStmtIf extends AstStmt
 			/*****************/
 			/* [3] End Scope */
 			/*****************/
-			SymbolTable.getInstance().endScope();
+			getSymbolTable().endScope();
 		}
 
 		/***************************************************/
@@ -136,7 +136,7 @@ public class AstStmtIf extends AstStmt
         /* [3] If condition is false (0), jump to the 'else' label.         */
         /* If there is no else, it will jump to the end of the if.     */
         /*******************************************************************/
-        Ir.getInstance().AddIrCommand(new IrCommandJumpIfEqToZero(condTemp, labelElse));
+        addIrCommand(new IrCommandJumpIfEqToZero(condTemp, labelElse));
 
         /*******************************************************************/
         /* [4] Generate IR for the 'then' body (if the condition was true)  */
@@ -148,12 +148,12 @@ public class AstStmtIf extends AstStmt
         /*******************************************************************/
         /* [5] After 'then' body, jump to the end to skip the 'else' block  */
         /*******************************************************************/
-        Ir.getInstance().AddIrCommand(new IrCommandJumpLabel(labelEnd));
+        addIrCommand(new IrCommandJumpLabel(labelEnd));
 
         /*******************************************************************/
         /* [6] Place the 'else' label here.                                */
         /*******************************************************************/
-        Ir.getInstance().AddIrCommand(new IrCommandLabel(labelElse));
+        addIrCommand(new IrCommandLabel(labelElse));
 
         /*******************************************************************/
         /* [7] Generate IR for the 'else' body (if it exists)              */
@@ -165,7 +165,7 @@ public class AstStmtIf extends AstStmt
         /*******************************************************************/
         /* [8] Place the 'end' label to mark the exit of the if-else block */
         /*******************************************************************/
-        Ir.getInstance().AddIrCommand(new IrCommandLabel(labelEnd));
+        addIrCommand(new IrCommandLabel(labelEnd));
 
         /*******************************************************************/
         /* [9] Statements do not produce a value, so we return null        */

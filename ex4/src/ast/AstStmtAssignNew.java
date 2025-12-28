@@ -65,7 +65,7 @@ public class AstStmtAssignNew extends AstStmt
 		AstGraphviz.getInstance().logNode(
 				serialNumber,
 			"ASSIGN\nleft := right\n");
-		
+
 		/****************************************/
 		/* PRINT Edges to AST GRAPHVIZ DOT file */
 		/****************************************/
@@ -95,27 +95,27 @@ public class AstStmtAssignNew extends AstStmt
 
 		if (var instanceof AstVarSimple) {
 			AstVarSimple v = (AstVarSimple) var;
-			symboltable.SymbolTableEntry entry = symboltable.SymbolTable.getInstance().findEntry(v.name);
-			
-			ir.Ir.getInstance().AddIrCommand(new ir.IrCommandStore(
-				v.name, 
-				src, 
-				entry.offset, 
+			symboltable.SymbolTableEntry entry = getSymbolTable().findEntry(v.name);
+
+			addIrCommand(new IrCommandStore(
+				v.name,
+				src,
+				entry.offset,
 				entry.isGlobal
 			));
-		} 
+		}
 		else if (var instanceof AstVarField) {
 			AstVarField v = (AstVarField) var;
-			Temp base = v.var.irMe(); 
-			
-			ir.Ir.getInstance().AddIrCommand(new ir.IrCommandFieldStore(base, v.fieldOffset, src));
-		} 
+			Temp base = v.var.irMe();
+
+			addIrCommand(new IrCommandFieldStore(base, v.fieldOffset, src));
+		}
 		else if (var instanceof AstVarSubscript) {
 			AstVarSubscript v = (AstVarSubscript) var;
-			Temp base = v.var.irMe();      
+			Temp base = v.var.irMe();
 			Temp index = v.subscript.irMe();
-			
-			ir.Ir.getInstance().AddIrCommand(new ir.IrCommandArrayStore(base, index, src));
+
+			addIrCommand(new IrCommandArrayStore(base, index, src));
 		}
 
 		return null;
