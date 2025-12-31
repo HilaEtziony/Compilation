@@ -2,6 +2,9 @@ import java.io.*;
 import java.io.PrintWriter;
 import java_cup.runtime.Symbol;
 import ast.*;
+import ir.BasicBlock;
+import ir.Graph;
+import ir.Ir;
 
 public class Main
 {
@@ -57,6 +60,28 @@ public class Main
 			/* [8] IR the AST ... */
 			/**********************/
 			ast.irMe();
+
+			/********************************************/
+			/* [8.5] Build and print IR control-flow CFG */
+			/********************************************/
+			Graph cfg = Graph.fromIr(Ir.getInstance());
+			System.out.println("CFG blocks (index: command -> successors)");
+			for (BasicBlock block : cfg.getBlocks())
+			{
+				StringBuilder successors = new StringBuilder();
+				for (BasicBlock succ : block.getSuccessors())
+				{
+					if (successors.length() > 0)
+					{
+						successors.append(", ");
+					}
+					successors.append(succ.getIndex());
+				}
+				System.out.printf("Block %d (%s) -> [%s]%n",
+					block.getIndex(),
+					block.getCommand().getClass().getSimpleName(),
+					successors.toString());
+			}
 
 			/**************************/
 			/* [9] Close output file */

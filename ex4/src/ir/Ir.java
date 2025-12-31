@@ -43,6 +43,35 @@ public class Ir
 		}
 	}
 
+	/***************************/
+	/* Retrieve IR commands... */
+	/***************************/
+	public List<IrCommand> getCommands()
+	{
+		if ((head == null) && (tail == null))
+		{
+			return Collections.emptyList();
+		}
+
+		List<IrCommand> commands = new ArrayList<>();
+		if (head != null)
+		{
+			commands.add(head);
+		}
+
+		IrCommandList it = tail;
+		while (it != null)
+		{
+			if (it.head != null)
+			{
+				commands.add(it.head);
+			}
+			it = it.tail;
+		}
+
+		return Collections.unmodifiableList(commands);
+	}
+
 	/**************************************/
 	/* USUAL SINGLETON IMPLEMENTATION ... */
 	/**************************************/
@@ -67,4 +96,4 @@ public class Ir
 		}
 		return instance;
 	}
-
+}

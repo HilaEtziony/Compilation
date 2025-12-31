@@ -114,7 +114,7 @@ public class AstNewExp extends AstExp
 		Temp dst = TempFactory.getInstance().getFreshTemp();
 
 		if (exp == null) { // like "new int"
-			Type t = symboltable.getSymbolTable().find(type.type);
+			Type t = getSymbolTable().find(type.type);
 			TypeClass tc = (TypeClass) t;
 			int numberOfFields = tc.calcTotalFields();
 			int sizeInBytes = (numberOfFields + 1) * 4;

@@ -1,7 +1,6 @@
 package ast;
 
-import ir.Ir;
-import ir.IrCommandStore;
+import ir.*;
 import semanticError.SemanticErrorException;
 import symboltable.SymbolTableEntry;
 import temp.Temp;
