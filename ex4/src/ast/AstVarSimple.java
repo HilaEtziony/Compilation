@@ -17,6 +17,8 @@ public class AstVarSimple extends AstVar
 	/* simple variable name */
 	/************************/
 	public String name;
+	private Integer cachedOffset = null;
+    private Boolean cachedIsGlobal = null;
 
 	/******************/
 	/* CONSTRUCTOR(S) */
@@ -71,6 +73,8 @@ public class AstVarSimple extends AstVar
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
 
+		cacheEntryInfo();
+
 		/**********************************************************/
 		/* [2] return type of variable, since simple var has type */
 		/**********************************************************/
@@ -79,13 +83,48 @@ public class AstVarSimple extends AstVar
 
 	public Temp irMe()
 	{
-		SymbolTableEntry entry = getSymbolTable().findEntry(name);
+		ensureEntryInfoAvailable();
 		Temp t = TempFactory.getInstance().getFreshTemp();
-		addIrCommand(new IrCommandLoad(t,name, entry.offset, entry.isGlobal));
+		addIrCommand(new IrCommandLoad(t,name, cachedOffset, cachedIsGlobal));
 		return t;
 	}
 
 	public String getPath() {
 		return this.name;
 	}
+
+	private void cacheEntryInfo()
+    {
+		SymbolTableEntry entry = getSymbolTable().findEntry(name);
+		if (entry == null)
+		{
+			throw new IllegalStateException(String.format(
+				"Symbol table entry for %s is unavailable during semantic analysis",
+				name));
+    	}
+        this.cachedOffset = entry.offset;
+        this.cachedIsGlobal = entry.isGlobal;
+    }
+
+    private void ensureEntryInfoAvailable()
+    {
+        if (cachedOffset == null || cachedIsGlobal == null)
+        {
+            throw new IllegalStateException(String.format(
+                "Variable %s offset/global info not cached before IR generation",
+                name));
+        }
+	}
+
+	public int getCachedOffset()
+   {
+       ensureEntryInfoAvailable();
+       return cachedOffset;
+   }
+
+   public boolean isGlobalVariable()
+   {
+       ensureEntryInfoAvailable();
+       return cachedIsGlobal;
+   }
 }

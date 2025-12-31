@@ -1,8 +1,6 @@
 package ast;
 
 import semanticError.SemanticErrorException;
-import symboltable.SymbolTable;
-import symboltable.SymbolTableEntry;
 import types.*;
 import temp.*;
 import ir.*;
@@ -108,8 +106,7 @@ public class AstStmtAssign extends AstStmt
 
 		if (var instanceof AstVarSimple) {
 			AstVarSimple v = (AstVarSimple) var;
-			SymbolTableEntry entry = getSymbolTable().findEntry(v.name);
-			addIrCommand(new IrCommandStore(v.name, srcTemp, entry.offset, entry.isGlobal));
+			addIrCommand(new IrCommandStore(v.name, srcTemp, v.getCachedOffset(), v.isGlobalVariable()));
 		}
 		else if (var instanceof AstVarField) {
 			AstVarField v = (AstVarField) var;
