@@ -20,4 +20,10 @@ public class IrCommandPrintInt extends IrCommand
 	{
 		this.t = t;
 	}
+
+	@Override
+	public String toString()
+	{
+		return String.format("PrintInt(%s)", t);
+	}
 }

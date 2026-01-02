@@ -12,4 +12,14 @@ public class IrCommandConstString extends IrCommand
         this.dst = dst;
         this.strValue = strValue;
     }
+
+    @Override
+    public String toString()
+    {
+        if (strValue == null) {
+            return String.format("%s := null", dst);
+        }
+        String escaped = strValue.replace("\"", "\\\"");
+        return String.format("%s := \"%s\"", dst, escaped);
+    }
 }

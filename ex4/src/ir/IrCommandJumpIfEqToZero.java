@@ -27,4 +27,10 @@ public class IrCommandJumpIfEqToZero extends IrCommand
 		this.t          = t;
 		this.labelName = labelName;
 	}
+
+	@Override
+	public String toString()
+	{
+		return String.format("if %s == 0 goto %s", t, labelName);
+	}
 }

@@ -8,4 +8,12 @@ public class IrCommandReturn extends IrCommand {
     public IrCommandReturn(Temp res) {
         this.res = res;
     }
+
+    @Override
+    public String toString() {
+        if (res == null) {
+            return "return";
+        }
+        return String.format("return %s", res);
+    }
 }

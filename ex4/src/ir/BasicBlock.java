@@ -13,8 +13,9 @@ public class BasicBlock {
 
     public BasicBlock(int index, IrCommand command) {
         if (command == null) {
-            throw new IllegalArgumentException("IR command cannot be null");
+            throw new IllegalArgumentException("IR command can't be null");
         }
+
         this.index = index;
         this.command = command;
         this.label = (command instanceof IrCommandLabel)
@@ -46,6 +47,7 @@ public class BasicBlock {
         if (block == null || block == this || successors.contains(block)) {
             return;
         }
+
         successors.add(block);
         block.addPredecessorInternal(this);
     }
@@ -54,11 +56,13 @@ public class BasicBlock {
         if (block == null || predecessors.contains(block)) {
             return;
         }
+
         predecessors.add(block);
     }
 
+    @Override
     public String toString() {
-        String labelName = (label == null) ? String.format("cmd_%d", index) : label;
-        return String.format("BasicBlock[%s -> %s]", labelName, command.getClass().getSimpleName());
+        String labelSuffix = (label == null) ? "" : String.format(":%s", label);
+        return String.format("BasicBlock[%d%s] %s", index, labelSuffix, command);
     }
 }

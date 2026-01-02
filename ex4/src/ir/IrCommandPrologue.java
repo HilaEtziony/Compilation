@@ -8,4 +8,9 @@ public class IrCommandPrologue extends IrCommand {
         this.funcName = funcName;
         this.frameSize = frameSize;
     }
+
+    @Override
+    public String toString() {
+        return String.format("prologue %s (frame=%d)", funcName, frameSize);
+    }
 }

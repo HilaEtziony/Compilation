@@ -24,4 +24,10 @@ public class IrCommandBinopLtIntegers extends IrCommand
 		this.t1 = t1;
 		this.t2 = t2;
 	}
+
+	@Override
+	public String toString()
+	{
+		return String.format("%s := (%s < %s)", dst, t1, t2);
+	}
 }

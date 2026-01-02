@@ -20,4 +20,10 @@ public class IrCommandFieldLoad extends IrCommand
         this.base   = base;
         this.offset = offset;
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("%s := %s.field[%d]", dst, base, offset);
+    }
 }

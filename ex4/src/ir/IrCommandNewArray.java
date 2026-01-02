@@ -10,4 +10,9 @@ public class IrCommandNewArray extends IrCommand {
         this.dst = dst;
         this.size = size;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s := new_array(%s)", dst, size);
+    }
 }

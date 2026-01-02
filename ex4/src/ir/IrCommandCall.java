@@ -22,4 +22,30 @@ public class IrCommandCall extends IrCommand {
         this.id = id;
         this.args = args;
     }
+
+    @Override
+    public String toString() {
+        String target = (varTemp != null) ? String.format("%s.%s", varTemp, id) : id;
+        String argsStr = formatArgs();
+        if (res == null) {
+            return String.format("call %s(%s)", target, argsStr);
+        }
+        return String.format("%s := call %s(%s)", res, target, argsStr);
+    }
+
+    private String formatArgs() {
+        if (args == null) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        TempList current = args;
+        while (current != null) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(current.head);
+            current = current.tail;
+        }
+        return sb.toString();
+    }
 }

@@ -16,6 +16,7 @@ public class Graph {
         if (ir == null) {
             throw new IllegalArgumentException("IR instance can't be null");
         }
+
         Graph graph = new Graph();
         graph.build(ir.getCommands());
         return graph;
@@ -56,12 +57,14 @@ public class Graph {
                 if (target != null) {
                     block.addSuccessor(target);
                 }
+
             } else if (command instanceof IrCommandJumpIfEqToZero) {
                 IrCommandJumpIfEqToZero jumpIf = (IrCommandJumpIfEqToZero) command;
                 BasicBlock taken = labelToBlock.get(jumpIf.labelName);
                 if (taken != null) {
                     block.addSuccessor(taken);
                 }
+
                 BasicBlock fallThrough = nextBlock(createdBlocks, i);
                 if (fallThrough != null) {
                     block.addSuccessor(fallThrough);

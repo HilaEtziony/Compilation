@@ -19,4 +19,10 @@ public class IrCommandAllocate extends IrCommand
 	{
 		this.varName = varName;
 	}
+
+	@Override
+	public String toString()
+	{
+		return String.format("alloc %s", varName);
+	}
 }

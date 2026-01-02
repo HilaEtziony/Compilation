@@ -14,4 +14,10 @@ public class IrCommandArrayStore extends IrCommand
         this.index = index;
         this.src   = src;
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("%s[%s] := %s", base, index, src);
+    }
 }

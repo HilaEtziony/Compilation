@@ -21,4 +21,10 @@ public class IrCommandFieldStore extends IrCommand
         this.offset = offset;
         this.src    = src;
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("%s.field[%d] := %s", base, offset, src);
+    }
 }

@@ -26,4 +26,12 @@ public class IrCommandLoad extends IrCommand
 		this.offset   = offset;
 		this.isGlobal = isGlobal;
 	}
+
+	@Override
+	public String toString()
+	{
+		String scope = isGlobal ? "global" : "frame";
+		String name = (varName == null) ? "<anon>" : varName;
+		return String.format("%s := load %s(offset=%d, %s)", dst, name, offset, scope);
+	}
 }

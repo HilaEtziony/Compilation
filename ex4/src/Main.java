@@ -79,7 +79,7 @@ public class Main
 				}
 				System.out.printf("Block %d (%s) -> [%s]%n",
 					block.getIndex(),
-					block.getCommand().getClass().getSimpleName(),
+					block.getCommand(),
 					successors.toString());
 			}
 

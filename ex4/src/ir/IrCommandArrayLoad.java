@@ -15,4 +15,10 @@ public class IrCommandArrayLoad extends IrCommand
         this.index = index;
     }
 
+    @Override
+    public String toString()
+    {
+        return String.format("%s := %s[%s]", dst, base, index);
+    }
+
 }

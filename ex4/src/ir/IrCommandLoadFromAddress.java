@@ -17,4 +17,9 @@ public class IrCommandLoadFromAddress extends IrCommand {
         this.dst = dst;
         this.address = address;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s := *%s", dst, address);
+    }
 }

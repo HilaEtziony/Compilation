@@ -24,4 +24,10 @@ public class Temp
 	{
 		return serial;
 	}
+
+	@Override
+	public String toString()
+	{
+		return String.format("t%d", serial);
+	}
 }

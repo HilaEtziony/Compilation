@@ -22,4 +22,14 @@ public class IrCommandConstInt extends IrCommand
 		this.t = t;
 		this.value = value;
 	}
+
+	@Override
+	public String toString()
+	{
+		if (t == null)
+		{
+			return String.format("const %d", value);
+		}
+		return String.format("%s := %d", t, value);
+	}
 }

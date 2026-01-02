@@ -27,4 +27,12 @@ public class IrCommandStore extends IrCommand
 		this.offset = offset;
 		this.isGlobal = isGlobal;
 	}
+
+	@Override
+	public String toString()
+	{
+		String scope = isGlobal ? "global" : "frame";
+		String name = (varName == null) ? "<anon>" : varName;
+		return String.format("store %s := %s(offset=%d, %s)", name, src, offset, scope);
+	}
 }
