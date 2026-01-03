@@ -264,9 +264,15 @@ public class AstDecFunc extends AstDec
 	{
 		addIrCommand(new IrCommandLabel(identifier));
 
-		int frameSize = this.numLocals * 4;
+		// Calculate the offset for the return value
+		int returnValOffset = -((this.numLocals + 1) * 4);
+		getSymbolTable().setCurrentFunctionReturnOffset(returnValOffset);
+
+		// Calculate frame size inculuding return address
+		int frameSize = (this.numLocals + 1) * 4;
 		addIrCommand(new IrCommandPrologue(identifier, frameSize));
 
+		// Create and set exit label
 		String exitLabel = identifier + "_exit";
 		getSymbolTable().setCurrentFunctionExitLabel(exitLabel);
 
@@ -275,8 +281,16 @@ public class AstDecFunc extends AstDec
 		}
 
 		addIrCommand(new IrCommandLabel(exitLabel));
+		
+		Temp resTemp = null;
+		// Load return value into temp if not void
+		if (!this.return_type.type.equals("void")) {
+			resTemp = TempFactory.getInstance().getFreshTemp();
+			addIrCommand(new IrCommandLoad(resTemp, "return_val", returnValOffset, false));
+		}
+
 		addIrCommand(new IrCommandEpilogue(identifier));
-		addIrCommand(new IrCommandReturn(null));
+		addIrCommand(new IrCommandReturn(resTemp));
 
 		return null;
 	}

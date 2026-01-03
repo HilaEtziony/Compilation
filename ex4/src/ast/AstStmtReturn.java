@@ -3,6 +3,7 @@ package ast;
 import ir.Ir;
 import ir.IrCommandJumpLabel;
 import ir.IrCommandReturn;
+import ir.IrCommandStore;
 import semanticError.SemanticErrorException;
 import symboltable.*;
 import temp.Temp;
@@ -106,33 +107,23 @@ public class AstStmtReturn extends AstStmt
 
 	public Temp irMe()
 	{
-		Temp t = null;
-
-		/*******************************************************************/
-		/* [1] If there is a return expression, calculate it to get a Temp */
-		/*******************************************************************/
 		if (exp != null)
 		{
-			t = exp.irMe();
+			Temp t = exp.irMe();
+			
+			// Get return value offset
+			int returnOffset = getSymbolTable().getCurrentFunctionReturnOffset();
+			
+			// Save to stack (using IrCommandStore)
+			addIrCommand(new IrCommandStore("return_val", t, returnOffset, false));
 		}
 
-		/*******************************************************************/
-		/* [2] Add the Return IR command.                                  */
-		/* This is MANDATORY to signal the end of function execution.      */
-		/*******************************************************************/
-		addIrCommand(new IrCommandReturn(t));
-
-		/*******************************************************************/
-		/* [3] Jump to function exit label                                 */
-		/*******************************************************************/
+		// Jump to function exit label
 		String exitLabel = getSymbolTable().getCurrentFunctionExitLabel();
 		if (exitLabel != null) {
 			addIrCommand(new IrCommandJumpLabel(exitLabel));
 		}
 
-		/*******************************************************************/
-		/* [4] Statements always return null as they don't have a value    */
-		/*******************************************************************/
 		return null;
 	}
 }
