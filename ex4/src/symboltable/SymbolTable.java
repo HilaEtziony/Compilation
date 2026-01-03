@@ -12,6 +12,7 @@ public class SymbolTable
 	private int localOffsetCounter = 0;
 	private int localCount = 0;
 	private String currentFunctionExitLabel = null;
+	private int currentFunctionReturnOffset;
 	
 	public static final String SCOPE_BOUNDARY = "SCOPE-BOUNDARY";
 
@@ -22,6 +23,14 @@ public class SymbolTable
 	private SymbolTableEntry top;
 	private int topIndex = 0;
 	public TypeClass currentClass = null;
+
+	public void setCurrentFunctionReturnOffset(int offset) {
+		this.currentFunctionReturnOffset = offset;
+	}
+
+	public int getCurrentFunctionReturnOffset() {
+		return this.currentFunctionReturnOffset;
+	}
 
 	public boolean isGlobalScope() {
 		return scopeLevel == 0;
