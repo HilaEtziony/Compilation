@@ -32,4 +32,9 @@ public class IrCommandConstInt extends IrCommand
 		}
 		return String.format("%s := %d", t, value);
 	}
+
+	public Temp getTemp()
+	{
+		return t;
+	}
 }

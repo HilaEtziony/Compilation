@@ -34,4 +34,12 @@ public class IrCommandLoad extends IrCommand
 		String name = (varName == null) ? "<anon>" : varName;
 		return String.format("%s := load %s(offset=%d, %s)", dst, name, offset, scope);
 	}
+
+	public Temp getDst() {
+		return dst;
+	}
+
+	public String getVarName() {
+		return varName;
+	}
 }

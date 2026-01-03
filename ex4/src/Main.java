@@ -5,6 +5,7 @@ import ast.*;
 import ir.BasicBlock;
 import ir.Graph;
 import ir.Ir;
+import java.util.ArrayList;
 
 public class Main
 {
@@ -82,6 +83,16 @@ public class Main
 					block.getCommand(),
 					successors.toString());
 			}
+			// Create and run the use-before-def checker
+			UseBeforeDefCheck ubdc = new UseBeforeDefCheck(cfg);
+			ArrayList<String> errors = ubdc.useBeforeDef();
+			if (errors.isEmpty()){
+				System.out.println("Ok!");
+			}
+			for (String error: errors){
+				System.out.println("Use before definition error: " + error);
+			}
+
 
 			/**************************/
 			/* [9] Close output file */

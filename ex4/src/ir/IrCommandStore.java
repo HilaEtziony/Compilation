@@ -35,4 +35,14 @@ public class IrCommandStore extends IrCommand
 		String name = (varName == null) ? "<anon>" : varName;
 		return String.format("store %s := %s(offset=%d, %s)", name, src, offset, scope);
 	}
+
+	public Temp getSrc()
+	{
+		return this.src;
+	}
+
+	public String getVarName()
+	{
+		return this.varName;
+	}
 }
