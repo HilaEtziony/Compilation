@@ -12,17 +12,12 @@ package ir;
 /*******************/
 import temp.*;
 
-public class IrCommandBinopDivIntegers extends IrCommand
+public class IrCommandBinopDivIntegers extends IrCommandBinop
 {
-	public Temp t1;
-	public Temp t2;
-	public Temp dst;
 
 	public IrCommandBinopDivIntegers(Temp dst, Temp t1, Temp t2)
 	{
-		this.dst = dst;
-		this.t1 = t1;
-		this.t2 = t2;
+		super(dst, t1, t2);
 	}
 
 	@Override

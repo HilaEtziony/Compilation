@@ -12,16 +12,22 @@ package ir;
 /*******************/
 import temp.*;
 
-public class IrCommandBinopGtIntegers extends IrCommandBinop
+public class IrCommandBinop extends IrCommand
 {
-	public IrCommandBinopGtIntegers(Temp dst, Temp t1, Temp t2)
+	public Temp t1;
+	public Temp t2;
+	public Temp dst;
+
+	public IrCommandBinop(Temp dst, Temp t1, Temp t2)
 	{
-		super(dst, t1, t2);
+		this.dst = dst;
+		this.t1 = t1;
+		this.t2 = t2;
 	}
 
 	@Override
 	public String toString()
 	{
-		return String.format("%s := (%s > %s)", dst, t1, t2);
+		return String.format("%s := %s # %s", dst, t1, t2);
 	}
 }
