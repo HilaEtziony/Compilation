@@ -50,7 +50,7 @@ public class Main
 			/*************************/
 			/* [6] Print the AST ... */
 			/*************************/
-			ast.printMe();
+			// ast.printMe();
 
 			/**************************/
 			/* [7] Semant the AST ... */
@@ -86,11 +86,18 @@ public class Main
 			// Create and run the use-before-def checker
 			UseBeforeDefCheck ubdc = new UseBeforeDefCheck(cfg);
 			ArrayList<String> errors = ubdc.useBeforeDef();
+			StringBuilder sb = new StringBuilder();
 			if (errors.isEmpty()){
-				System.out.println("Ok!");
+				System.out.println("!OK");
+				fileWriter.print("!OK");
 			}
-			for (String error: errors){
-				System.out.println("Use before definition error: " + error);
+			else{
+				for (String error: errors){
+					System.out.println("Use before definition error: " + error);
+					sb.append(error + "\n");
+				}
+				sb.deleteCharAt(sb.length() - 1);
+				fileWriter.print(sb.toString());
 			}
 
 
@@ -102,11 +109,18 @@ public class Main
 			/*************************************/
 			/* [10] Finalize AST GRAPHIZ DOT file */
 			/*************************************/
-			AstGraphviz.getInstance().finalizeFile();
+			// AstGraphviz.getInstance().finalizeFile();
 		}
 
 		catch (Exception e)
 		{
+			try {
+				fileWriter = new PrintWriter(outputFileName);
+				fileWriter.println(e.getMessage());
+				e.printStackTrace(fileWriter);
+				fileWriter.close();
+			} catch (Exception e2) {
+			}
 			e.printStackTrace();
 		}
 	}
