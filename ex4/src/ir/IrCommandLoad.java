@@ -39,6 +39,10 @@ public class IrCommandLoad extends IrCommand
 		return dst;
 	}
 
+	public String getVarInfo() {
+		return varName +"["+ offset +"]";
+	}
+
 	public String getVarName() {
 		return varName;
 	}

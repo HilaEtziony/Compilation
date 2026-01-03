@@ -41,6 +41,10 @@ public class IrCommandStore extends IrCommand
 		return this.src;
 	}
 
+	public String getVarInfo() {
+		return varName +"["+ offset +"]";
+	}
+
 	public String getVarName()
 	{
 		return this.varName;

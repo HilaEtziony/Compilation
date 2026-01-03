@@ -26,7 +26,7 @@ public class UseBeforeDefCheck {
         }
         else if (command instanceof IrCommandStore){
             IrCommandStore cmd = (IrCommandStore) command;
-            String varName = cmd.getVarName();
+            String varName = cmd.getVarInfo();
             String srcTemp = cmd.getSrc().toString();
             // Check if the source temp is defined
             if(out_set.contains(srcTemp.toString())){
@@ -36,9 +36,17 @@ public class UseBeforeDefCheck {
         else if (command instanceof IrCommandLoad){
             IrCommandLoad cmd = (IrCommandLoad) command;
 
-            if(out_set.contains(cmd.getVarName())){
+            if(out_set.contains(cmd.getVarInfo())){
                 out_set.add(cmd.getDst().toString());
             }
+        }
+        else if (command instanceof IrCommandBinop){
+            IrCommandBinop cmd = (IrCommandBinop) command;
+            String t1 = cmd.t1.toString();
+            String t2 = cmd.t2.toString();
+            if(out_set.contains(t1) && out_set.contains(t2)){
+                out_set.add(cmd.dst.toString());
+            }   
         }
         
         
@@ -62,11 +70,6 @@ public class UseBeforeDefCheck {
         Set<String>[] lattice = new Set[cfg.getBlocks().size()];
         Queue<BasicBlock> worklist = new LinkedList<>();
         BasicBlock temp;
-
-        //debug prints
-        System.err.println("CFG has " + cfg.getBlocks().size() + " blocks.");
-        System.err.println("lattice has size " + lattice.length);
-        System.out.println("Starting use-before-def analysis...");
 
         // add entry block to worklist, and process until worklist is empty
         worklist.add(cfg.getEntryBlock());
@@ -114,9 +117,10 @@ public class UseBeforeDefCheck {
             IrCommand command = block.getCommand();
             if(command instanceof IrCommandLoad){
                 IrCommandLoad cmd = (IrCommandLoad) command;
-                String varName = cmd.getVarName();
+                String varName = cmd.getVarInfo();
                 if(!in_set.contains(varName)){
-                    errorSet.add(varName);
+                    errorSet.add(cmd.getVarName());
+                    System.out.println("Use before definition detected: " + cmd.getVarName() + " in block " + block.getIndex());
                 }
             }
         }
