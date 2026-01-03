@@ -1,0 +1,5 @@
+ID: 325149383
+Tests Passed: 95
+Failed Tests: ['test_12_nested_var_d', 'test_38_call_a1s_a2s_error', 'test_39_call_a2s_a1s_error', 'test_40_call_a2_a1_error', 'test_86_scope_rec_error', 'test_87_scope_rec_arr_error', 'test_97_self_object_duplicating_class']
+Total Tests: 102
+Final Grade: 93.13725490196079
