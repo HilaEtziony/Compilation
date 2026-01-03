@@ -32,12 +32,19 @@ public class UseBeforeDefCheck {
             if(out_set.contains(srcTemp.toString())){
                 out_set.add(varName);
             }
+            //else remove varName from out_set?
+            else{
+                out_set.remove(varName);
+            }
         }
         else if (command instanceof IrCommandLoad){
             IrCommandLoad cmd = (IrCommandLoad) command;
 
             if(out_set.contains(cmd.getVarInfo())){
                 out_set.add(cmd.getDst().toString());
+            }
+            else{
+                out_set.remove(cmd.getDst().toString());
             }
         }
         else if (command instanceof IrCommandBinop){
@@ -47,9 +54,10 @@ public class UseBeforeDefCheck {
             if(out_set.contains(t1) && out_set.contains(t2)){
                 out_set.add(cmd.dst.toString());
             }   
+            else{
+                out_set.remove(cmd.dst.toString());
+            }
         }
-        
-        
 
         return out_set;
     }
