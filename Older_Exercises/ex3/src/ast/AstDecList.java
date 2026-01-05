@@ -63,23 +63,11 @@ public class AstDecList extends AstStmt
 
 	public Type semantMe()
 	{
-		// First pass: definitions (classes, arrays, global variables) - in order of appearance
-		for (AstDecList it = this; it != null; it = it.tail)
-		{
-			if (it.head != null && !(it.head instanceof AstDecFunc))
-			{
-				it.head.semantMe();
-			}
-		}
-
-		// Second pass: function bodies (which can now use all previously defined)
-		for (AstDecList it = this; it != null; it = it.tail)
-		{
-			if (it.head != null && (it.head instanceof AstDecFunc))
-			{
-				it.head.semantMe();
-			}
-		}
+		/*************************************/
+		/* RECURSIVELY PRINT HEAD + TAIL ... */
+		/*************************************/
+		if (head != null) head.semantMe();
+		if (tail != null) tail.semantMe();
 
 		return null;
 	}
