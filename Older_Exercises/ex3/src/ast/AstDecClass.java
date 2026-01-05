@@ -50,77 +50,98 @@ public class AstDecClass extends AstDec
 	}
 
 	public Type semantMe()
-	{
-		/* [0a] Make sure class doesn't already exist */
-		if (SymbolTable.getInstance().find(name) != null) {
-			System.out.format("ERROR: class %s already exists in symbol table\n",name);
-			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
-		}
+    {
+        /********************************************************/
+        /* [0a] Check if the class name is already in use       */
+        /********************************************************/
+        if (SymbolTable.getInstance().find(name) != null) {
+            System.out.format("ERROR: class %s already exists in symbol table\n", name);
+            throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+        }
 
-		Type parentType = SymbolTable.getInstance().find(parentName);
-		/* [0b] Make sure father exist */
-		if (parentName != null) {
-			if (parentType == null || !(parentType instanceof TypeClass)) {
-				System.out.format("ERROR: parent class %s of class %s doesn't exist\n",parentName,name);
-				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
-			}
-		}
+        /********************************************************/
+        /* [0b] Check if the parent class exists (if extended)  */
+        /********************************************************/
+        Type parentType = null;
+        if (parentName != null) {
+            parentType = SymbolTable.getInstance().find(parentName);
+            if (parentType == null || !(parentType instanceof TypeClass)) {
+                System.out.format("ERROR: parent class %s of class %s doesn't exist\n", parentName, name);
+                throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+            }
+        }
 
-		/* [0c] Prevent circular dependencies */
-		if (parentName != null) {
-			// if got here, then parentType exists and is TypeClass
+        /********************************************************/
+        /* [0c] Check for circular inheritance                  */
+        /********************************************************/
+        if (parentName != null) {
+            TypeClass curr = (TypeClass) parentType;
+            while (curr != null) {
+                if (curr.name.equals(this.name)) {
+                    System.out.format("ERROR: circular inheritance detected for class %s\n", name);
+                    throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+                }
+                curr = curr.father;
+            }
+        }
 
-			TypeClass curr = (TypeClass) parentType;
-			while (curr != null){
-				if (curr.name.equals(this.name))
-				{
-					System.out.format("ERROR: class %s cannot extend itself, directly nor indirectly\n",name);
-					throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
-				}
-				TypeList existingDataMembers = curr.dataMembers;
-				for (TypeList it = existingDataMembers; it != null; it = it.tail) {
-					if(!it.head.isFunction()){
-						SymbolTable.getInstance().enter(it.head.name, it.head);
-					}
-				}
-				curr = curr.father;
-			}
-		}
+        /********************************************************/
+        /* [1] Create the Class Type object                     */
+        /********************************************************/
+        TypeClass t = new TypeClass((TypeClass)parentType, name, null);
 
-		/*************************/
-		/* [1] Begin Class Scope */
-		/*************************/
-		SymbolTable.getInstance().beginScope();
+        /********************************************************/
+        /* [2] Register the class in the Global Symbol Table    */
+        /* Doing this before beginScope allows fields to    */
+        /* reference the class itself (Recursion).          */
+        /********************************************************/
+        SymbolTable.getInstance().enter(name, t);
 
-		/*******************************/
-		/* [1a] Semant Class ...  */
-		/*******************************/
-		TypeClass t = new TypeClass((TypeClass)parentType,name, null);
-		SymbolTable.getInstance().enter(name, t);
-		SymbolTable.getInstance().currentClass = t;
-		/***************************/
-		/* [2] Semant Data Members */
-		/***************************/
-		// System.out.println("Semanting class data members for class " + name + " " + this.cFieldList );
-		this.cFieldList.semantMe(t);
-	
+        /********************************************************/
+        /* [3] Begin Class Scope                                */
+        /********************************************************/
+        SymbolTable.getInstance().beginScope();
+        SymbolTable.getInstance().currentClass = t;
 
-		/*****************/
-		/* [3] End Scope */
-		/*****************/
-		SymbolTable.getInstance().endScope();
-		SymbolTable.getInstance().currentClass = null;
 
-		/************************************************/
-		/* [4] Enter the Class Type to the Symbol Table */
-		/************************************************/
-		SymbolTable.getInstance().enter(name,t);
+		/********************************************************/
+        /* [4] Import Parent Members into current scope         */
+        /********************************************************/
+        if (parentType != null) {
+            TypeClass curr = (TypeClass) parentType;
+            while (curr != null) {
+                for (TypeList it = curr.dataMembers; it != null; it = it.tail) {
+					String memberName = it.head.name;
+                    // enter into symbol table just if the name doesn't exist in the current scope and
+					// the name is not redefined in the current class
+                    if (SymbolTable.getInstance().findInCurrentScope(memberName) == null &&
+                        !isRedefinedInCurrentClass(memberName)) 
+                    {
+                        SymbolTable.getInstance().enter(memberName, it.head);
+                    }
+                }
+                curr = curr.father;
+            }
+        }
 
-		/*********************************************************/
-		/* [5] Return value is irrelevant for class declarations */
-		/*********************************************************/
-		return null;
-	}
+        /********************************************************/
+        /* [5] Semant Class Members (Fields and Methods)        */
+        /********************************************************/
+        if (this.cFieldList != null) {
+            this.cFieldList.semantMe(t);
+        }
+
+        /********************************************************/
+        /* [6] End Class Scope                                  */
+        /********************************************************/
+        SymbolTable.getInstance().endScope();
+        SymbolTable.getInstance().currentClass = null;
+
+        /********************************************************/
+        /* [7] Class declaration doesn't return a specific type */
+        /********************************************************/
+        return null;
+    }
 
 	private void printTypeList(TypeList tl) {
 		System.out.print("TypeList: ");
@@ -128,6 +149,19 @@ public class AstDecClass extends AstDec
 			System.out.print(it.head.name + " ");
 		}
 		System.out.println();
+	}
+
+	private boolean isRedefinedInCurrentClass(String nameToCheck) {
+		if (cFieldList == null) return false;
+		for (AstDecList it = cFieldList; it != null; it = it.tail) {
+			if (it.head instanceof AstVarDec) {
+				if (((AstVarDec)it.head).id.name.equals(nameToCheck)) return true;
+			}
+			if (it.head instanceof AstDecFunc) {
+				if (((AstDecFunc)it.head).identifier.equals(nameToCheck)) return true;
+			}
+		}
+		return false;
 	}
 }
 
