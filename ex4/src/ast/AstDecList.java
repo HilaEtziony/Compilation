@@ -1,8 +1,7 @@
 package ast;
 
-import types.*;
 import temp.*;
-import ir.*;
+import types.*;
 
 /*
 USAGE:
@@ -102,10 +101,25 @@ public class AstDecList extends AstStmt
 
 	public Temp irMe()
 	{
-		if (head != null) head.irMe();
-		if (tail != null) tail.irMe();
+			// First pass: definitions (classes, arrays, global variables) - in order of appearance
+		for (AstDecList it = this; it != null; it = it.tail)
+		{
+			if (it.head != null && !(it.head instanceof AstDecFunc))
+			{
+				it.head.irMe();
+			}
+		}
 
-		return null;
+		// Second pass: function bodies (which can now use all previously defined)
+		for (AstDecList it = this; it != null; it = it.tail)
+		{
+			if (it.head != null && (it.head instanceof AstDecFunc))
+			{
+				it.head.irMe();
+			}
+		}
+
+		return null;	
 	}
 
 }
