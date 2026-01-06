@@ -234,10 +234,10 @@ public class AstDecFunc extends AstDec
 			}
 		}
 		SymbolTable.getInstance().enter(identifier, funcType);
+		theirClassType.dataMembers = new TypeList(funcType, theirClassType.dataMembers);
 		stmnts_of_funs.semantMe();
 		SymbolTable.getInstance().endScope();
 		
-		theirClassType.dataMembers = new TypeList(funcType, theirClassType.dataMembers);
 		SymbolTable.getInstance().enter(identifier, funcType);
 	}
 

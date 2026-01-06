@@ -1,0 +1,24 @@
+class A { int a; }
+
+
+
+
+
+class B extends A { int b; }
+
+array AS = A [];
+array BS = B [];
+
+
+int a;
+int b;
+
+int f(AS a) { return a[200].a; }
+void main() {
+    AS a := new A[13]; f(a); // f(new A[1]);
+
+
+    BS b := new B[a]; // Error
+
+
+}

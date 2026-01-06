@@ -1,0 +1,32 @@
+class A { int a; }
+
+
+
+
+
+class B extends A { int b; }
+
+array AS = A [];
+array BS = B [];
+
+
+int a;
+int b;
+
+int f(AS a) { return a[200].a; }
+void main() {
+
+
+    AS a := nil;
+
+
+
+
+
+    a := new A[b+b+b+b*f(a)];
+    
+    
+    
+    f(f(f(f(f(f(f(a)))))));
+
+}

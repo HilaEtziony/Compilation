@@ -1,0 +1,10 @@
+class A {
+    string name;
+    int iq;
+    A next;
+}
+array AS = A [];
+AS as := new A[20];
+string name := as[0].next.next.next.next.next.name;
+int iq := as[0].next.next.next.next.next.name; // Error
+

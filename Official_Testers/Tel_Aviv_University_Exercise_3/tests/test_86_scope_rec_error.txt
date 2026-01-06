@@ -1,0 +1,9 @@
+class A {
+    string name;
+    int iq;
+    A next;
+}
+A a := new A;
+string name := a.next.next.next.next.next.name;
+int iq := a.next.next.next.next.next.name; // Error
+
