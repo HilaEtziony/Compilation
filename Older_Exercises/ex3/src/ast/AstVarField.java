@@ -69,10 +69,12 @@ public class AstVarField extends AstVar
 	{
 		// Get the type of the base variable
 		Type varType = var.semantMe();
+		if(varType instanceof TypeClassVarDec) varType = ((TypeClassVarDec)varType).t;
 
 		// Check that the base variable is of a class type
 		if (!(varType instanceof TypeClass))
 		{
+			System.err.println(this + "|" + this.fieldName + "|" + this.lineNumber + "|"+this.var + "|" + varType);
 			System.out.format("ERROR: variable is not of a class type\n");
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
