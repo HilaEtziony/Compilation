@@ -250,13 +250,14 @@ public class AstDecFunc extends AstDec
 		
 		getSymbolTable().resetLocalOffset();
 
+		theirClassType.dataMembers = new TypeList(funcType, theirClassType.dataMembers);
+
 		stmnts_of_funs.semantMe();
 
 		this.numLocals = getSymbolTable().getLocalCount();
 
 		getSymbolTable().endScope();
 		
-		theirClassType.dataMembers = new TypeList(funcType, theirClassType.dataMembers);
 		getSymbolTable().enter(identifier, funcType);
 	}
 

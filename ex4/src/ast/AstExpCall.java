@@ -77,6 +77,10 @@ public class AstExpCall extends AstExp
 		if (var != null) {
 			// Method call on object
 			Type varType = var.semantMe();
+
+			// if varType is class variable, extract the type
+			if(varType instanceof TypeClassVarDec) varType = ((TypeClassVarDec)varType).t;
+
 			if (!varType.isClass()) {
 				System.out.format(">> ERROR: variable is not a class for method call %s\n", id);
 				throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
