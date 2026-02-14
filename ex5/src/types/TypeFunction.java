@@ -10,15 +10,23 @@ public class TypeFunction extends Type
 	/*************************/
 	/* types of input params */
 	/*************************/
-	public TypeList params;
+	public TypeList paramTypes;
 	
 	/****************/
 	/* CTROR(S) ... */
 	/****************/
-	public TypeFunction(Type returnType, String name, TypeList params)
-	{
-		this.name = name;
-		this.returnType = returnType;
-		this.params = params;
-	}
+    public TypeFunction(Type returnType, String name, TypeList paramTypes) {
+        this.name = name;
+        this.returnType = returnType;
+        this.paramTypes = paramTypes;
+    }
+
+    @Override
+    public boolean isFunction() { return true; }
+
+    @Override
+    public TypeList getParamTypes() { return paramTypes; }
+
+    @Override
+    public Type getReturnType() { return returnType; }
 }

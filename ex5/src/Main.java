@@ -1,9 +1,10 @@
 import java.io.*;
-import java.io.PrintWriter;
+
 import java_cup.runtime.Symbol;
 import ast.*;
 import ir.*;
 import mips.*;
+import semanticError.SemanticErrorException;
 
 public class Main
 {
@@ -50,15 +51,55 @@ public class Main
 			/*************************/
 			ast.printMe();
 
-			/**************************/
-			/* [7] Semant the AST ... */
-			/**************************/
-			ast.semantMe();
+			// This try and 2 next catches handle error as in ex3 - as necessary for ex5
+			try
+			{
+				/**************************/
+				/* [7] Semant the AST ... */
+				/**************************/
+				ast.semantMe();
+			}
+			
+			catch (SemanticErrorException e) 
+			{
+				fileWriter.close();
+				fileReader.close();
+				e.printStackTrace();
+				throw e;
+			}
+			catch (Exception e) 
+			{
+				e.printStackTrace();
+				throw e;
+			}
 
 			/**********************/
 			/* [8] Ir the AST ... */
 			/**********************/
 			ast.irMe();
+
+			//from ex4
+			/********************************************/
+			/* [8.5] Build and print IR control-flow CFG */
+			/********************************************/
+			Graph cfg = Graph.fromIr(Ir.getInstance());
+			System.out.println("CFG blocks (index: command -> successors)");
+			for (BasicBlock block : cfg.getBlocks())
+			{
+				StringBuilder successors = new StringBuilder();
+				for (BasicBlock succ : block.getSuccessors())
+				{
+					if (successors.length() > 0)
+					{
+						successors.append(", ");
+					}
+					successors.append(succ.getIndex());
+				}
+				System.out.printf("Block %d (%s) -> [%s]%n",
+					block.getIndex(),
+					block.getCommand(),
+					successors.toString());
+			}
 
 			/***********************/
 			/* [9] MIPS the Ir ... */
@@ -81,9 +122,51 @@ public class Main
 			fileWriter.close();
 		}
 
+		// All next catches handle errors as ex3 - ERROR(line number) for syntax or semantic errors, ERROR for lexical error.
+		catch (SemanticErrorException e) 
+		{
+			System.out.println("Semantic Error: " + e.getMessage());
+			try
+			{
+				fileWriter = new PrintWriter(outputFileName);
+				String message = e.getMessage();
+				fileWriter.print(message);
+				System.out.print(message);
+				fileWriter.close();
+			}
+			catch (FileNotFoundException ex)
+			{
+				ex.printStackTrace();
+			}
+
+		}
+
 		catch (Exception e)
 		{
 			e.printStackTrace();
+		}
+
+		catch(Error e)
+		{
+			try
+			{
+				fileWriter = new PrintWriter(outputFileName);
+				String message = e.getMessage();
+				if(message == null)
+				{
+					fileWriter.print("ERROR");
+				}
+				else
+				{
+					fileWriter.print(message);
+				}
+				fileWriter.close();
+			}
+			catch (FileNotFoundException ex)
+			{
+				ex.printStackTrace();
+			}
+
 		}
 	}
 }

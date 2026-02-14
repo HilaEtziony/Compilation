@@ -1,52 +1,92 @@
-/***********/
-/* PACKAGE */
-/***********/
 package symboltable;
 
-/*******************/
-/* GENERAL IMPORTS */
-/*******************/
 import java.io.PrintWriter;
-
-/*******************/
-/* PROJECT IMPORTS */
-/*******************/
 import types.*;
 
-/****************/
-/* SYMBOL TABLE */
-/****************/
 public class SymbolTable
 {
 	private int hashArraySize = 13;
+
+	private int scopeLevel = 0;         // 0 = Global, 1+ = Local
+	private int globalOffsetCounter = 0;
+	private int localOffsetCounter = 0;
+	private int localCount = 0;
+	private String currentFunctionExitLabel = null;
+	private int currentFunctionReturnOffset;
 	
+	public static final String SCOPE_BOUNDARY = "SCOPE-BOUNDARY";
+
 	/**********************************************/
 	/* The actual symbol table data structure ... */
 	/**********************************************/
 	private SymbolTableEntry[] table = new SymbolTableEntry[hashArraySize];
 	private SymbolTableEntry top;
 	private int topIndex = 0;
-	
+	public TypeClass currentClass = null;
+
+	public void setCurrentFunctionReturnOffset(int offset) {
+		this.currentFunctionReturnOffset = offset;
+	}
+
+	public int getCurrentFunctionReturnOffset() {
+		return this.currentFunctionReturnOffset;
+	}
+
+	public boolean isGlobalScope() {
+		return scopeLevel == 0;
+	}
+
+	// Calculate new offset and update counters
+	public int calculateNewOffset(boolean isGlobal) {
+		if (isGlobal) {
+			int current = globalOffsetCounter;
+			globalOffsetCounter += 4; // Every global variable takes 4 bytes
+			return current;
+		} else {
+			// In the stack, offsets decrease from the Frame Pointer ($fp)
+			localOffsetCounter -= 4; 
+			return localOffsetCounter;
+		}
+	}
+
+	public void resetLocalOffset() {
+		this.localCount = 0;
+	}
+
+	public int getLocalCount() {
+		return this.localCount;
+	}
+
+	public void setCurrentFunctionExitLabel(String label) {
+		this.currentFunctionExitLabel = label;
+	}
+
+	public String getCurrentFunctionExitLabel() {
+		return this.currentFunctionExitLabel;
+	}
+
 	/**************************************************************/
 	/* A very primitive hash function for exposition purposes ... */
 	/**************************************************************/
 	private int hash(String s)
 	{
-		if (s.charAt(0) == 'l') {return 1;}
-		if (s.charAt(0) == 'm') {return 1;}
-		if (s.charAt(0) == 'r') {return 3;}
-		if (s.charAt(0) == 'i') {return 6;}
-		if (s.charAt(0) == 'd') {return 6;}
-		if (s.charAt(0) == 'k') {return 6;}
-		if (s.charAt(0) == 'f') {return 6;}
-		if (s.charAt(0) == 'S') {return 6;}
-		return 12;
+		if (s == null) return 0;
+		return (s.hashCode() & 0x7fffffff) % hashArraySize;
+	}
+
+	/****************************************************************************/
+	/* Original version - for types, functions, and scope boundaries        */
+	/****************************************************************************/
+	public void enter(String name, Type t) {
+		boolean isGlobal = isGlobalScope();
+		int offset = calculateNewOffset(isGlobal);
+		enter(name, t, offset, isGlobal);
 	}
 
 	/****************************************************************************/
 	/* Enter a variable, function, class type or array type to the symbol table */
 	/****************************************************************************/
-	public void enter(String name, Type t)
+	public void enter(String name, Type t, int offset, boolean isGlobal)
 	{
 		/*************************************************/
 		/* [1] Compute the hash value for this new entry */
@@ -62,7 +102,7 @@ public class SymbolTable
 		/**************************************************************************/
 		/* [3] Prepare a new symbol table entry with name, type, next and prevtop */
 		/**************************************************************************/
-		SymbolTableEntry e = new SymbolTableEntry(name,t,hashValue,next,top, topIndex++);
+		SymbolTableEntry e = new SymbolTableEntry(name,t,hashValue,next,top, topIndex++, offset, isGlobal);
 
 		/**********************************************/
 		/* [4] Update the top of the symbol table ... */
@@ -77,7 +117,11 @@ public class SymbolTable
 		/**************************/
 		/* [6] Print Symbol Table */
 		/**************************/
-		printMe();
+		// printMe();
+		// this.printStackTopDown(5);
+		if (!isGlobal && offset < 0) { 
+			localCount++;
+		}
 	}
 
 	/***********************************************/
@@ -85,9 +129,52 @@ public class SymbolTable
 	/***********************************************/
 	public Type find(String name)
 	{
+		if (name == null) return null;
 		SymbolTableEntry e;
 				
 		for (e = table[hash(name)]; e != null; e = e.next)
+		{
+			if (name.equals(e.name))
+			{
+				return e.type;
+			}
+		}
+		
+		return null;
+	}
+
+	/*****************************************************************/
+	/* Find the inner-most scope element with name and return entry */
+	/*****************************************************************/
+	public SymbolTableEntry findEntry(String name) {
+		if (name == null) return null;
+
+		for (SymbolTableEntry e = table[hash(name)]; e != null; e = e.next) {
+			if (name.equals(e.name)) {
+				return e; // Return the entire entry
+			}
+		}
+		return null;
+	}
+
+	public int getOffset(String name) {
+		SymbolTableEntry e = findEntry(name);
+		return (e != null) ? e.offset : -1;
+	}
+
+	public boolean isGlobal(String name) {
+		SymbolTableEntry e = findEntry(name);
+		return (e != null) ? e.isGlobal : false;
+	}
+
+	/*****************************************************************/
+	/* Find the inner-most scope element with name in current scope  */
+	/*****************************************************************/
+	public Type findInCurrentScope(String name)
+	{
+		if (name == null) return null;
+		
+		for (SymbolTableEntry e = top; e != null && !e.name.equals(SCOPE_BOUNDARY); e = e.prevtop)
 		{
 			if (name.equals(e.name))
 			{
@@ -103,6 +190,15 @@ public class SymbolTable
 	/***************************************************************************/
 	public void beginScope()
 	{
+		scopeLevel++; // update scope level
+			
+		// Reset local offset counter at the beginning of a new local scope
+		if (scopeLevel == 1) {
+			localOffsetCounter = 0;
+			localCount = 0;
+		}
+
+		// this.printStackTopDown(7);
 		/************************************************************************/
 		/* Though <SCOPE-BOUNDARY> entries are present inside the symbol table, */
 		/* they are not really types. In order to be able to debug print them,  */
@@ -110,13 +206,15 @@ public class SymbolTable
 		/* class only contain their type name which is the bottom sign: _|_     */
 		/************************************************************************/
 		enter(
-			"SCOPE-BOUNDARY",
+			SCOPE_BOUNDARY,
 			new TypeForScopeBoundaries("NONE"));
 
+		// System.out.println("BEGINNING NEW SCOPE" + " of type: " + top.type + " with name: " + top.name);
 		/*********************************************/
 		/* Print the symbol table after every change */
 		/*********************************************/
 		printMe();
+		// this.printStackTopDown(7);
 	}
 
 	/********************************************************************************/
@@ -125,26 +223,34 @@ public class SymbolTable
 	/********************************************************************************/
 	public void endScope()
 	{
+		// System.out.println("ENDING SCOPE");
+		// this.printStackTopDown(5);
+		// printMe();
 		/**************************************************************************/
 		/* Pop elements from the symbol table stack until a SCOPE-BOUNDARY is hit */		
-		/**************************************************************************/
-		while (top.name != "SCOPE-BOUNDARY")
+		/**************************************************************************/		
+		while (!top.name.equals(SCOPE_BOUNDARY))
 		{
+			//System.out.println("Popping symbol: " + top.name + " of type: " + top.type);
 			table[top.index] = top.next;
-			topIndex = topIndex -1;
+			topIndex--;
 			top = top.prevtop;
 		}
 		/**************************************/
 		/* Pop the SCOPE-BOUNDARY sign itself */		
 		/**************************************/
+		//System.out.println("Popping SCOPE BOUNDARY" + " of type: " + top.type + " with name: " + top.name);
 		table[top.index] = top.next;
-		topIndex = topIndex -1;
+		topIndex = top.index;
 		top = top.prevtop;
 
 		/*********************************************/
 		/* Print the symbol table after every change */		
 		/*********************************************/
+		scopeLevel--; // update scope level
 		printMe();
+		// this.printStackTopDown(5);
+		// System.out.println("SCOPE ENDED" );
 	}
 	
 	public static int n=0;
@@ -236,8 +342,8 @@ public class SymbolTable
 	protected SymbolTable() {}
 
 	/******************************/
-	/* GET SINGLETON INSTANCE ... */
-	/******************************/
+	/* GET SINGLETON INSTANCE ... */ // -> only 1 instance of symbol table is created
+	/******************************/ // whenever we want to modify it, we call SymbolTable.getInstance().XXX
 	public static SymbolTable getInstance()
 	{
 		if (instance == null)
@@ -246,7 +352,7 @@ public class SymbolTable
 			/* [0] The instance itself ... */
 			/*******************************/
 			instance = new SymbolTable();
-
+			// instance.beginScope();
 			/*****************************************/
 			/* [1] Enter primitive types int, string */
 			/*****************************************/
@@ -257,19 +363,73 @@ public class SymbolTable
 			/* [2] How should we handle void ??? */
 			/*************************************/
 
+			instance.enter("void",  TypeVoid.getInstance());
+
 			/***************************************/
-			/* [3] Enter library function PrintInt */
+			/* [3] Enter library functions */
 			/***************************************/
 			instance.enter(
 				"PrintInt",
-				new TypeFunction(
+				new TypeFunction( // this PrintInt func represents a func obj, returns void, takes int as args
 					TypeVoid.getInstance(),
 					"PrintInt",
 					new TypeList(
 						TypeInt.getInstance(),
 						null)));
-			
+
+			instance.enter(
+				"PrintString",
+				new TypeFunction( // this PrintString func represents a func obj, returns void, takes string as args
+					TypeVoid.getInstance(),
+					"PrintString",
+					new TypeList(
+						TypeString.getInstance(),
+						null)));
 		}
+
 		return instance;
+	}
+
+	public boolean isInFunction(){
+		SymbolTableEntry temp = this.top;
+		while (temp != null){
+			if (temp.type instanceof TypeFunction){
+				return true;
+			}
+
+			temp = temp.prevtop;
+		}
+
+		return false;
+	}
+
+	public Type getCurrentFunctionReturnType() {
+		SymbolTableEntry temp = this.top;
+		// System.out.println("Getting current function return type...");
+		while (temp != null){
+			// System.out.println("Checking symbol: " + temp.name + " of type: " + temp.type);
+			if (temp.type instanceof TypeFunction){
+				TypeFunction funcType = (TypeFunction) temp.type;
+				// System.out.println("Found function: " + funcType.name + " with return type: " + funcType.returnType);
+				return funcType.returnType;
+			}
+
+			temp = temp.prevtop;
+		}
+		return TypeVoid.getInstance();
+	}
+
+	// Debug utility: print the top N entries of the stack
+	public void printStackTopDown(int n) {
+		SymbolTableEntry curr = top;
+		int count = 0;
+		System.out.print("[STACK] Top-down: ");
+		while (curr != null && count < n) {
+			System.out.print(curr.name + " (" + curr.type.name + ")");
+			curr = curr.prevtop;
+			count++;
+			if (curr != null && count < n) System.out.print(" -> ");
+		}
+		System.out.println();
 	}
 }

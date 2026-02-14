@@ -3,6 +3,8 @@
 /***********/
 package ir;
 
+import mips.MipsGenerator;
+
 /*******************/
 /* GENERAL IMPORTS */
 /*******************/
@@ -11,7 +13,6 @@ package ir;
 /* PROJECT IMPORTS */
 /*******************/
 import temp.*;
-import mips.*;
 
 public class IrCommandPrintInt extends IrCommand
 {
@@ -21,7 +22,13 @@ public class IrCommandPrintInt extends IrCommand
 	{
 		this.t = t;
 	}
-	
+
+	@Override
+	public String toString()
+	{
+		return String.format("PrintInt(%s)", t);
+	}
+
 	/***************/
 	/* MIPS me !!! */
 	/***************/

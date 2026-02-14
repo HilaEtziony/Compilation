@@ -1,5 +1,8 @@
 package ast;
 
+import types.*;
+import symboltable.*;
+
 public class AstNodeSerialNumber
 {
 	/*******************************************/
@@ -7,7 +10,7 @@ public class AstNodeSerialNumber
 	/* In particular, it can help in creating  */
 	/* a graphviz dot format of the AST ...    */
 	/*******************************************/
-	public int SerialNumber;
+	public int serialNumber;
 	
 	/**************************************/
 	/* USUAL SINGLETON IMPLEMENTATION ... */
@@ -27,7 +30,7 @@ public class AstNodeSerialNumber
 		if (instance == null)
 		{
 			instance = new AstNodeSerialNumber();
-			instance.SerialNumber = 0;
+			instance.serialNumber = 0;
 			
 		}
 		return instance;
@@ -38,7 +41,7 @@ public class AstNodeSerialNumber
 	/**********************************/
 	public int get()
 	{
-		return SerialNumber++;
+		return serialNumber++;
 	}
 
 	/**********************************/

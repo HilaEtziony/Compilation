@@ -3,6 +3,8 @@
 /***********/
 package ir;
 
+import mips.MipsGenerator;
+
 /*******************/
 /* GENERAL IMPORTS */
 /*******************/
@@ -11,21 +13,20 @@ package ir;
 /* PROJECT IMPORTS */
 /*******************/
 import temp.*;
-import mips.*;
 
-public class IrCommandBinopEqIntegers extends IrCommand
+public class IrCommandBinopEqIntegers extends IrCommandBinop
 {
-	public Temp t1;
-	public Temp t2;
-	public Temp dst;
 
 	public IrCommandBinopEqIntegers(Temp dst, Temp t1, Temp t2)
 	{
-		this.dst = dst;
-		this.t1 = t1;
-		this.t2 = t2;
+		super(dst, t1, t2);
 	}
-	
+
+	@Override
+	public String toString()
+	{
+		return String.format("%s := (%s == %s)", dst, t1, t2);
+	}
 	/***************/
 	/* MIPS me !!! */
 	/***************/

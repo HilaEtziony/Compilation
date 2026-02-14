@@ -3,6 +3,8 @@
 /***********/
 package ir;
 
+import mips.MipsGenerator;
+
 /*******************/
 /* GENERAL IMPORTS */
 /*******************/
@@ -10,17 +12,22 @@ package ir;
 /*******************/
 /* PROJECT IMPORTS */
 /*******************/
-import mips.*;
 
 public class IrCommandAllocate extends IrCommand
 {
 	String varName;
-	
+
 	public IrCommandAllocate(String varName)
 	{
 		this.varName = varName;
 	}
-	
+
+	@Override
+	public String toString()
+	{
+		return String.format("alloc %s", varName);
+	}
+
 	/***************/
 	/* MIPS me !!! */
 	/***************/

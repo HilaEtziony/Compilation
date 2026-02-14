@@ -1,21 +1,27 @@
 package ast;
 
+import semanticError.SemanticErrorException;
 import types.*;
 import temp.*;
 import ir.*;
+
+/*
+USAGE:
+	| var:v ASSIGN exp:e SEMICOLON									{: RESULT = new AstStmtAssign(v,e); 				:}
+*/
 
 public class AstStmtAssign extends AstStmt
 {
 	/***************/
 	/*  var := exp */
 	/***************/
-	public AstExpVar var;
+	public AstVar var;
 	public AstExp exp;
 
 	/*******************/
 	/*  CONSTRUCTOR(S) */
 	/*******************/
-	public AstStmtAssign(AstExpVar var, AstExp exp)
+	public AstStmtAssign(AstVar var, AstExp exp, int lineNumber)
 	{
 		/******************************/
 		/* SET A UNIQUE SERIAL NUMBER */
@@ -28,8 +34,9 @@ public class AstStmtAssign extends AstStmt
 		System.out.print("====================== stmt -> var ASSIGN exp SEMICOLON\n");
 
 		/*******************************/
-		/* COPY INPUT DATA MENBERS ... */
+		/* COPY INPUT DATA MEMBERS ... */
 		/*******************************/
+		this.lineNumber = lineNumber;
 		this.var = var;
 		this.exp = exp;
 	}
@@ -56,7 +63,7 @@ public class AstStmtAssign extends AstStmt
 		AstGraphviz.getInstance().logNode(
                 serialNumber,
 			"ASSIGN\nleft := right\n");
-		
+
 		/****************************************/
 		/* PRINT Edges to AST GRAPHVIZ DOT file */
 		/****************************************/
@@ -66,25 +73,57 @@ public class AstStmtAssign extends AstStmt
 
 	public Type semantMe()
 	{
-		Type t1 = null;
-		Type t2 = null;
-		
-		if (var != null) t1 = var.semantMe();
-		if (exp != null) t2 = exp.semantMe();
-		
-		if (t1 != t2)
-		{
-			System.out.format(">> ERROR [%d:%d] type mismatch for var := exp\n",6,6);				
+		Type t_exp = exp.semantMe();
+		Type t_var = var.semantMe();
+
+		if(t_var != null && t_var instanceof TypeClassVarDec) t_var = ((TypeClassVarDec)t_var).t;
+		if(t_exp != null && t_exp instanceof TypeClassVarDec) t_exp = ((TypeClassVarDec)t_exp).t;
+
+		/**************************************/
+		/* [1] Check assignment of nil        */
+		/**************************************/
+		if (t_exp.isNil() && !(t_var.isClass() || t_var.isArray())) {
+			System.out.format(">> ERROR: cannot assign nil to %s\n", t_var.name);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
 		}
+
+		/**************************************/
+		/* [2] Check assignment compatibility */
+		/**************************************/
+		if (!t_var.isCompatible(t_exp)) {
+			System.out.format(">> ERROR: cannot assign %s to %s\n", t_exp.name, t_var.name);
+			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+		}
+
+		/************************************************************/
+		/* [3] Return value is irrelevant for statements          */
+		/************************************************************/
 		return null;
 	}
 
-	public Temp irMe()
-	{
-		Temp src = exp.irMe();
-		Ir.
-				getInstance().
-				AddIrCommand(new IrCommandStore(((AstExpVarSimple) var).name,src));
+	public Temp irMe() {
+		Temp srcTemp = exp.irMe();
+
+		if (var instanceof AstVarSimple) {
+			AstVarSimple v = (AstVarSimple) var;
+			addIrCommand(new IrCommandStore(v.name, srcTemp, v.getCachedOffset(), v.isGlobalVariable()));
+		}
+		else if (var instanceof AstVarField) {
+			AstVarField v = (AstVarField) var;
+			Temp baseTemp = v.var.irMe();
+			addIrCommand(new IrCommandFieldStore(baseTemp, v.fieldOffset, srcTemp));
+		}
+		else if (var instanceof AstVarSubscript) {
+			AstVarSubscript v = (AstVarSubscript) var;
+
+			Temp baseTemp = v.var.irMe();
+			Temp indexTemp = v.subscript.irMe();
+
+			addIrCommand(new IrCommandArrayStore(baseTemp, indexTemp, srcTemp));
+		}
+		else {
+			throw new UnsupportedOperationException("Unsupported variable type in assignment");
+		}
 
 		return null;
 	}

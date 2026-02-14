@@ -1,11 +1,5 @@
-/***********/
-/* PACKAGE */
-/***********/
 package symboltable;
 
-/*******************/
-/* PROJECT IMPORTS */
-/*******************/
 import types.*;
 
 /**********************/
@@ -13,20 +7,11 @@ import types.*;
 /**********************/
 public class SymbolTableEntry
 {
-	/*********/
-	/* index */
-	/*********/
 	int index;
-	
-	/********/
-	/* name */
-	/********/
 	public String name;
-
-	/******************/
-	/* TYPE value ... */
-	/******************/
 	public Type type;
+	public int offset;     
+    public boolean isGlobal; 
 
 	/*********************************************/
 	/* prevtop and next symbol table entries ... */
@@ -48,7 +33,9 @@ public class SymbolTableEntry
 		int index,
 		SymbolTableEntry next,
 		SymbolTableEntry prevtop,
-		int prevtopIndex)
+		int prevtopIndex, 
+		int offset,
+		boolean isGlobal)
 	{
 		this.index = index;
 		this.name = name;
@@ -56,5 +43,8 @@ public class SymbolTableEntry
 		this.next = next;
 		this.prevtop = prevtop;
 		this.prevtopIndex = prevtopIndex;
+		this.offset = offset;
+		this.isGlobal = isGlobal;
 	}
+
 }

@@ -3,6 +3,8 @@
 /***********/
 package ir;
 
+import mips.MipsGenerator;
+
 /*******************/
 /* GENERAL IMPORTS */
 /*******************/
@@ -11,7 +13,11 @@ package ir;
 /* PROJECT IMPORTS */
 /*******************/
 import temp.*;
-import mips.*;
+
+/*
+USAGE:
+	| WHILE LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE 		{: RESULT = new AstStmtWhile(cond,body); 			:}
+*/
 
 public class IrCommandJumpIfEqToZero extends IrCommand
 {
@@ -23,7 +29,13 @@ public class IrCommandJumpIfEqToZero extends IrCommand
 		this.t          = t;
 		this.labelName = labelName;
 	}
-	
+
+	@Override
+	public String toString()
+	{
+		return String.format("if %s == 0 goto %s", t, labelName);
+	}
+
 	/***************/
 	/* MIPS me !!! */
 	/***************/

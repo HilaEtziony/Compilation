@@ -1,30 +1,36 @@
 package ast;
 
-import types.*;
 import temp.*;
-import ir.*;
+import types.*;
 
-public class AstDecList extends AstNode
+/*
+USAGE:
+	| dec:d	decList:l												{: RESULT = new AstDecList(d,l);    				:}
+	| dec:d															{: RESULT = new AstDecList(d,null); 				:}
+	| cField:c	cFieldList:l										{: RESULT = new AstDecList(c,l);    				:}
+	| cField:c														{: RESULT = new AstDecList(c,null); 				:}
+*/
+
+public class AstDecList extends AstStmt
 {
-	/****************/
-	/* DATA MEMBERS */
-	/****************/
-	public AstDec head;
-	public AstDecList tail;
+    /****************/
+    /* DATA MEMBERS */
+    /****************/
+    public AstDec head;
+    public AstDecList tail;
 
-	/******************/
-	/* CONSTRUCTOR(S) */
-	/******************/
-	public AstDecList(AstDec head, AstDecList tail)
-	{
-		/******************************/
-		/* SET A UNIQUE SERIAL NUMBER */
-		/******************************/
-		serialNumber = AstNodeSerialNumber.getFresh();
+    /******************/
+    /* CONSTRUCTOR(S) */
+    /******************/
+    public AstDecList(AstDec head, AstDecList tail)
+    {
+        serialNumber = AstNodeSerialNumber.getFresh();
+        if (tail != null) System.out.print("====================== decList -> dec decList\n");
+        if (tail == null) System.out.print("====================== decList -> dec         \n");
 
-		this.head = head;
-		this.tail = tail;
-	}
+        this.head = head;
+        this.tail = tail;
+    }
 
 	/********************************************************/
 	/* The printing message for a declaration list AST node */
@@ -48,7 +54,7 @@ public class AstDecList extends AstNode
 		AstGraphviz.getInstance().logNode(
 				serialNumber,
 			"DEC\nLIST\n");
-				
+
 		/****************************************/
 		/* PRINT Edges to AST GRAPHVIZ DOT file */
 		/****************************************/
@@ -58,20 +64,62 @@ public class AstDecList extends AstNode
 
 	public Type semantMe()
 	{
-		/*************************************/
-		/* RECURSIVELY PRINT HEAD + TAIL ... */
-		/*************************************/
-		if (head != null) head.semantMe();
-		if (tail != null) tail.semantMe();
+		// First pass: definitions (classes, arrays, global variables) - in order of appearance
+		for (AstDecList it = this; it != null; it = it.tail)
+		{
+			if (it.head != null && !(it.head instanceof AstDecFunc))
+			{
+				it.head.semantMe();
+			}
+		}
+
+		// Second pass: function bodies (which can now use all previously defined)
+		for (AstDecList it = this; it != null; it = it.tail)
+		{
+			if (it.head != null && (it.head instanceof AstDecFunc))
+			{
+				it.head.semantMe();
+			}
+		}
 
 		return null;
+	}
+
+	public int semantMe(TypeClass container, int offset) {
+		int currentOffset = offset;
+
+		if (head != null) {
+			currentOffset = head.semantMe(container, currentOffset);
+		}
+		
+		if (tail != null) {
+			return tail.semantMe(container, currentOffset);
+		}
+		
+		return currentOffset;
 	}
 
 	public Temp irMe()
 	{
-		if (head != null) head.irMe();
-		if (tail != null) tail.irMe();
+			// First pass: definitions (classes, arrays, global variables) - in order of appearance
+		for (AstDecList it = this; it != null; it = it.tail)
+		{
+			if (it.head != null && !(it.head instanceof AstDecFunc))
+			{
+				it.head.irMe();
+			}
+		}
 
-		return null;
+		// Second pass: function bodies (which can now use all previously defined)
+		for (AstDecList it = this; it != null; it = it.tail)
+		{
+			if (it.head != null && (it.head instanceof AstDecFunc))
+			{
+				it.head.irMe();
+			}
+		}
+
+		return null;	
 	}
+
 }

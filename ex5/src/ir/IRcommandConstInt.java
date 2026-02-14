@@ -3,6 +3,8 @@
 /***********/
 package ir;
 
+import mips.MipsGenerator;
+
 /*******************/
 /* GENERAL IMPORTS */
 /*******************/
@@ -11,19 +13,33 @@ package ir;
 /* PROJECT IMPORTS */
 /*******************/
 import temp.*;
-import mips.*;
 
-public class IRcommandConstInt extends IrCommand
+public class IrCommandConstInt extends IrCommand
 {
 	Temp t;
 	int value;
 	
-	public IRcommandConstInt(Temp t, int value)
+	public IrCommandConstInt(Temp t, int value)
 	{
 		this.t = t;
 		this.value = value;
 	}
-	
+
+	@Override
+	public String toString()
+	{
+		if (t == null)
+		{
+			return String.format("const %d", value);
+		}
+		return String.format("%s := %d", t, value);
+	}
+
+	public Temp getTemp()
+	{
+		return t;
+	}
+
 	/***************/
 	/* MIPS me !!! */
 	/***************/

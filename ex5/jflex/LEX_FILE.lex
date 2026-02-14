@@ -5,19 +5,19 @@
 /*************/
 /* USER CODE */
 /*************/
-   
+
 import java_cup.runtime.*;
 
 /******************************/
 /* DOLLAR DOLLAR - DON'T TOUCH! */
 /******************************/
-      
+
 %%
-   
+
 /************************************/
 /* OPTIONS AND DECLARATIONS SECTION */
 /************************************/
-   
+
 /*****************************************************/ 
 /* Lexer is the name of the class JFlex will create. */
 /* The code will be written to the file Lexer.java.  */
@@ -30,7 +30,7 @@ import java_cup.runtime.*;
 /********************************************************************/
 %line
 %column
-    
+
 /*******************************************************************************/
 /* Note that this has to be the EXACT same name of the class the CUP generates */
 /*******************************************************************************/
@@ -40,7 +40,19 @@ import java_cup.runtime.*;
 /* CUP compatibility mode interfaces with a CUP generated parser. */
 /******************************************************************/
 %cup
-   
+
+/*********************/
+/* LEXICAL STATES    */
+/*********************/
+/* 
+ * Declare additional lexical states used for context-sensitive scanning.
+ * These states allow the lexer to handle different token contexts separately.
+ * YYINITIAL is the default start state.
+ * INSIDE_QUOTES: Used when scanning inside string literals
+ * COMMENT_TYPE_1: Used when scanning inside comment blocks (declare here!)
+ */
+%state COMMENT_TYPE_2
+
 /****************/
 /* DECLARATIONS */
 /****************/
@@ -54,18 +66,45 @@ import java_cup.runtime.*;
 	/*********************************************************************************/
 	/* Create a new java_cup.runtime.Symbol with information about the current token */
 	/*********************************************************************************/
+	final int MAX_INT = 32767;
+
 	private Symbol symbol(int type)               {return new Symbol(type, yyline, yycolumn);}
 	private Symbol symbol(int type, Object value) {return new Symbol(type, yyline, yycolumn, value);}
 
 	/*******************************************/
 	/* Enable line number extraction from main */
 	/*******************************************/
-	public int getLine()    { return yyline + 1; }
+	public int getLine() { return yyline + 1; } 
 
 	/**********************************************/
 	/* Enable token position extraction from main */
 	/**********************************************/
-	public int getTokenStartPosition() { return yycolumn + 1; }
+	public int getTokenStartPosition() { return yycolumn + 1; } 
+
+	private Symbol isIntValid(String given_int){ 
+		long value = Long.parseLong(given_int);
+		
+		if (value > MAX_INT) {
+			throw new Error();
+		}
+		
+		return symbol(TokenNames.INT, Integer.valueOf(yytext()));
+	}
+
+	final static String COMMENT_LEGAL = "()[]{}?!+-*;./ \t\f\r\n";
+	private void checkLegalComment(String comment, int line){
+		//System.out.println("Checking comment");
+		//System.out.println(comment);
+		//System.out.println(line);
+		char c;
+		for (int i = 0; i < comment.length(); i++) {
+			c = comment.charAt(i);
+            if (!Character.isLetterOrDigit(c) && COMMENT_LEGAL.indexOf(c) ==-1){
+		//		System.out.println("Error in comment! " + c);
+				throw new Error();
+			}
+        }
+	}
 %}
 
 /***********************/
@@ -73,10 +112,15 @@ import java_cup.runtime.*;
 /***********************/
 LineTerminator	= \r|\n|\r\n
 WhiteSpace		= {LineTerminator} | [ \t\f]
+KEYWORDS		= class | nil | array | while | int | void | extends | return | new | if | else | string
 INTEGER			= 0 | [1-9][0-9]*
-ID				= [a-zA-Z]+
-STRING			= \"[a-z|A-Z]*\"
-   
+INT_W_LEADING_Z = 0[0-9]+
+ID				= [a-zA-Z][a-zA-Z0-9]*
+LETTERS			= [a-zA-Z]*
+STRING_SEQ = "\"" [a-zA-z]* "\""
+COMMENT_LEGAL_CHAR = [a-zA-Z0-9\(\)\[\]\{\}\?!+\-*/;. \t\f]
+COMMENT_2_LEGAL_CHAR = {COMMENT_LEGAL_CHAR} | {LineTerminator}
+
 /******************************/
 /* DOLLAR DOLLAR - DON'T TOUCH! */
 /******************************/
@@ -86,7 +130,7 @@ STRING			= \"[a-z|A-Z]*\"
 /************************************************************/
 /* LEXER matches regular expressions to actions (Java code) */
 /************************************************************/
-   
+
 /**************************************************************/
 /* YYINITIAL is the state at which the lexer begins scanning. */
 /* So these regular expressions will only be matched if the   */
@@ -94,31 +138,60 @@ STRING			= \"[a-z|A-Z]*\"
 /**************************************************************/
 
 <YYINITIAL> {
+"//"[^\r\n]*(\r\n|\r|\n)	{ 
+					String text = yytext();
+					// Remove the "//" prefix and any line terminator suffix
+					String comment = text.substring(2);
+					// Remove trailing line terminators (handles \n, \r, or \r\n)
+					comment = comment.replaceAll("[\r\n]+$", "");
+					checkLegalComment(comment, yyline); 
+}
+"/*"				{ yybegin (COMMENT_TYPE_2) ; }
 
-"if"				{ return symbol(TokenNames.IF);}
-"="					{ return symbol(TokenNames.EQ);}
-"<"					{ return symbol(TokenNames.LT);}
-"."					{ return symbol(TokenNames.DOT);}
-"+"					{ return symbol(TokenNames.PLUS);}
-"-"					{ return symbol(TokenNames.MINUS);}
-"class"				{ return symbol(TokenNames.CLASS);}
-"while"				{ return symbol(TokenNames.WHILE);}
-"return"			{ return symbol(TokenNames.RETURN);}
-"*"					{ return symbol(TokenNames.TIMES);}
-"/"					{ return symbol(TokenNames.DIVIDE);}
-":="				{ return symbol(TokenNames.ASSIGN);}
-"("					{ return symbol(TokenNames.LPAREN);}
-")"					{ return symbol(TokenNames.RPAREN);}
-"["					{ return symbol(TokenNames.LBRACK);}
-"]"					{ return symbol(TokenNames.RBRACK);}
-"{"					{ return symbol(TokenNames.LBRACE);}
-"}"					{ return symbol(TokenNames.RBRACE);}
-","					{ return symbol(TokenNames.COMMA);}
-";"					{ return symbol(TokenNames.SEMICOLON);}
-{ID}				{ return symbol(TokenNames.ID, yytext());}
-{INTEGER}			{ return symbol(TokenNames.INT, Integer.valueOf(yytext()));}
-{STRING}			{ return symbol(TokenNames.STRING, yytext());}
-{WhiteSpace}		{ /* just skip what was found, do nothing */ }
-{LineTerminator}	{ /* just skip what was found, do nothing */ }
-<<EOF>>				{ return symbol(TokenNames.EOF);}
+"("					{ return symbol(TokenNames.LPAREN); }
+")"					{ return symbol(TokenNames.RPAREN); }
+"["					{ return symbol(TokenNames.LBRACK); }
+"]"					{ return symbol(TokenNames.RBRACK); }
+"{"					{ return symbol(TokenNames.LBRACE); }
+"}"					{ return symbol(TokenNames.RBRACE); }
+"+"					{ return symbol(TokenNames.PLUS); }
+"-"					{ return symbol(TokenNames.MINUS); }
+"*"					{ return symbol(TokenNames.TIMES); }
+"/"					{ return symbol(TokenNames.DIVIDE); }
+","					{ return symbol(TokenNames.COMMA); }
+"."					{ return symbol(TokenNames.DOT); }
+";"					{ return symbol(TokenNames.SEMICOLON); }
+"int"				{ return symbol(TokenNames.TYPE_INT); }
+"string"			{ return symbol(TokenNames.TYPE_STRING); }
+"void"				{ return symbol(TokenNames.TYPE_VOID); }
+":="				{ return symbol(TokenNames.ASSIGN); }
+"="					{ return symbol(TokenNames.EQ); }
+"<"					{ return symbol(TokenNames.LT); }
+">"					{ return symbol(TokenNames.GT); }
+{STRING_SEQ}		{ return symbol(TokenNames.STRING, yytext()); }
+
+"array"				{ return symbol(TokenNames.ARRAY); }
+"class"				{ return symbol(TokenNames.CLASS); }
+"return"			{ return symbol(TokenNames.RETURN); }
+"while"				{ return symbol(TokenNames.WHILE); }
+"if"				{ return symbol(TokenNames.IF); }
+"else"				{ return symbol(TokenNames.ELSE); }
+"new"				{ return symbol(TokenNames.NEW); }
+"extends"			{ return symbol(TokenNames.EXTENDS); }
+"nil"				{ return symbol(TokenNames.NIL); }
+
+{INT_W_LEADING_Z} 	{ throw new Error(); } // It's before INTEGER otherwise wouldn't be cought
+{INTEGER}			{ return isIntValid(yytext()); }
+{ID}				{ return symbol(TokenNames.ID, String.valueOf(yytext())); }
+
+{WhiteSpace}		{ }
+<<EOF>>				{ return symbol(TokenNames.EOF); }
+.                   { throw new Error(); } // Catch-all: Match any single character that is NOT a quote or a letter
+}
+
+<COMMENT_TYPE_2> {
+"*/"					{ yybegin(YYINITIAL);}
+{COMMENT_2_LEGAL_CHAR}	{}
+. 						{ throw new Error(); }
+<<EOF>>					{ throw new Error(); }
 }
