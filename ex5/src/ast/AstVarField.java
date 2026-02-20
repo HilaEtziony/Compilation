@@ -92,15 +92,11 @@ public class AstVarField extends AstVar
 
 			while (fieldList != null)
 			{
-				// dataMembers contains both TypeClassVarDec (fields) and TypeFunction (methods)
-				if (fieldList.head instanceof TypeClassVarDec)
+				Type field = fieldList.head;
+				if (field.name.equals(fieldName) && (field instanceof TypeClassVarDec))
 				{
-					TypeClassVarDec field = (TypeClassVarDec) fieldList.head;
-					if (field.name.equals(fieldName))
-					{
-						this.fieldOffset = field.offset;
-						return field;
-					}
+					this.fieldOffset = field.offset;
+					return field;
 				}
 				fieldList = fieldList.tail;
 			}
