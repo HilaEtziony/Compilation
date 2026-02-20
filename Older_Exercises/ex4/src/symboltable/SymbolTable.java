@@ -79,8 +79,13 @@ public class SymbolTable
 	/****************************************************************************/
 	public void enter(String name, Type t) {
 		boolean isGlobal = isGlobalScope();
-		int offset = calculateNewOffset(isGlobal);
-		enter(name, t, offset, isGlobal);
+		if (name.equals(SCOPE_BOUNDARY) || t instanceof TypeFunction || name.equals("int") || name.equals("string") || name.equals("void")) {
+			// Enter to the sympbol table without offset (offset 0)
+			enter(name, t, 0, isGlobal);
+		} else {
+			int offset = calculateNewOffset(isGlobal);
+			enter(name, t, offset, isGlobal);
+		}
 	}
 
 	/****************************************************************************/

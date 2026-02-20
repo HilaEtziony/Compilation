@@ -107,7 +107,7 @@ public class TypeClass extends Type
 			while (current_members != null)
 			{
 				Type t = current_members.head;
-				if (t.name.equals(id))
+				if (t != null && t.name != null && t.name.equals(id))
 				{
 					return t;
 				}

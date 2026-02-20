@@ -208,7 +208,10 @@ public class AstVarDec extends AstDec
 			return null;
 		}
 
-		addIrCommand(new IrCommandAllocate(id.name));
+		// Not generate allocate command for global variable 
+		if (!this.isGlobal) {
+			addIrCommand(new IrCommandAllocate(id.name));
+		}
 
 		if (expr != null)
 		{
