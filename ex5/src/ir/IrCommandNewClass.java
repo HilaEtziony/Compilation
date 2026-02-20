@@ -15,4 +15,10 @@ public class IrCommandNewClass extends IrCommand {
     public String toString() {
         return String.format("%s := new_class(size=%d)", dst, size);
     }
+
+    @Override
+    public void mipsMe()
+    {
+        // TODO
+    }
 }

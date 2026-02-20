@@ -16,4 +16,10 @@ public class IrCommandReturn extends IrCommand {
         }
         return String.format("return %s", res);
     }
+
+    @Override
+    public void mipsMe()
+    {
+        // TODO
+    }
 }

@@ -21,4 +21,10 @@ public class IrCommandArrayLoad extends IrCommand
         return String.format("%s := %s[%s]", dst, base, index);
     }
 
+    @Override
+    public void mipsMe()
+    {
+        // TODO 
+    }
+
 }

@@ -15,4 +15,10 @@ public class IrCommandNewArray extends IrCommand {
     public String toString() {
         return String.format("%s := new_array(%s)", dst, size);
     }
+
+    @Override
+    public void mipsMe()
+    {
+        // TODO
+    }
 }

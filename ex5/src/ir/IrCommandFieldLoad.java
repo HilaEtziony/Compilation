@@ -26,4 +26,10 @@ public class IrCommandFieldLoad extends IrCommand
     {
         return String.format("%s := %s.field[%d]", dst, base, offset);
     }
+
+    @Override
+    public void mipsMe()
+    {
+        // TODO
+    }
 }

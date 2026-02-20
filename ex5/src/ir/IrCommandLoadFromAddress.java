@@ -22,4 +22,10 @@ public class IrCommandLoadFromAddress extends IrCommand {
     public String toString() {
         return String.format("%s := *%s", dst, address);
     }
+
+    @Override
+    public void mipsMe() 
+    {
+        // TODO
+    }
 }

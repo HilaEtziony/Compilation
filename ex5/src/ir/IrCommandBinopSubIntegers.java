@@ -25,4 +25,10 @@ public class IrCommandBinopSubIntegers extends IrCommandBinop
 	{
 		return String.format("%s := %s - %s", dst, t1, t2);
 	}
+
+	@Override
+	public void mipsMe()
+	{
+		// TODO
+	}
 }

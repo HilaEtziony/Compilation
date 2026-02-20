@@ -48,4 +48,10 @@ public class IrCommandCall extends IrCommand {
         }
         return sb.toString();
     }
+
+    @Override
+    public void mipsMe()
+    {
+        // TODO
+    }
 }

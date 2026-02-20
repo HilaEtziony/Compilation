@@ -22,4 +22,10 @@ public class IrCommandConstString extends IrCommand
         String escaped = strValue.replace("\"", "\\\"");
         return String.format("%s := \"%s\"", dst, escaped);
     }
+
+    @Override
+    public void mipsMe()
+    {
+        // TODO
+    }
 }

@@ -27,4 +27,10 @@ public class IrCommandFieldStore extends IrCommand
     {
         return String.format("%s.field[%d] := %s", base, offset, src);
     }
+
+    @Override
+    public void mipsMe()
+    {
+        // TODO
+    }
 }
