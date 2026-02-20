@@ -13,4 +13,10 @@ public class IrCommandPrologue extends IrCommand {
     public String toString() {
         return String.format("prologue %s (frame=%d)", funcName, frameSize);
     }
+
+    @Override
+    public void mipsMe()
+    {
+        // TODO
+    }
 }

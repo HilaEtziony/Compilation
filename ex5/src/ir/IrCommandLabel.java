@@ -26,4 +26,9 @@ public class IrCommandLabel extends IrCommand
 		return String.format("label %s:", labelName);
 	}
 
+	@Override
+	public void mipsMe()
+	{
+		// TODO
+	}
 }

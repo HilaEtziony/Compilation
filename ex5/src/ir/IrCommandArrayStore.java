@@ -31,4 +31,10 @@ public class IrCommandArrayStore extends IrCommand
     {
         return String.format("%s[%s] := %s", base, index, src);
     }
+
+    @Override
+    public void mipsMe()
+    {
+        // TODO
+    }
 }
