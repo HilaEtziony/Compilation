@@ -78,6 +78,9 @@ public class SymbolTable
 	/* Original version - for types, functions, and scope boundaries        */
 	/****************************************************************************/
 	public void enter(String name, Type t) {
+		if(name == null || t == null) {
+			throw new IllegalArgumentException("Name and type cannot be null - %s, %s".formatted(name, t));
+		}
 		boolean isGlobal = isGlobalScope();
 		if (name.equals(SCOPE_BOUNDARY) || t instanceof TypeFunction || name.equals("int") || name.equals("string") || name.equals("void")) {
 			// Enter to the sympbol table without offset (offset 0)
