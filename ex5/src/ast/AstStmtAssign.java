@@ -102,29 +102,41 @@ public class AstStmtAssign extends AstStmt
 	}
 
 	public Temp irMe() {
-		Temp srcTemp = exp.irMe();
+	//L-Value
+    Temp baseTemp = null;
+    Temp indexTemp = null;
+    int fieldOffset = -1;
 
-		if (var instanceof AstVarSimple) {
+    if (var instanceof AstVarField) {
+        baseTemp = ((AstVarField) var).var.irMe();
+        fieldOffset = ((AstVarField) var).fieldOffset;
+    } 
+    else if (var instanceof AstVarSubscript) {
+        baseTemp = ((AstVarSubscript) var).var.irMe();
+        indexTemp = ((AstVarSubscript) var).subscript.irMe();
+    }
+
+	// R-Value
+    Temp srcTemp = exp.irMe(); 
+
+    // Store
+    if (var instanceof AstVarSimple) {
 			AstVarSimple v = (AstVarSimple) var;
-			addIrCommand(new IrCommandStore(v.name, srcTemp, v.getCachedOffset(), v.isGlobalVariable()));
-		}
-		else if (var instanceof AstVarField) {
-			AstVarField v = (AstVarField) var;
-			Temp baseTemp = v.var.irMe();
-			addIrCommand(new IrCommandFieldStore(baseTemp, v.fieldOffset, srcTemp));
-		}
-		else if (var instanceof AstVarSubscript) {
-			AstVarSubscript v = (AstVarSubscript) var;
-
-			Temp baseTemp = v.var.irMe();
-			Temp indexTemp = v.subscript.irMe();
-
-			addIrCommand(new IrCommandArrayStore(baseTemp, indexTemp, srcTemp));
-		}
-		else {
-			throw new UnsupportedOperationException("Unsupported variable type in assignment");
-		}
-
-		return null;
+            if (v.isClassField()) { 
+                Temp tThis = TempFactory.getInstance().getFreshTemp();
+                addIrCommand(new IrCommandLoad(tThis, "this", 8, false));
+                addIrCommand(new IrCommandFieldStore(tThis, v.getCachedOffset(), srcTemp));
+            } else {
+                addIrCommand(new IrCommandStore(v.name, srcTemp, v.getCachedOffset(), v.isGlobalVariable()));
+            }
+    }
+    else if (var instanceof AstVarField) {
+        addIrCommand(new IrCommandFieldStore(baseTemp, fieldOffset, srcTemp));
+    }
+    else if (var instanceof AstVarSubscript) {
+        addIrCommand(new IrCommandArrayStore(baseTemp, indexTemp, srcTemp));
+    }
+    
+    return null;
 	}
 }

@@ -89,29 +89,40 @@ public class AstStmtAssignNew extends AstStmt
 	}
 
 	public Temp irMe() {
+		// L-Value
+		Temp base = null;
+		Temp index = null;
+		int fieldOffset = -1;
+
+		if (var instanceof AstVarField) {
+			base = ((AstVarField) var).var.irMe();
+			fieldOffset = ((AstVarField) var).fieldOffset;
+		} 
+		else if (var instanceof AstVarSubscript) {
+			base = ((AstVarSubscript) var).var.irMe();
+			index = ((AstVarSubscript) var).subscript.irMe();
+		}
+
+		// R-Value
 		Temp src = exp.irMe();
 
+		ir.Ir.getInstance().currentObjectPtr = src;
+
+		// Store
 		if (var instanceof AstVarSimple) {
 			AstVarSimple v = (AstVarSimple) var;
-
-			addIrCommand(new IrCommandStore(
-				v.name,
-				src,
-				v.getCachedOffset(),
-				v.isGlobalVariable()
-			));
+			if (v.isClassField()) {
+				Temp tThis = temp.TempFactory.getInstance().getFreshTemp();
+				addIrCommand(new IrCommandLoad(tThis, "this", 8, false));
+				addIrCommand(new IrCommandFieldStore(tThis, v.getCachedOffset(), src));
+			} else {
+				addIrCommand(new IrCommandStore(v.name, src, v.getCachedOffset(), v.isGlobalVariable()));
+			}
 		}
 		else if (var instanceof AstVarField) {
-			AstVarField v = (AstVarField) var;
-			Temp base = v.var.irMe();
-
-			addIrCommand(new IrCommandFieldStore(base, v.fieldOffset, src));
+			addIrCommand(new IrCommandFieldStore(base, fieldOffset, src));
 		}
 		else if (var instanceof AstVarSubscript) {
-			AstVarSubscript v = (AstVarSubscript) var;
-			Temp base = v.var.irMe();
-			Temp index = v.subscript.irMe();
-
 			addIrCommand(new IrCommandArrayStore(base, index, src));
 		}
 

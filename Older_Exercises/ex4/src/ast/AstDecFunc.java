@@ -150,11 +150,13 @@ public class AstDecFunc extends AstDec
 		return null;		
 	}
 
-	public void semantMe(TypeClass theirClassType){
+	public int semantMe(TypeClass theirClassType, int offset){
 		// similar to above, but enter to theirClassType's data members instead of symbol table
 		Type t;
 		Type returnType = this.return_type.semantMe();
 		TypeList type_list =null;
+
+		System.out.format(">> Semanting method %s of class %s\n", identifier, theirClassType.name);
 
 		/*******************/
 		/* [0] return type */
@@ -178,6 +180,9 @@ public class AstDecFunc extends AstDec
 		getSymbolTable().beginScope();
 
 		int paramOffset = 8;
+
+		getSymbolTable().enter("this", theirClassType, paramOffset, false);
+    	paramOffset += 4;
 
 		for (AstTypeIdList it = func_input; it  != null; it = it.tail)
 		{
@@ -259,6 +264,8 @@ public class AstDecFunc extends AstDec
 		getSymbolTable().endScope();
 		
 		getSymbolTable().enter(identifier, funcType);
+
+		return offset;
 	}
 
 	public Temp irMe()

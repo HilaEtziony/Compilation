@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import temp.Temp;
+
 /*******************/
 /* PROJECT IMPORTS */
 /*******************/
@@ -18,6 +20,8 @@ public class Ir
 {
 	private IrCommand head=null;
 	private IrCommandList tail=null;
+	public Temp currentObjectPtr = null;
+
 
 	/******************/
 	/* Add Ir command */

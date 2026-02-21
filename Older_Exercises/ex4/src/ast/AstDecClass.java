@@ -155,11 +155,13 @@ public class AstDecClass extends AstDec
 
 	public Temp irMe()
 	{
-		if (cFieldList != null)
-		{
-			cFieldList.irMe();
-		}
-
+        for (AstDecList it = cFieldList; it != null; it = it.tail)
+        {
+            if (it.head instanceof AstDecFunc)
+            {
+                it.head.irMe();
+            }
+        }
 		return null;
 	}
 
