@@ -1,8 +1,5 @@
 package ast;
 
-import ir.Ir;
-import ir.IrCommandAllocate;
-import ir.IrCommandStore;
 import semanticError.SemanticErrorException;
 import symboltable.*;
 import types.*;
@@ -205,18 +202,27 @@ public class AstVarDec extends AstDec
 	public Temp irMe()
 	{
 		if (this.isClassField) {
+			if (ir.Ir.getInstance().currentObjectPtr == null) {
+				return null;
+			}
+			
+			if (expr != null) {
+				Temp val = expr.irMe();
+				addIrCommand(new IrCommandFieldStore(ir.Ir.getInstance().currentObjectPtr, this.offset, val));
+			}
 			return null;
 		}
+		else{
+			// Not generate allocate command for global variable 
+			if (!this.isGlobal) {
+				addIrCommand(new IrCommandAllocate(id.name));
+			}
 
-		// Not generate allocate command for global variable 
-		if (!this.isGlobal) {
-			addIrCommand(new IrCommandAllocate(id.name));
-		}
-
-		if (expr != null)
-		{
-			Temp valueTemp = expr.irMe();
-			addIrCommand(new IrCommandStore(id.name, valueTemp, this.offset, this.isGlobal));
+			if (expr != null)
+			{
+				Temp valueTemp = expr.irMe();
+				addIrCommand(new IrCommandStore(id.name, valueTemp, this.offset, this.isGlobal));
+			}
 		}
 
 		return null;

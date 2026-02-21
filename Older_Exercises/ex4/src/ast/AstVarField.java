@@ -92,10 +92,9 @@ public class AstVarField extends AstVar
 
 			while (fieldList != null)
 			{
-				TypeClassVarDec field = (TypeClassVarDec) fieldList.head;
-				if (field.name.equals(fieldName))
+				Type field = fieldList.head;
+				if (field.name.equals(fieldName) && (field instanceof TypeClassVarDec))
 				{
-
 					this.fieldOffset = field.offset;
 					return field;
 				}

@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import temp.Temp;
+
 /*******************/
 /* PROJECT IMPORTS */
 /*******************/
@@ -18,6 +20,8 @@ public class Ir
 {
 	private IrCommand head=null;
 	private IrCommandList tail=null;
+	public Temp currentObjectPtr = null;
+
 
 	/******************/
 	/* Add Ir command */
@@ -70,15 +74,6 @@ public class Ir
 		}
 
 		return Collections.unmodifiableList(commands);
-	}
-
-	/***************/
-	/* MIPS me !!! */
-	/***************/
-	public void mipsMe()
-	{
-		if (head != null) head.mipsMe();
-		if (tail != null) tail.mipsMe();
 	}
 
 	/**************************************/

@@ -181,6 +181,9 @@ public class AstDecFunc extends AstDec
 
 		int paramOffset = 8;
 
+		getSymbolTable().enter("this", theirClassType, paramOffset, false);
+    	paramOffset += 4;
+
 		for (AstTypeIdList it = func_input; it  != null; it = it.tail)
 		{
 			t = getSymbolTable().find(it.head.type);

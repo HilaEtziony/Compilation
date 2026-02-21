@@ -19,6 +19,7 @@ public class AstVarSimple extends AstVar
 	public String name;
 	private Integer cachedOffset = null;
     private Boolean cachedIsGlobal = null;
+	private Boolean cachedIsClassField = false;
 
 	/******************/
 	/* CONSTRUCTOR(S) */
@@ -62,22 +63,30 @@ public class AstVarSimple extends AstVar
 
 	public Type semantMe()
 	{
-		/******************************/
-		/* [1] Try finding var in ST */
-		/******************************/
-		Type t = getSymbolTable().find(name);
+		SymbolTableEntry entry = getSymbolTable().findEntry(name);
 
-		if (t == null)
+		if (entry == null)
 		{
-			System.out.format(">> ERROR: variable %s does not exist\n",name);
+			System.out.format(">> ERROR: variable %s does not exist\n", name);
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
+		}
+
+		Type t = entry.type;
+
+		TypeClass currentClass = getSymbolTable().currentClass;
+		
+		if (currentClass != null) {
+			Type member = currentClass.getDataMemberInClass(name);
+			
+			if (member != null && !member.isFunction() && entry.offset >= 8) {
+				this.cachedIsClassField = true;
+			} else {
+				this.cachedIsClassField = false;
+			}
 		}
 
 		cacheEntryInfo();
 
-		/**********************************************************/
-		/* [2] return type of variable, since simple var has type */
-		/**********************************************************/
 		return t;
 	}
 
@@ -85,7 +94,18 @@ public class AstVarSimple extends AstVar
 	{
 		ensureEntryInfoAvailable();
 		Temp t = TempFactory.getInstance().getFreshTemp();
-		addIrCommand(new IrCommandLoad(t,name, cachedOffset, cachedIsGlobal));
+
+		if (this.cachedIsClassField && !this.cachedIsGlobal) {
+			Temp tThis = TempFactory.getInstance().getFreshTemp();
+			// Get object
+			addIrCommand(new IrCommandLoad(tThis, "this", 8, false));
+
+			// Get Field Object
+			addIrCommand(new IrCommandFieldLoad(t, tThis, cachedOffset));
+		} else {
+			addIrCommand(new IrCommandLoad(t, name, cachedOffset, cachedIsGlobal));
+		}
+		
 		return t;
 	}
 
@@ -127,4 +147,6 @@ public class AstVarSimple extends AstVar
        ensureEntryInfoAvailable();
        return cachedIsGlobal;
    }
+
+   public boolean isClassField() { return cachedIsClassField; }
 }

@@ -3,8 +3,7 @@ package types;
 public class TypeClassVarDec extends Type
 {
 	public Type t;
-	public String name;
-	public int offset; // added to help with offsets of class fields
+	// Note: 'name' and 'offset' are inherited from Type
 
 	public TypeClassVarDec(Type t, String name, int offset)
 	{
