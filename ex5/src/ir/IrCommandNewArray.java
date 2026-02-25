@@ -1,5 +1,6 @@
 package ir;
 
+import java.util.*;
 import temp.Temp;
 
 public class IrCommandNewArray extends IrCommand {
@@ -10,6 +11,12 @@ public class IrCommandNewArray extends IrCommand {
         this.dst = dst;
         this.size = size;
     }
+
+    @Override
+    public Set<Temp> def() { return Collections.singleton(dst); }
+
+    @Override
+    public Set<Temp> use() { return size != null ? Collections.singleton(size) : Collections.emptySet(); }
 
     @Override
     public String toString() {

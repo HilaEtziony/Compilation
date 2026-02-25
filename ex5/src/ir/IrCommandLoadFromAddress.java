@@ -3,6 +3,7 @@ package ir;
 /*******************/
 /* GENERAL IMPORTS */
 /*******************/
+import java.util.*;
 
 /*******************/
 /* PROJECT IMPORTS */
@@ -17,6 +18,12 @@ public class IrCommandLoadFromAddress extends IrCommand {
         this.dst = dst;
         this.address = address;
     }
+
+    @Override
+    public Set<Temp> def() { return Collections.singleton(dst); }
+
+    @Override
+    public Set<Temp> use() { return Collections.singleton(address); }
 
     @Override
     public String toString() {

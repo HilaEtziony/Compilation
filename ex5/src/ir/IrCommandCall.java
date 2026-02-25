@@ -1,5 +1,6 @@
 package ir;
 
+import java.util.*;
 import temp.*;
 
 /*
@@ -21,6 +22,21 @@ public class IrCommandCall extends IrCommand {
         this.varTemp = varTemp;
         this.id = id;
         this.args = args;
+    }
+
+    @Override
+    public Set<Temp> def() { return res != null ? Collections.singleton(res) : Collections.emptySet(); }
+
+    @Override
+    public Set<Temp> use()
+    {
+        Set<Temp> s = new HashSet<>();
+        if (varTemp != null) s.add(varTemp);
+        for (TempList tl = args; tl != null; tl = tl.tail)
+        {
+            if (tl.head != null) s.add(tl.head);
+        }
+        return s;
     }
 
     @Override

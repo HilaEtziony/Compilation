@@ -8,6 +8,7 @@ import mips.MipsGenerator;
 /*******************/
 /* GENERAL IMPORTS */
 /*******************/
+import java.util.*;
 
 /*******************/
 /* PROJECT IMPORTS */
@@ -29,6 +30,9 @@ public class IrCommandStore extends IrCommand
 		this.offset = offset;
 		this.isGlobal = isGlobal;
 	}
+
+	@Override
+	public Set<Temp> use() { return src != null ? Collections.singleton(src) : Collections.emptySet(); }
 
 	@Override
 	public String toString()

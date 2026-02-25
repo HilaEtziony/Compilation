@@ -6,10 +6,12 @@ package ir;
 /*******************/
 /* GENERAL IMPORTS */
 /*******************/
+import java.util.*;
 
 /*******************/
 /* PROJECT IMPORTS */
 /*******************/
+import temp.*;
 
 public abstract class IrCommand
 {
@@ -21,6 +23,12 @@ public abstract class IrCommand
 	{
 		return String.format("Label_%d_%s", labelCounter++,msg);
 	}
+
+	/****************************/
+	/* Liveness: def/use sets   */
+	/****************************/
+	public Set<Temp> def() { return Collections.emptySet(); }
+	public Set<Temp> use() { return Collections.emptySet(); }
 
 	/*******************************************************************/
 	/* MIPS me - default empty body so subclasses compile before       */

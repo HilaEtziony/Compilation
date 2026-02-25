@@ -6,6 +6,7 @@ package ir;
 /*******************/
 /* PROJECT IMPORTS */
 /*******************/
+import java.util.*;
 import temp.*;
 
 
@@ -20,6 +21,15 @@ public class IrCommandFieldStore extends IrCommand
         this.base   = base;
         this.offset = offset;
         this.src    = src;
+    }
+
+    @Override
+    public Set<Temp> use()
+    {
+        Set<Temp> s = new HashSet<>();
+        if (base != null) s.add(base);
+        if (src != null) s.add(src);
+        return s;
     }
 
     @Override

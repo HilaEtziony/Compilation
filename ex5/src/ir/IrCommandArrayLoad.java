@@ -1,5 +1,6 @@
 package ir;
 
+import java.util.*;
 import temp.Temp;
 
 public class IrCommandArrayLoad extends IrCommand
@@ -13,6 +14,18 @@ public class IrCommandArrayLoad extends IrCommand
         this.dst   = dst;
         this.base  = base;
         this.index = index;
+    }
+
+    @Override
+    public Set<Temp> def() { return Collections.singleton(dst); }
+
+    @Override
+    public Set<Temp> use()
+    {
+        Set<Temp> s = new HashSet<>();
+        if (base != null) s.add(base);
+        if (index != null) s.add(index);
+        return s;
     }
 
     @Override

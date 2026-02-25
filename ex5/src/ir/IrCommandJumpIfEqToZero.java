@@ -8,6 +8,7 @@ import mips.MipsGenerator;
 /*******************/
 /* GENERAL IMPORTS */
 /*******************/
+import java.util.*;
 
 /*******************/
 /* PROJECT IMPORTS */
@@ -21,7 +22,7 @@ USAGE:
 
 public class IrCommandJumpIfEqToZero extends IrCommand
 {
-	public Temp t;
+	Temp t;
 	String labelName;
 	
 	public IrCommandJumpIfEqToZero(Temp t, String labelName)
@@ -29,6 +30,9 @@ public class IrCommandJumpIfEqToZero extends IrCommand
 		this.t          = t;
 		this.labelName = labelName;
 	}
+
+	@Override
+	public Set<Temp> use() { return Collections.singleton(t); }
 
 	@Override
 	public String toString()
