@@ -30,4 +30,5 @@ public class IrCommandBinop extends IrCommand
 	{
 		return String.format("%s := %s # %s", dst, t1, t2);
 	}
+
 }

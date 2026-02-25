@@ -22,8 +22,9 @@ public abstract class IrCommand
 		return String.format("Label_%d_%s", labelCounter++,msg);
 	}
 
-	/***************/
-	/* MIPS me !!! */
-	/***************/
-	public abstract void mipsMe();
+	/*******************************************************************/
+	/* MIPS me - default empty body so subclasses compile before       */
+	/* their mipsMe() implementations are added (done in MIPS branch) */
+	/*******************************************************************/
+	public void mipsMe() {}
 }

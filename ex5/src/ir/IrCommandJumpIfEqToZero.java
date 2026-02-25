@@ -21,7 +21,7 @@ USAGE:
 
 public class IrCommandJumpIfEqToZero extends IrCommand
 {
-	Temp t;
+	public Temp t;
 	String labelName;
 	
 	public IrCommandJumpIfEqToZero(Temp t, String labelName)

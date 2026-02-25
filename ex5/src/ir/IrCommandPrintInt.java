@@ -16,7 +16,7 @@ import temp.*;
 
 public class IrCommandPrintInt extends IrCommand
 {
-	Temp t;
+	public Temp t;
 	
 	public IrCommandPrintInt(Temp t)
 	{

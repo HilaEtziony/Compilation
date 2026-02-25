@@ -16,7 +16,7 @@ import temp.*;
 
 public class IrCommandConstInt extends IrCommand
 {
-	Temp t;
+	public Temp t;
 	int value;
 	
 	public IrCommandConstInt(Temp t, int value)
