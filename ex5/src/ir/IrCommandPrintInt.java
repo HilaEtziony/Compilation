@@ -8,6 +8,7 @@ import mips.MipsGenerator;
 /*******************/
 /* GENERAL IMPORTS */
 /*******************/
+import java.util.*;
 
 /*******************/
 /* PROJECT IMPORTS */
@@ -22,6 +23,9 @@ public class IrCommandPrintInt extends IrCommand
 	{
 		this.t = t;
 	}
+
+	@Override
+	public Set<Temp> use() { return Collections.singleton(t); }
 
 	@Override
 	public String toString()

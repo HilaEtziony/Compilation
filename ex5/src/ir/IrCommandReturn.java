@@ -1,5 +1,6 @@
 package ir;
 
+import java.util.*;
 import temp.*;
 
 public class IrCommandReturn extends IrCommand {
@@ -10,10 +11,14 @@ public class IrCommandReturn extends IrCommand {
     }
 
     @Override
+    public Set<Temp> use() { return res != null ? Collections.singleton(res) : Collections.emptySet(); }
+
+    @Override
     public String toString() {
         if (res == null) {
             return "return";
         }
         return String.format("return %s", res);
     }
+
 }

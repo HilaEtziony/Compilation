@@ -89,7 +89,12 @@ public class AstDecList extends AstStmt
 		int currentOffset = offset;
 
 		if (head != null) {
-			currentOffset = head.semantMe(container, currentOffset);
+			if (head instanceof AstDecFunc) {
+				// Functions use the 1-arg semantMe(TypeClass) — they don't affect field offset
+				((AstDecFunc) head).semantMe(container);
+			} else {
+				currentOffset = head.semantMe(container, currentOffset);
+			}
 		}
 		
 		if (tail != null) {

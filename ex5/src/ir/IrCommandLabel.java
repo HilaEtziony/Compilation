@@ -25,4 +25,5 @@ public class IrCommandLabel extends IrCommand
 	{
 		return String.format("label %s:", labelName);
 	}
+
 }
