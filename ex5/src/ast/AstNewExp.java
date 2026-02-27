@@ -5,6 +5,7 @@ import semanticError.SemanticErrorException;
 import symboltable.*;
 import temp.Temp;
 import temp.TempFactory;
+import temp.TempList;
 import types.*;
 
 /*
@@ -123,6 +124,10 @@ public class AstNewExp extends AstExp
 
 			String vtableName = "VTable_" + tc.name;
         	addIrCommand(new IrCommandStoreVTable(dst, vtableName));
+
+			String initFuncName = tc.name + "_Init";
+			TempList initArgs = new TempList(dst, null);
+			addIrCommand(new IrCommandCall(null, null, initFuncName, initArgs));		
 		}
 		else { // like "new int[x]"
 			Temp sizeTemp = exp.irMe();

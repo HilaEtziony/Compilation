@@ -3,6 +3,8 @@ package ast;
 import semanticError.SemanticErrorException;
 import symboltable.*;
 import temp.Temp;
+import temp.TempFactory;
+import temp.TempList;
 import types.*;
 import ir.*;
 
@@ -165,6 +167,37 @@ public class AstDecClass extends AstDec
                 it.head.irMe();
             }
         }
+
+        String initLabel = this.name + "_Init";
+        addIrCommand(new IrCommandLabel(initLabel));
+        addIrCommand(new IrCommandPrologue(initLabel, 4));
+
+        Temp t_this = TempFactory.getInstance().getFreshTemp();
+        
+        int thisOffset = SymbolTable.getInstance().getOffset("this");
+
+        addIrCommand(new IrCommandLoad(t_this, "this", (thisOffset != -1 ? thisOffset : 8), false));
+
+        if (this.parentName != null) {
+            String parentInitName = this.parentName + "_Init";
+            TempList parentArgs = new TempList(t_this, null);
+            addIrCommand(new IrCommandCall(null, null, parentInitName, parentArgs));
+        }
+
+        ir.Ir.getInstance().currentObjectPtr = t_this;
+
+        if (cFieldList != null) {
+            for (AstDecList it = cFieldList; it != null; it = it.tail) {
+                if (it.head instanceof AstVarDec) {
+                    it.head.irMe(); 
+                }
+            }
+        }
+
+        ir.Ir.getInstance().currentObjectPtr = null;
+
+        addIrCommand(new IrCommandEpilogue(initLabel));
+        addIrCommand(new IrCommandReturn(null));
 
         TypeClass tc = (TypeClass) SymbolTable.getInstance().find(this.name);
         if (tc != null) {
