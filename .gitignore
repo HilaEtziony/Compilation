@@ -10,3 +10,4 @@ CMakeLists.txt
 CMAKE_JAVA_BUILD.md
 .idea/
 cmake-build-*/
+COMPILER

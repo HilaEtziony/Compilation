@@ -3,6 +3,7 @@ import java.io.*;
 import java_cup.runtime.Symbol;
 import ast.*;
 import ir.*;
+import codegen.*;
 import mips.*;
 import semanticError.SemanticErrorException;
 
@@ -100,6 +101,28 @@ public class Main
 					block.getCommand(),
 					successors.toString());
 			}
+
+			/********************************************/
+			/* [8.6] Liveness analysis → file output     */
+			/********************************************/
+			LivenessAnalysis liveness = new LivenessAnalysis(cfg);
+			PrintWriter livenessWriter = new PrintWriter("./output/liveness.txt");
+			livenessWriter.println("Liveness analysis results:");
+			for (BasicBlock block : cfg.getBlocks())
+			{
+				livenessWriter.printf("Block %d (%s): IN=%s  OUT=%s%n",
+					block.getIndex(),
+					block.getCommand(),
+					liveness.getLiveIn(block),
+					liveness.getLiveOut(block));
+			}
+			livenessWriter.close();
+
+			/********************************************/
+			/* [8.7] Register allocation                */
+			/********************************************/
+			RegisterAllocator.allocateRegisters(liveness, cfg);
+			RegisterAllocator.printInterferenceGraph();
 
 			/***********************/
 			/* [9] MIPS the Ir ... */

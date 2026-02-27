@@ -1,5 +1,6 @@
 package ir;
 
+import java.util.*;
 import temp.Temp;
 
 public class IrCommandConstString extends IrCommand
@@ -12,6 +13,9 @@ public class IrCommandConstString extends IrCommand
         this.dst = dst;
         this.strValue = strValue;
     }
+
+    @Override
+    public Set<Temp> def() { return Collections.singleton(dst); }
 
     @Override
     public String toString()

@@ -1,11 +1,9 @@
-/***********/
-/* PACKAGE */
-/***********/
 package ir;
 
 /*******************/
 /* GENERAL IMPORTS */
 /*******************/
+import java.util.*;
 
 /*******************/
 /* PROJECT IMPORTS */
@@ -23,6 +21,18 @@ public class IrCommandBinop extends IrCommand
 		this.dst = dst;
 		this.t1 = t1;
 		this.t2 = t2;
+	}
+
+	@Override
+	public Set<Temp> def() { return Collections.singleton(dst); }
+
+	@Override
+	public Set<Temp> use()
+	{
+		Set<Temp> s = new HashSet<>();
+		if (t1 != null) s.add(t1);
+		if (t2 != null) s.add(t2);
+		return s;
 	}
 
 	@Override
