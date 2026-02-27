@@ -8,7 +8,6 @@ import mips.MipsGenerator;
 /*******************/
 /* GENERAL IMPORTS */
 /*******************/
-import java.util.*;
 
 /*******************/
 /* PROJECT IMPORTS */
@@ -25,9 +24,6 @@ public class IrCommandConstInt extends IrCommand
 		this.t = t;
 		this.value = value;
 	}
-
-	@Override
-	public Set<Temp> def() { return t != null ? Collections.singleton(t) : Collections.emptySet(); }
 
 	@Override
 	public String toString()
