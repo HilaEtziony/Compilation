@@ -289,10 +289,10 @@ public class AstDecFunc extends AstDec
 
 		// Calculate frame size inculuding return address if return_type not "void"
 		int frameSize = (this.numLocals + returnValSpace) * 4;
-		addIrCommand(new IrCommandPrologue(identifier, frameSize));
+		addIrCommand(new IrCommandPrologue(labelName, frameSize));
 
 		// Create and set exit label
-		String exitLabel = identifier + "_exit";
+		String exitLabel = labelName + "_exit";
 		getSymbolTable().setCurrentFunctionExitLabel(exitLabel);
 
 		if (stmnts_of_funs != null) {
@@ -307,7 +307,7 @@ public class AstDecFunc extends AstDec
 			addIrCommand(new IrCommandLoad(resTemp, "return_val", returnValOffset, false));
 		}
 
-		addIrCommand(new IrCommandEpilogue(identifier));
+		addIrCommand(new IrCommandEpilogue(labelName));
 		addIrCommand(new IrCommandReturn(resTemp));
 
 		return null;
