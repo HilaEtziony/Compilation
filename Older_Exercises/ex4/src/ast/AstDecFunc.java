@@ -217,6 +217,7 @@ public class AstDecFunc extends AstDec
 		/* [2] Enter the Function Type to theirClassType's data members */
 		/***************************************************/
 		TypeFunction funcType = new TypeFunction(returnType,this.identifier,type_list);
+		funcType.className = theirClassType.name; // Put class Name in func type
 		/* Check for overriding */
 		Type existingMember = theirClassType.getDataMemberInClass(identifier);
 		if (existingMember != null){
@@ -270,7 +271,14 @@ public class AstDecFunc extends AstDec
 
 	public Temp irMe()
 	{
-		addIrCommand(new IrCommandLabel(identifier));
+		String labelName = identifier;
+		TypeClass currentClass = SymbolTable.getInstance().currentClass;
+		
+		if (currentClass != null) {
+			labelName = currentClass.name + "_" + identifier;
+		}
+
+		addIrCommand(new IrCommandLabel(labelName));
 
 		int returnValSpace = this.return_type.type.equals("void") ? 0 : 1;
 		int returnValOffset = -((this.numLocals + returnValSpace) * 4);

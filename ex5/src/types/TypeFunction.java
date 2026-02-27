@@ -11,6 +11,11 @@ public class TypeFunction extends Type
 	/* types of input params */
 	/*************************/
 	public TypeList paramTypes;
+
+    /*************************/
+	/* class name for methods */
+	/*************************/
+    public String className; 
 	
 	/****************/
 	/* CTROR(S) ... */

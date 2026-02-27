@@ -7,6 +7,7 @@ public class TypeClass extends Type
 	/*********************************************************************/
 	public TypeClass father;
 	public int size;
+	public TypeList methods;
 
 	/**************************************************/
 	/* Gather up all data members in one place        */
@@ -116,5 +117,65 @@ public class TypeClass extends Type
 			curr_class = curr_class.father;
 		}
 		return null;
+	}
+
+	private TypeList copyTypeList(TypeList original) {
+		if (original == null) return null;
+		return new TypeList(original.head, copyTypeList(original.tail));
+	}
+
+	private void updateOrAddMethod(Type newMethod) {
+		TypeList curr = this.methods;
+		TypeList prev = null;
+
+		while (curr != null) {
+			if (curr.head.name.equals(newMethod.name)) {
+				curr.head = newMethod;
+				return;
+			}
+			prev = curr;
+			curr = curr.tail;
+		}
+
+		if (prev == null) {
+			this.methods = new TypeList(newMethod, null);
+		} else {
+			prev.tail = new TypeList(newMethod, null);
+		}
+	}
+
+	private TypeList reverseTypeList(TypeList list) {
+		TypeList reversed = null;
+		for (TypeList it = list; it != null; it = it.tail) {
+			reversed = new TypeList(it.head, reversed);
+		}
+		return reversed;
+	}
+
+	public void buildMethodsList(TypeList localMembers) {
+		if (this.father != null) {
+			this.methods = copyTypeList(this.father.methods);
+		}
+
+		TypeList orderedMembers = reverseTypeList(localMembers);
+
+		for (TypeList it = localMembers; it != null; it = it.tail) {
+			if (it.head.isFunction()) {
+				updateOrAddMethod(it.head);
+			}
+		}
+	}
+
+	public int getMethodOffset(String methodName) {
+		int offset = 0;
+		TypeList curr = this.methods;
+		while (curr != null) {
+			if (curr.head.name.equals(methodName)) {
+				return offset * 4; 
+			}
+			offset++;
+			curr = curr.tail;
+		}
+		return -1; 
 	}
 }

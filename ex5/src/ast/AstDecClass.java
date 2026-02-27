@@ -4,6 +4,7 @@ import semanticError.SemanticErrorException;
 import symboltable.*;
 import temp.Temp;
 import types.*;
+import ir.*;
 
 /*
 USAGE:
@@ -139,6 +140,8 @@ public class AstDecClass extends AstDec
             t.size = startOffset;
         }
 
+        t.buildMethodsList(t.dataMembers);
+
         /********************************************************/
         /* [6] End Class Scope                                  */
         /********************************************************/
@@ -162,6 +165,12 @@ public class AstDecClass extends AstDec
                 it.head.irMe();
             }
         }
+
+        TypeClass tc = (TypeClass) SymbolTable.getInstance().find(this.name);
+        if (tc != null) {
+            addIrCommand(new IrCommandDefineVTable(this.name, tc.methods));
+        }
+
 		return null;
 	}
 
