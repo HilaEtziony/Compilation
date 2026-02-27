@@ -182,7 +182,7 @@ public class AstVarDec extends AstDec
 		/************************************************/
 		/* [4] Enter the Identifier to the Class Data Members */
 		/************************************************/
-		TypeClassVarDec fieldDescriptor = new TypeClassVarDec(t, id.name, offset, expr); // set the name of the type to the variable's name
+		TypeClassVarDec fieldDescriptor = new TypeClassVarDec(t, id.name, offset); // set the name of the type to the variable's name
 		theirClassType.dataMembers = new TypeList((Type)fieldDescriptor, theirClassType.dataMembers);
 		getSymbolTable().enter(id.name,t, offset, false);
 
