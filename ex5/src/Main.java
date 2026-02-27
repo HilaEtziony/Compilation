@@ -118,6 +118,12 @@ public class Main
 			}
 			livenessWriter.close();
 
+			/********************************************/
+			/* [8.7] Register allocation                */
+			/********************************************/
+			RegisterAllocator.allocateRegisters(liveness, cfg);
+			RegisterAllocator.printInterferenceGraph();
+
 			/***********************/
 			/* [9] MIPS the Ir ... */
 			/***********************/
