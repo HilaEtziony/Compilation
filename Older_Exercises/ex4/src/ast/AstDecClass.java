@@ -160,6 +160,9 @@ public class AstDecClass extends AstDec
 
 	public Temp irMe()
 	{
+        TypeClass tc = (TypeClass) SymbolTable.getInstance().find(this.name);
+        SymbolTable.getInstance().currentClass = tc;
+
         for (AstDecList it = cFieldList; it != null; it = it.tail)
         {
             if (it.head instanceof AstDecFunc)
@@ -199,10 +202,11 @@ public class AstDecClass extends AstDec
         addIrCommand(new IrCommandEpilogue(initLabel));
         addIrCommand(new IrCommandReturn(null));
 
-        TypeClass tc = (TypeClass) SymbolTable.getInstance().find(this.name);
         if (tc != null) {
             addIrCommand(new IrCommandDefineVTable(this.name, tc.methods));
         }
+
+        SymbolTable.getInstance().currentClass = null;
 
 		return null;
 	}

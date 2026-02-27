@@ -22,7 +22,7 @@ public class IrCommandDefineVTable extends IrCommand {
             if (it.head instanceof TypeFunction) {
                 TypeFunction func = (TypeFunction) it.head;
 
-                sb.append(String.format("\n\t.word %s", func.name));
+                sb.append(String.format("\n\t.word %s_%s", func.className, func.name));            
             }
             it = it.tail;
         }
