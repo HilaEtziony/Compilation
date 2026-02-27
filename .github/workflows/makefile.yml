@@ -11,6 +11,9 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      TERM: xterm
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -21,7 +24,15 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
 
+    - name: Install JFlex
+      run: sudo apt-get update && sudo apt-get install -y jflex
+
     - name: Build ex5
       run: |
         cd ex5
         make
+
+    - name: Verify build artifacts
+      run: |
+        cd ex5
+        test -f COMPILER && echo "COMPILER jar created successfully"
