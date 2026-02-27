@@ -100,4 +100,10 @@ public class Ir
 		}
 		return instance;
 	}
+
+	public void mipsMe(){
+		// TODO: implement MIPS code generation
+		// method signerature can be changed according 
+		// to design decisions 
+	}
 }
