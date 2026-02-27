@@ -50,6 +50,7 @@ public class SymbolTable
 	}
 
 	public void resetLocalOffset() {
+		this.localOffsetCounter = 0;
 		this.localCount = 0;
 	}
 
