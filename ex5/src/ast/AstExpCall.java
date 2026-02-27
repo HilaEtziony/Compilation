@@ -20,6 +20,9 @@ public class AstExpCall extends AstExp
     public String id;
     public AstExpList expList;
 
+	private TypeClass cachedClassType; 
+    private boolean isVirtualCall = false;
+
     public AstExpCall(AstVar var, String id, AstExpList expList, int lineNumber)
     {
         serialNumber = AstNodeSerialNumber.getFresh();
@@ -77,6 +80,9 @@ public class AstExpCall extends AstExp
 		if (var != null) {
 			// Method call on object
 			Type varType = var.semantMe();
+
+			this.cachedClassType = (TypeClass) varType;
+			this.isVirtualCall = true;
 
 			// if varType is class variable, extract the type
 			if(varType instanceof TypeClassVarDec) varType = ((TypeClassVarDec)varType).t;
@@ -142,9 +148,19 @@ public class AstExpCall extends AstExp
 		Temp varTemp = null;
         TempList tempArgsList = null;
 
-        if (var != null) {
-            varTemp = var.irMe();
-        }
+		if (var != null) {
+			varTemp = var.irMe();
+		} 
+		else {
+			TypeClass currentClass = SymbolTable.getInstance().currentClass;
+			if (currentClass != null && currentClass.getMethod(id) != null) {
+				this.cachedClassType = currentClass;
+				this.isVirtualCall = true;
+				varTemp = TempFactory.getInstance().getFreshTemp();
+				int thisOffset = SymbolTable.getInstance().getOffset("this");
+				addIrCommand(new IrCommandLoad(varTemp, "this", thisOffset, false)); 
+			}
+		}
 
         /*******************************************************************/
         /* [1] Evaluate function arguments from the expList.               */
@@ -182,8 +198,20 @@ public class AstExpCall extends AstExp
 		/*******************************************************************/
         /* [3] Create the IR Call command and add it to the IR list.       */
         /*******************************************************************/
-        addIrCommand(new IrCommandCall(resultTemp, varTemp, id, tempArgsList));
+		// VTable Call 
+		if (varTemp != null) {
+			Type varType = this.cachedClassType;
+			if (varType instanceof TypeClassVarDec) varType = ((TypeClassVarDec)varType).t;
+			
+			TypeClass tc = (TypeClass) varType;
+			int methodOffset = tc.getMethodOffset(id); 
 
+			addIrCommand(new IrCommandVirtualCall(resultTemp, varTemp, methodOffset, tempArgsList));
+		} 
+		// Global Call 
+		else {
+			addIrCommand(new IrCommandCall(resultTemp, null, id, tempArgsList));
+		}
 		/******************************************************/
         /* [4] Return the Temp that will hold the return value */
         /******************************************************/

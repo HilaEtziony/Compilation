@@ -22,8 +22,9 @@ public class TypeList
     /***********************************************/
     public int length()
     {
-        if (tail == null) return 1;
-        return 1 + tail.length();
+        int count = 0;
+        for (TypeList it = this; it != null; it = it.tail) count++;
+        return count;
     }
 
     /***********************************************/

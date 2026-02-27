@@ -120,6 +120,9 @@ public class AstNewExp extends AstExp
 			int sizeInBytes = (numberOfFields + 1) * 4;
 
 			addIrCommand(new IrCommandNewClass(dst, sizeInBytes));
+
+			String vtableName = "VTable_" + tc.name;
+        	addIrCommand(new IrCommandStoreVTable(dst, vtableName));
 		}
 		else { // like "new int[x]"
 			Temp sizeTemp = exp.irMe();
