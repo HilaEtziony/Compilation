@@ -123,6 +123,7 @@ public class AstNewExp extends AstExp
 
 			String vtableName = "VTable_" + tc.name;
         	addIrCommand(new IrCommandStoreVTable(dst, vtableName));
+			initializeFieldsRecursive(dst, tc);
 		}
 		else { // like "new int[x]"
 			Temp sizeTemp = exp.irMe();
@@ -131,6 +132,22 @@ public class AstNewExp extends AstExp
 		}
 
 		return dst;
+	}
+
+	private void initializeFieldsRecursive(Temp objectPtr, TypeClass tc) {
+		if (tc == null) return;
+		
+		initializeFieldsRecursive(objectPtr, tc.father);
+
+		for (TypeList it = tc.dataMembers; it != null; it = it.tail) {
+			if (it.head instanceof TypeClassVarDec) {
+				TypeClassVarDec field = (TypeClassVarDec) it.head;
+				if (field.initValue != null) {
+					Temp val = field.initValue.irMe();
+					addIrCommand(new IrCommandFieldStore(objectPtr, field.offset, val));
+				}
+			}
+		}
 	}
 
 }
