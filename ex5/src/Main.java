@@ -7,10 +7,8 @@ import codegen.*;
 import mips.*;
 import semanticError.SemanticErrorException;
 
-public class Main
-{
-	static public void main(String argv[])
-	{
+public class Main {
+	static public void main(String argv[]) {
 		Lexer l;
 		Parser p;
 		Symbol s;
@@ -20,8 +18,7 @@ public class Main
 		String inputFileName = argv[0];
 		String outputFileName = argv[1];
 
-		try
-		{
+		try {
 			/********************************/
 			/* [1] Initialize a file reader */
 			/********************************/
@@ -53,23 +50,19 @@ public class Main
 			ast.printMe();
 
 			// This try and 2 next catches handle error as in ex3 - as necessary for ex5
-			try
-			{
+			try {
 				/**************************/
 				/* [7] Semant the AST ... */
 				/**************************/
 				ast.semantMe();
 			}
-			
-			catch (SemanticErrorException e) 
-			{
+
+			catch (SemanticErrorException e) {
 				fileWriter.close();
 				fileReader.close();
 				e.printStackTrace();
 				throw e;
-			}
-			catch (Exception e) 
-			{
+			} catch (Exception e) {
 				e.printStackTrace();
 				throw e;
 			}
@@ -79,47 +72,43 @@ public class Main
 			/**********************/
 			ast.irMe();
 
-			//from ex4
+			// from ex4
 			/********************************************/
 			/* [8.5] Build and print IR control-flow CFG */
 			/********************************************/
 			Graph cfg = Graph.fromIr(Ir.getInstance());
 			System.out.println("CFG blocks (index: command -> successors)");
-			for (BasicBlock block : cfg.getBlocks())
-			{
+			for (BasicBlock block : cfg.getBlocks()) {
 				StringBuilder successors = new StringBuilder();
-				for (BasicBlock succ : block.getSuccessors())
-				{
-					if (successors.length() > 0)
-					{
+				for (BasicBlock succ : block.getSuccessors()) {
+					if (successors.length() > 0) {
 						successors.append(", ");
 					}
 					successors.append(succ.getIndex());
 				}
 				System.out.printf("Block %d (%s) -> [%s]%n",
-					block.getIndex(),
-					block.getCommand(),
-					successors.toString());
+						block.getIndex(),
+						block.getCommand(),
+						successors.toString());
 			}
 
 			/********************************************/
-			/* [8.6] Liveness analysis → file output     */
+			/* [8.6] Liveness analysis → file output */
 			/********************************************/
 			LivenessAnalysis liveness = new LivenessAnalysis(cfg);
 			PrintWriter livenessWriter = new PrintWriter("./output/liveness.txt");
 			livenessWriter.println("Liveness analysis results:");
-			for (BasicBlock block : cfg.getBlocks())
-			{
+			for (BasicBlock block : cfg.getBlocks()) {
 				livenessWriter.printf("Block %d (%s): IN=%s  OUT=%s%n",
-					block.getIndex(),
-					block.getCommand(),
-					liveness.getLiveIn(block),
-					liveness.getLiveOut(block));
+						block.getIndex(),
+						block.getCommand(),
+						liveness.getLiveIn(block),
+						liveness.getLiveOut(block));
 			}
 			livenessWriter.close();
 
 			/********************************************/
-			/* [8.7] Register allocation                */
+			/* [8.7] Register allocation */
 			/********************************************/
 			RegisterAllocator.allocateRegisters(liveness, cfg);
 			RegisterAllocator.printInterferenceGraph();
@@ -137,6 +126,8 @@ public class Main
 			/***************************/
 			/* [11] Finalize MIPS file */
 			/***************************/
+			// TODO hila 2.5 — calling MipsGenerator.getInstance().emitErrorHandlers() here
+			// before finalizeFile()
 			MipsGenerator.getInstance().finalizeFile();
 
 			/**************************/
@@ -145,48 +136,37 @@ public class Main
 			fileWriter.close();
 		}
 
-		// All next catches handle errors as ex3 - ERROR(line number) for syntax or semantic errors, ERROR for lexical error.
-		catch (SemanticErrorException e) 
-		{
+		// All next catches handle errors as ex3 - ERROR(line number) for syntax or
+		// semantic errors, ERROR for lexical error.
+		catch (SemanticErrorException e) {
 			System.out.println("Semantic Error: " + e.getMessage());
-			try
-			{
+			try {
 				fileWriter = new PrintWriter(outputFileName);
 				String message = e.getMessage();
 				fileWriter.print(message);
 				System.out.print(message);
 				fileWriter.close();
-			}
-			catch (FileNotFoundException ex)
-			{
+			} catch (FileNotFoundException ex) {
 				ex.printStackTrace();
 			}
 
 		}
 
-		catch (Exception e)
-		{
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		catch(Error e)
-		{
-			try
-			{
+		catch (Error e) {
+			try {
 				fileWriter = new PrintWriter(outputFileName);
 				String message = e.getMessage();
-				if(message == null)
-				{
+				if (message == null) {
 					fileWriter.print("ERROR");
-				}
-				else
-				{
+				} else {
 					fileWriter.print(message);
 				}
 				fileWriter.close();
-			}
-			catch (FileNotFoundException ex)
-			{
+			} catch (FileNotFoundException ex) {
 				ex.printStackTrace();
 			}
 
