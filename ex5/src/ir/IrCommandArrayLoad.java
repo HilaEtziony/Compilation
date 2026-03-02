@@ -1,43 +1,42 @@
 package ir;
 
 import java.util.*;
+import mips.MipsGenerator;
 import temp.Temp;
 
-public class IrCommandArrayLoad extends IrCommand
-{
+public class IrCommandArrayLoad extends IrCommand {
     public Temp dst;
     public Temp base;
     public Temp index;
 
-    public IrCommandArrayLoad(Temp dst, Temp base, Temp index)
-    {
-        this.dst   = dst;
-        this.base  = base;
+    public IrCommandArrayLoad(Temp dst, Temp base, Temp index) {
+        this.dst = dst;
+        this.base = base;
         this.index = index;
     }
 
     @Override
-    public Set<Temp> def() { return Collections.singleton(dst); }
+    public Set<Temp> def() {
+        return Collections.singleton(dst);
+    }
 
     @Override
-    public Set<Temp> use()
-    {
+    public Set<Temp> use() {
         Set<Temp> s = new HashSet<>();
-        if (base != null) s.add(base);
-        if (index != null) s.add(index);
+        if (base != null)
+            s.add(base);
+        if (index != null)
+            s.add(index);
         return s;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return String.format("%s := %s[%s]", dst, base, index);
     }
 
     @Override
-    public void mipsMe()
-    {
-        // TODO 
+    public void mipsMe() {
+        MipsGenerator.getInstance().arrayLoad(dst, base, index);
     }
-
 }
