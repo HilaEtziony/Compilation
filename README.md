@@ -10,3 +10,8 @@ zip -r Tel_Aviv_University_Exercise_2/zipped.zip ex2 ids.txt # from Compilation 
 cd CN/ex2/Tel_Aviv_University_Exercise_2
 python3 self-check.py
 ```
+
+Alternatively, run ceratin tests on my VM
+```
+java -jar COMPILER input/TEST_X.txt output/testX_output.txt
+```
