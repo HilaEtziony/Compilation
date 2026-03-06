@@ -203,6 +203,99 @@ public class MipsGenerator {
 		fileWriter.format("\tsw Temp_%d,0($s0)\n", idxSrc);
 	}
 
+	/*******************************/
+	/* Class operations */
+	/*******************************/
+	public void newClass(Temp dst, int sizeInBytes) {
+		int idxDst = dst.getSerialNumber();
+
+		fileWriter.format("\tli $a0,%d\n", sizeInBytes);
+		fileWriter.format("\tli $v0,9\n");
+		fileWriter.format("\tsyscall\n");
+		fileWriter.format("\tmove Temp_%d,$v0\n", idxDst);
+	}
+
+	public void storeVTable(Temp obj, String vtableName) {
+		int idxObj = obj.getSerialNumber();
+
+		fileWriter.format("\tla $s0,%s\n", vtableName);
+		fileWriter.format("\tsw $s0,0(Temp_%d)\n", idxObj);
+	}
+
+	public void defineVTable(String className, types.TypeList methods) {
+		fileWriter.format(".data\n");
+		fileWriter.format("VTable_%s:\n", className);
+
+		types.TypeList it = methods;
+		while (it != null) {
+			if (it.head instanceof types.TypeFunction) {
+				types.TypeFunction func = (types.TypeFunction) it.head;
+				fileWriter.format("\t.word %s_%s\n", func.className, func.name);
+			}
+
+			it = it.tail;
+		}
+	}
+
+	public void fieldLoad(Temp dst, Temp base, int offset) {
+		int idxDst = dst.getSerialNumber();
+		int idxBase = base.getSerialNumber();
+
+		// TODO hila 2.5 — null pointer check (needs invalid_ptr_dref_handler)
+		fileWriter.format("\tbeq Temp_%d,$zero,invalid_ptr_dref_handler\n", idxBase);
+		fileWriter.format("\tlw Temp_%d,%d(Temp_%d)\n", idxDst, offset, idxBase);
+	}
+
+	public void fieldStore(Temp base, int offset, Temp src) {
+		int idxBase = base.getSerialNumber();
+		int idxSrc = src.getSerialNumber();
+
+		// TODO hila 2.5 — null pointer check (needs invalid_ptr_dref_handler)
+		fileWriter.format("\tbeq Temp_%d,$zero,invalid_ptr_dref_handler\n", idxBase);
+		fileWriter.format("\tsw Temp_%d,%d(Temp_%d)\n", idxSrc, offset, idxBase);
+	}
+
+	public void virtualCall(Temp dst, Temp obj, int methodOffset, TempList args) {
+		int idxObj = obj.getSerialNumber();
+
+		// TODO hila 2.5 — null pointer check (needs invalid_ptr_dref_handler)
+		fileWriter.format("\tbeq Temp_%d,$zero,invalid_ptr_dref_handler\n", idxObj);
+
+		// Push args onto stack (right to left already handled by IR gen)
+		TempList it = args;
+		while (it != null) {
+			int idxArg = it.head.getSerialNumber();
+			fileWriter.format("\tsubu $sp,$sp,4\n");
+			fileWriter.format("\tsw Temp_%d,0($sp)\n", idxArg);
+			it = it.tail;
+		}
+
+		// Load vtable pointer from object offset 0
+		fileWriter.format("\tlw $s0,0(Temp_%d)\n", idxObj);
+		// Load method address from vtable at methodOffset
+		fileWriter.format("\tlw $s0,%d($s0)\n", methodOffset);
+		// Call the method
+		fileWriter.format("\tjalr $s0\n");
+
+		// Clean up args from stack
+		int argCount = 0;
+		TempList it2 = args;
+		while (it2 != null) {
+			argCount++;
+			it2 = it2.tail;
+		}
+
+		if (argCount > 0) {
+			fileWriter.format("\taddu $sp,$sp,%d\n", argCount * 4);
+		}
+
+		// Move return value to dst
+		if (dst != null) {
+			int idxDst = dst.getSerialNumber();
+			fileWriter.format("\tmove Temp_%d,$v0\n", idxDst);
+		}
+	}
+
 	// TODO hila 2.5 — add emitErrorHandlers() method here that emits
 	// access_violation_handler, invalid_ptr_dref_handler, illegal_div_by_0_handler
 	// labels with their error message printing + exit syscall code

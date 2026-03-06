@@ -16,58 +16,44 @@ import temp.Temp;
 /* PROJECT IMPORTS */
 /*******************/
 
-public class Ir
-{
-	private IrCommand head=null;
-	private IrCommandList tail=null;
+public class Ir {
+	private IrCommand head = null;
+	private IrCommandList tail = null;
 	public Temp currentObjectPtr = null;
-
 
 	/******************/
 	/* Add Ir command */
 	/******************/
-	public void AddIrCommand(IrCommand cmd)
-	{
-		if ((head == null) && (tail == null))
-		{
+	public void AddIrCommand(IrCommand cmd) {
+		if ((head == null) && (tail == null)) {
 			this.head = cmd;
-		}
-		else if ((head != null) && (tail == null))
-		{
-			this.tail = new IrCommandList(cmd,null);
-		}
-		else
-		{
+		} else if ((head != null) && (tail == null)) {
+			this.tail = new IrCommandList(cmd, null);
+		} else {
 			IrCommandList it = tail;
-			while ((it != null) && (it.tail != null))
-			{
+			while ((it != null) && (it.tail != null)) {
 				it = it.tail;
 			}
-			it.tail = new IrCommandList(cmd,null);
+			it.tail = new IrCommandList(cmd, null);
 		}
 	}
 
 	/***************************/
 	/* Retrieve IR commands... */
 	/***************************/
-	public List<IrCommand> getCommands()
-	{
-		if ((head == null) && (tail == null))
-		{
+	public List<IrCommand> getCommands() {
+		if ((head == null) && (tail == null)) {
 			return Collections.emptyList();
 		}
 
 		List<IrCommand> commands = new ArrayList<>();
-		if (head != null)
-		{
+		if (head != null) {
 			commands.add(head);
 		}
 
 		IrCommandList it = tail;
-		while (it != null)
-		{
-			if (it.head != null)
-			{
+		while (it != null) {
+			if (it.head != null) {
 				commands.add(it.head);
 			}
 			it = it.tail;
@@ -84,15 +70,14 @@ public class Ir
 	/*****************************/
 	/* PREVENT INSTANTIATION ... */
 	/*****************************/
-	protected Ir() {}
+	protected Ir() {
+	}
 
 	/******************************/
 	/* GET SINGLETON INSTANCE ... */
 	/******************************/
-	public static Ir getInstance()
-	{
-		if (instance == null)
-		{
+	public static Ir getInstance() {
+		if (instance == null) {
 			/*******************************/
 			/* [0] The instance itself ... */
 			/*******************************/
@@ -101,9 +86,9 @@ public class Ir
 		return instance;
 	}
 
-	public void mipsMe(){
-		// TODO: implement MIPS code generation
-		// method signerature can be changed according 
-		// to design decisions 
+	public void mipsMe() {
+		for (IrCommand cmd : getCommands()) {
+			cmd.mipsMe();
+		}
 	}
 }
