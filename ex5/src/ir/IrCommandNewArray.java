@@ -1,6 +1,7 @@
 package ir;
 
 import java.util.*;
+import mips.MipsGenerator;
 import temp.Temp;
 
 public class IrCommandNewArray extends IrCommand {
@@ -13,10 +14,14 @@ public class IrCommandNewArray extends IrCommand {
     }
 
     @Override
-    public Set<Temp> def() { return Collections.singleton(dst); }
+    public Set<Temp> def() {
+        return Collections.singleton(dst);
+    }
 
     @Override
-    public Set<Temp> use() { return size != null ? Collections.singleton(size) : Collections.emptySet(); }
+    public Set<Temp> use() {
+        return size != null ? Collections.singleton(size) : Collections.emptySet();
+    }
 
     @Override
     public String toString() {
@@ -24,8 +29,7 @@ public class IrCommandNewArray extends IrCommand {
     }
 
     @Override
-    public void mipsMe()
-    {
-        // TODO
+    public void mipsMe() {
+        MipsGenerator.getInstance().newArray(dst, size);
     }
 }

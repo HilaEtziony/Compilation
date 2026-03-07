@@ -1,5 +1,6 @@
 package ir;
 
+import mips.MipsGenerator;
 import temp.Temp;
 
 public class IrCommandStoreVTable extends IrCommand {
@@ -14,5 +15,10 @@ public class IrCommandStoreVTable extends IrCommand {
     @Override
     public String toString() {
         return String.format("store_vtable(obj=%s, table=%s)", dstObj, vtableName);
+    }
+
+    @Override
+    public void mipsMe() {
+        MipsGenerator.getInstance().storeVTable(dstObj, vtableName);
     }
 }

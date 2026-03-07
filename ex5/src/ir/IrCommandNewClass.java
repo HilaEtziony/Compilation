@@ -1,11 +1,12 @@
 package ir;
 
 import java.util.*;
+import mips.MipsGenerator;
 import temp.Temp;
 
 public class IrCommandNewClass extends IrCommand {
     public Temp dst;
-    public int size; 
+    public int size;
 
     public IrCommandNewClass(Temp dst, int size) {
         this.dst = dst;
@@ -13,7 +14,9 @@ public class IrCommandNewClass extends IrCommand {
     }
 
     @Override
-    public Set<Temp> def() { return Collections.singleton(dst); }
+    public Set<Temp> def() {
+        return Collections.singleton(dst);
+    }
 
     @Override
     public String toString() {
@@ -21,8 +24,7 @@ public class IrCommandNewClass extends IrCommand {
     }
 
     @Override
-    public void mipsMe()
-    {
-        // TODO
+    public void mipsMe() {
+        MipsGenerator.getInstance().newClass(dst, size);
     }
 }

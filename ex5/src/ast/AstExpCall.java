@@ -163,13 +163,18 @@ public class AstExpCall extends AstExp
 		}
 
         /*******************************************************************/
-        /* [1] Evaluate function arguments from the expList.               */
+        /* [1] Evaluate function arguments LEFT to RIGHT (per PDF 2.3)     */
         /*******************************************************************/
         if (expList != null) {
             int numArgs = expList.size();
+            // Evaluate left-to-right
+            Temp[] argTemps = new Temp[numArgs];
+            for (int i = 0; i < numArgs; i++) {
+                argTemps[i] = expList.get(i).irMe();
+            }
+            // Build TempList in correct order
             for (int i = numArgs - 1; i >= 0; i--) {
-                Temp t = expList.get(i).irMe();
-                tempArgsList = new TempList(t, tempArgsList);
+                tempArgsList = new TempList(argTemps[i], tempArgsList);
             }
         }
 

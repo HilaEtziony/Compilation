@@ -11,32 +11,31 @@ USAGE:
 	| cField:c														{: RESULT = new AstDecList(c,null); 				:}
 */
 
-public class AstDecList extends AstStmt
-{
-    /****************/
-    /* DATA MEMBERS */
-    /****************/
-    public AstDec head;
-    public AstDecList tail;
+public class AstDecList extends AstStmt {
+	/****************/
+	/* DATA MEMBERS */
+	/****************/
+	public AstDec head;
+	public AstDecList tail;
 
-    /******************/
-    /* CONSTRUCTOR(S) */
-    /******************/
-    public AstDecList(AstDec head, AstDecList tail)
-    {
-        serialNumber = AstNodeSerialNumber.getFresh();
-        if (tail != null) System.out.print("====================== decList -> dec decList\n");
-        if (tail == null) System.out.print("====================== decList -> dec         \n");
+	/******************/
+	/* CONSTRUCTOR(S) */
+	/******************/
+	public AstDecList(AstDec head, AstDecList tail) {
+		serialNumber = AstNodeSerialNumber.getFresh();
+		if (tail != null)
+			System.out.print("====================== decList -> dec decList\n");
+		if (tail == null)
+			System.out.print("====================== decList -> dec         \n");
 
-        this.head = head;
-        this.tail = tail;
-    }
+		this.head = head;
+		this.tail = tail;
+	}
 
 	/********************************************************/
 	/* The printing message for a declaration list AST node */
 	/********************************************************/
-	public void printMe()
-	{
+	public void printMe() {
 		/********************************/
 		/* AST NODE TYPE = AST DEC LIST */
 		/********************************/
@@ -45,39 +44,39 @@ public class AstDecList extends AstStmt
 		/*************************************/
 		/* RECURSIVELY PRINT HEAD + TAIL ... */
 		/*************************************/
-		if (head != null) head.printMe();
-		if (tail != null) tail.printMe();
+		if (head != null)
+			head.printMe();
+		if (tail != null)
+			tail.printMe();
 
 		/**********************************/
 		/* PRINT to AST GRAPHVIZ DOT file */
 		/**********************************/
 		AstGraphviz.getInstance().logNode(
 				serialNumber,
-			"DEC\nLIST\n");
+				"DEC\nLIST\n");
 
 		/****************************************/
 		/* PRINT Edges to AST GRAPHVIZ DOT file */
 		/****************************************/
-		if (head != null) AstGraphviz.getInstance().logEdge(serialNumber,head.serialNumber);
-		if (tail != null) AstGraphviz.getInstance().logEdge(serialNumber,tail.serialNumber);
+		if (head != null)
+			AstGraphviz.getInstance().logEdge(serialNumber, head.serialNumber);
+		if (tail != null)
+			AstGraphviz.getInstance().logEdge(serialNumber, tail.serialNumber);
 	}
 
-	public Type semantMe()
-	{
-		// First pass: definitions (classes, arrays, global variables) - in order of appearance
-		for (AstDecList it = this; it != null; it = it.tail)
-		{
-			if (it.head != null && !(it.head instanceof AstDecFunc))
-			{
+	public Type semantMe() {
+		// First pass: definitions (classes, arrays, global variables) - in order of
+		// appearance
+		for (AstDecList it = this; it != null; it = it.tail) {
+			if (it.head != null && !(it.head instanceof AstDecFunc)) {
 				it.head.semantMe();
 			}
 		}
 
 		// Second pass: function bodies (which can now use all previously defined)
-		for (AstDecList it = this; it != null; it = it.tail)
-		{
-			if (it.head != null && (it.head instanceof AstDecFunc))
-			{
+		for (AstDecList it = this; it != null; it = it.tail) {
+			if (it.head != null && (it.head instanceof AstDecFunc)) {
 				it.head.semantMe();
 			}
 		}
@@ -90,41 +89,37 @@ public class AstDecList extends AstStmt
 
 		if (head != null) {
 			if (head instanceof AstDecFunc) {
-				// Functions use the 1-arg semantMe(TypeClass) — they don't affect field offset
-				((AstDecFunc) head).semantMe(container);
+				// Functions use the 2-arg semantMe(TypeClass, int) to register into dataMembers
+				((AstDecFunc) head).semantMe(container, currentOffset);
 			} else {
 				currentOffset = head.semantMe(container, currentOffset);
 			}
 		}
-		
+
 		if (tail != null) {
 			return tail.semantMe(container, currentOffset);
 		}
-		
+
 		return currentOffset;
 	}
 
-	public Temp irMe()
-	{
-			// First pass: definitions (classes, arrays, global variables) - in order of appearance
-		for (AstDecList it = this; it != null; it = it.tail)
-		{
-			if (it.head != null && !(it.head instanceof AstDecFunc))
-			{
+	public Temp irMe() {
+		// First pass: definitions (classes, arrays, global variables) - in order of
+		// appearance
+		for (AstDecList it = this; it != null; it = it.tail) {
+			if (it.head != null && !(it.head instanceof AstDecFunc)) {
 				it.head.irMe();
 			}
 		}
 
 		// Second pass: function bodies (which can now use all previously defined)
-		for (AstDecList it = this; it != null; it = it.tail)
-		{
-			if (it.head != null && (it.head instanceof AstDecFunc))
-			{
+		for (AstDecList it = this; it != null; it = it.tail) {
+			if (it.head != null && (it.head instanceof AstDecFunc)) {
 				it.head.irMe();
 			}
 		}
 
-		return null;	
+		return null;
 	}
 
 }
