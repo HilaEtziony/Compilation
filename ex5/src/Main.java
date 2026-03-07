@@ -126,8 +126,8 @@ public class Main {
 			/***************************/
 			/* [11] Finalize MIPS file */
 			/***************************/
-			// TODO hila 2.5 — calling MipsGenerator.getInstance().emitErrorHandlers() here
-			// before finalizeFile()
+			// Emit runtime error handlers (section 2.5) before finalizing
+			MipsGenerator.getInstance().emitErrorHandlers();
 			MipsGenerator.getInstance().finalizeFile();
 
 			/**************************/

@@ -151,21 +151,19 @@ public class MipsGenerator {
 		fileWriter.format("\tmove Temp_%d,$v0\n", idxDst); // dst = base address
 	}
 
-	// TODO hila 2.5 — runtime checks in arrayLoad/arrayStore depend on handler
-	// labels (access_violation_handler, invalid_ptr_dref_handler)
+	// Runtime checks: null ptr → invalid_ptr_dref_handler, bounds → access_violation_handler
 	public void arrayLoad(Temp dst, Temp base, Temp index) {
 		int idxDst = dst.getSerialNumber();
 		int idxBase = base.getSerialNumber();
 		int idxIndex = index.getSerialNumber();
 
-		// TODO hila 2.5 — null pointer check (needs invalid_ptr_dref_handler)
+		// 1. Null pointer check (section 2.5: Invalid Pointer Dereference)
 		fileWriter.format("\tbeq Temp_%d,$zero,invalid_ptr_dref_handler\n", idxBase);
 
 		// 2. Load array length from offset 0
 		fileWriter.format("\tlw $s0,0(Temp_%d)\n", idxBase);
 
-		// TODO hila 2.5 — bounds checks (need access_violation_handler)
-		// 3. Bounds check: index < 0
+		// 3. Bounds check: index < 0 (section 2.5: Access Violation)
 		fileWriter.format("\tbltz Temp_%d,access_violation_handler\n", idxIndex);
 
 		// 4. Bounds check: index >= length
@@ -183,14 +181,13 @@ public class MipsGenerator {
 		int idxIndex = index.getSerialNumber();
 		int idxSrc = src.getSerialNumber();
 
-		// TODO hila 2.5 — null pointer check (needs invalid_ptr_dref_handler label)
+		// 1. Null pointer check (section 2.5: Invalid Pointer Dereference)
 		fileWriter.format("\tbeq Temp_%d,$zero,invalid_ptr_dref_handler\n", idxBase);
 
 		// 2. Load array length from offset 0
 		fileWriter.format("\tlw $s0,0(Temp_%d)\n", idxBase);
 
-		// TODO hila 2.5 — bounds checks (need access_violation_handler label)
-		// 3. Bounds check: index < 0
+		// 3. Bounds check: index < 0 (section 2.5: Access Violation)
 		fileWriter.format("\tbltz Temp_%d,access_violation_handler\n", idxIndex);
 
 		// 4. Bounds check: index >= length
@@ -241,7 +238,7 @@ public class MipsGenerator {
 		int idxDst = dst.getSerialNumber();
 		int idxBase = base.getSerialNumber();
 
-		// TODO hila 2.5 — null pointer check (needs invalid_ptr_dref_handler)
+		// Null pointer check (section 2.5: Invalid Pointer Dereference)
 		fileWriter.format("\tbeq Temp_%d,$zero,invalid_ptr_dref_handler\n", idxBase);
 		fileWriter.format("\tlw Temp_%d,%d(Temp_%d)\n", idxDst, offset, idxBase);
 	}
@@ -250,7 +247,7 @@ public class MipsGenerator {
 		int idxBase = base.getSerialNumber();
 		int idxSrc = src.getSerialNumber();
 
-		// TODO hila 2.5 — null pointer check (needs invalid_ptr_dref_handler)
+		// Null pointer check (section 2.5: Invalid Pointer Dereference)
 		fileWriter.format("\tbeq Temp_%d,$zero,invalid_ptr_dref_handler\n", idxBase);
 		fileWriter.format("\tsw Temp_%d,%d(Temp_%d)\n", idxSrc, offset, idxBase);
 	}
@@ -258,7 +255,7 @@ public class MipsGenerator {
 	public void virtualCall(Temp dst, Temp obj, int methodOffset, TempList args) {
 		int idxObj = obj.getSerialNumber();
 
-		// TODO hila 2.5 — null pointer check (needs invalid_ptr_dref_handler)
+		// Null pointer check (section 2.5: Invalid Pointer Dereference)
 		fileWriter.format("\tbeq Temp_%d,$zero,invalid_ptr_dref_handler\n", idxObj);
 
 		// Push args onto stack (right to left already handled by IR gen)
@@ -296,9 +293,44 @@ public class MipsGenerator {
 		}
 	}
 
-	// TODO hila 2.5 — add emitErrorHandlers() method here that emits
-	// access_violation_handler, invalid_ptr_dref_handler, illegal_div_by_0_handler
-	// labels with their error message printing + exit syscall code
+	/*******************************/
+	/* Division with zero check    */
+	/*******************************/
+	public void divIntegers(Temp dst, Temp t1, Temp t2) {
+		int idxDst = dst.getSerialNumber();
+		int idx1 = t1.getSerialNumber();
+		int idx2 = t2.getSerialNumber();
+
+		// Division by zero check (section 2.5: Illegal Division By Zero)
+		fileWriter.format("\tbeq Temp_%d,$zero,illegal_div_by_0_handler\n", idx2);
+		fileWriter.format("\tdiv Temp_%d,Temp_%d,Temp_%d\n", idxDst, idx1, idx2);
+	}
+
+	/***************************************/
+	/* Runtime error handlers (section 2.5) */
+	/***************************************/
+	public void emitErrorHandlers() {
+		fileWriter.print("access_violation_handler:\n");
+		fileWriter.print("\tla $a0,string_access_violation\n");
+		fileWriter.print("\tli $v0,4\n");
+		fileWriter.print("\tsyscall\n");
+		fileWriter.print("\tli $v0,10\n");
+		fileWriter.print("\tsyscall\n");
+
+		fileWriter.print("invalid_ptr_dref_handler:\n");
+		fileWriter.print("\tla $a0,string_invalid_ptr_dref\n");
+		fileWriter.print("\tli $v0,4\n");
+		fileWriter.print("\tsyscall\n");
+		fileWriter.print("\tli $v0,10\n");
+		fileWriter.print("\tsyscall\n");
+
+		fileWriter.print("illegal_div_by_0_handler:\n");
+		fileWriter.print("\tla $a0,string_illegal_div_by_0\n");
+		fileWriter.print("\tli $v0,4\n");
+		fileWriter.print("\tsyscall\n");
+		fileWriter.print("\tli $v0,10\n");
+		fileWriter.print("\tsyscall\n");
+	}
 
 	/**************************************/
 	/* USUAL SINGLETON IMPLEMENTATION ... */

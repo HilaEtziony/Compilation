@@ -10,6 +10,7 @@ package ir;
 /*******************/
 /* PROJECT IMPORTS */
 /*******************/
+import mips.MipsGenerator;
 import temp.*;
 
 public class IrCommandBinopDivIntegers extends IrCommandBinop
@@ -27,8 +28,7 @@ public class IrCommandBinopDivIntegers extends IrCommandBinop
 	}
 
 	@Override
-	public void mipsMe()
-	{
-		// TODO
+	public void mipsMe() {
+		MipsGenerator.getInstance().divIntegers(dst, t1, t2);
 	}
 }
