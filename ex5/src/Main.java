@@ -93,7 +93,7 @@ public class Main {
 			}
 
 			/********************************************/
-			/* [8.6] Liveness analysis → file output */
+			/* [8.6] Liveness analysis -> file output */
 			/********************************************/
 			LivenessAnalysis liveness = new LivenessAnalysis(cfg);
 			PrintWriter livenessWriter = new PrintWriter("./output/liveness.txt");

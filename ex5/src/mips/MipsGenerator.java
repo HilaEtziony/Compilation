@@ -151,7 +151,7 @@ public class MipsGenerator {
 		fileWriter.format("\tmove Temp_%d,$v0\n", idxDst); // dst = base address
 	}
 
-	// Runtime checks: null ptr → invalid_ptr_dref_handler, bounds → access_violation_handler
+	// Runtime checks: null ptr -> invalid_ptr_dref_handler, bounds -> access_violation_handler
 	public void arrayLoad(Temp dst, Temp base, Temp index) {
 		int idxDst = dst.getSerialNumber();
 		int idxBase = base.getSerialNumber();
