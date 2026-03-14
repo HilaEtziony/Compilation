@@ -454,47 +454,51 @@ public class MipsGenerator
     /**************************************/
 	public void stringConcat(Temp dst, Temp t1, Temp t2) {
         String regDst = codegen.RegisterAllocator.getRegister(dst);
-        String regT1  = codegen.RegisterAllocator.getRegister(t1);
-        String regT2  = codegen.RegisterAllocator.getRegister(t2);
+        String regS1  = codegen.RegisterAllocator.getRegister(t1);
+        String regS2  = codegen.RegisterAllocator.getRegister(t2);
         String label  = IrCommand.getFreshLabel("str_concat");
 
-        // 1. Calculate length of t1 (result in $a0)
+        // 0. Backup source addresses to $s registers before syscall 9
+        // This ensures they aren't lost if regS1/regS2 are mapped to volatile registers
+        textSection.append(String.format("\tmove $s4, %s\n", regS1));
+        textSection.append(String.format("\tmove $s5, %s\n", regS2));
+
+        // 1. Calculate length of s1 (result in $a0)
         textSection.append(String.format("\tmove $a0, $zero\n"));
         textSection.append(String.format("len1_%s:\n", label));
-        textSection.append(String.format("\tadd $s0, %s, $a0\n", regT1));
+        textSection.append(String.format("\tadd $s0, $s4, $a0\n")); // Use backed up $s4
         textSection.append(String.format("\tlb $s1, 0($s0)\n"));
         textSection.append(String.format("\tbeqz $s1, len2_start_%s\n", label));
         textSection.append(String.format("\taddi $a0, $a0, 1\n"));
         textSection.append(String.format("\tj len1_%s\n", label));
 
-        // 2. Add length of t2
+        // 2. Add length of s2
         textSection.append(String.format("len2_start_%s:\n", label));
-        textSection.append(String.format("\tmove $t0, $zero\n"));
+        textSection.append(String.format("\tmove $s0, $zero\n"));
         textSection.append(String.format("len2_%s:\n", label));
-        textSection.append(String.format("\tadd $s0, %s, $t0\n", regT2));
-        textSection.append(String.format("\tlb $s1, 0($s0)\n"));
-        textSection.append(String.format("\tbeqz $s1, alloc_%s\n", label));
-        textSection.append(String.format("\taddi $t0, $t0, 1\n"));
+        textSection.append(String.format("\tadd $s1, $s5, $s0\n")); // Use backed up $s5
+        textSection.append(String.format("\tlb $s2, 0($s1)\n"));
+        textSection.append(String.format("\tbeqz $s2, alloc_%s\n", label));
+        textSection.append(String.format("\taddi $s0, $s0, 1\n"));
         textSection.append(String.format("\tj len2_%s\n", label));
 
         // 3. Malloc (len1 + len2 + 1)
         textSection.append(String.format("alloc_%s:\n", label));
-        textSection.append(String.format("\tadd $a0, $a0, $t0\n")); // a0 = len1 + len2
-        textSection.append(String.format("\taddi $a0, $a0, 1\n"));  // null terminator
-        textSection.append(String.format("\tli $v0, 9\n"));         // sbrk
+        textSection.append(String.format("\tadd $a0, $a0, $s0\n")); 
+        textSection.append(String.format("\taddi $a0, $a0, 1\n"));  
+        textSection.append(String.format("\tli $v0, 9\n"));         
         textSection.append(String.format("\tsyscall\n"));
         textSection.append(String.format("\tmove %s, $v0\n", regDst));
 
-        // 4. Copy t1 to dst
-        // $s0 will be our current offset in the destination string
+        // 4. Copy s1 to dst
         textSection.append(String.format("\tmove $s0, $zero\n"));
-        copyString("copy1_" + label, regT1, regDst);
+        copyString("copy1_" + label, "$s4", regDst);
 
-        // 5. Copy t2 to dst (starting from t1's null terminator)
-        // We subtract 1 from $s0 because copy1 stopped at the null terminator, 
-        // and we want t2 to overwrite that null terminator.
+        // 5. Copy s2 to dst (starting from s1's null terminator)
+        // We decrement $s0 by 1 because copy1 finishes at the null terminator, 
+        // and we want to overwrite it with the first char of s2.
         textSection.append(String.format("\taddi $s0, $s0, -1\n"));
-        copyString("copy2_" + label, regT2, regDst);
+        copyString("copy2_" + label, "$s5", regDst);
     }
 
 	public void lb(String regDst, String regBase, int offset) {
@@ -506,48 +510,52 @@ public class MipsGenerator
 	}
 
 	private void copyString(String label, String regSrc, String regDst) {
-        textSection.append(String.format("\tmove $s1, $zero\n")); 
-        textSection.append(String.format("%s:\n", label));
-        
-        textSection.append(String.format("\tadd $t0, %s, $s1\n", regSrc));
-        textSection.append(String.format("\tlb $t1, 0($t0)\n"));
-        
-        textSection.append(String.format("\tadd $t2, %s, $s0\n", regDst)); 
-        textSection.append(String.format("\tsb $t1, 0($t2)\n"));
-        
-        textSection.append(String.format("\tbeqz $t1, end_%s\n", label));
-        textSection.append(String.format("\taddi $s1, $s1, 1\n"));
-        textSection.append(String.format("\taddi $s0, $s0, 1\n"));
-        textSection.append(String.format("\tj %s\n", label));
-        textSection.append(String.format("end_%s:\n", label));
-    }
+		textSection.append(String.format("\tmove $s1, $zero\n")); 
+		textSection.append(String.format("%s:\n", label));
+		
+		textSection.append(String.format("\tadd $s2, %s, $s1\n", regSrc));
+		textSection.append(String.format("\tlb $s3, 0($s2)\n"));
+		
+		textSection.append(String.format("\tadd $s2, %s, $s0\n", regDst)); 
+		textSection.append(String.format("\tsb $s3, 0($s2)\n"));
+		
+		textSection.append(String.format("\tbeqz $s3, end_%s\n", label));
+		textSection.append(String.format("\taddi $s1, $s1, 1\n"));
+		textSection.append(String.format("\taddi $s0, $s0, 1\n"));
+		textSection.append(String.format("\tj %s\n", label));
+		textSection.append(String.format("end_%s:\n", label));
+	}
 
     /**************************************/
     /* String Equality				      */
     /**************************************/
-    public void stringEq(Temp dst, Temp t1, Temp t2) {
-		String d = codegen.RegisterAllocator.getRegister(dst);
-		String s1 = codegen.RegisterAllocator.getRegister(t1);
-		String s2 = codegen.RegisterAllocator.getRegister(t2);
-		String label = IrCommand.getFreshLabel("str_eq");
+	public void stringEq(Temp dst, Temp t1, Temp t2) {
+        String d = codegen.RegisterAllocator.getRegister(dst);
+        String s1 = codegen.RegisterAllocator.getRegister(t1);
+        String s2 = codegen.RegisterAllocator.getRegister(t2);
+        String label = IrCommand.getFreshLabel("str_eq");
 
         textSection.append(String.format("\tmove $s0,$zero\n"));
         textSection.append(String.format("loop_%s:\n", label));
-        textSection.append(String.format("\tadd $t0,Temp_%d,$s0\n", s1));
-        textSection.append(String.format("\tadd $t1,Temp_%d,$s0\n", s2));
-        textSection.append(String.format("\tlb $t2,0($t0)\n"));
-        textSection.append(String.format("\tlb $t3,0($t1)\n"));
-        textSection.append(String.format("\tbne $t2,$t3,not_equal_%s\n", label));
-        textSection.append(String.format("\tbeqz $t2,equal_%s\n", label));
-        textSection.append(String.format("\taddi $s0,$s0,1\n"));
+        
+        // Use $s1-$s4 for internal logic to avoid trampling over $t registers 
+        // that the Register Allocator might be using for s1, s2, or d.
+        textSection.append(String.format("\tadd $s1, %s, $s0\n", s1));
+        textSection.append(String.format("\tadd $s2, %s, $s0\n", s2));
+        textSection.append(String.format("\tlb $s3, 0($s1)\n"));
+        textSection.append(String.format("\tlb $s4, 0($s2)\n"));
+        
+        textSection.append(String.format("\tbne $s3, $s4, not_equal_%s\n", label));
+        textSection.append(String.format("\tbeqz $s3, equal_%s\n", label));
+        textSection.append(String.format("\taddi $s0, $s0, 1\n"));
         textSection.append(String.format("\tj loop_%s\n", label));
         
         textSection.append(String.format("equal_%s:\n", label));
-        textSection.append(String.format("\tli Temp_%d,1\n", d));
+        textSection.append(String.format("\tli %s, 1\n", d));
         textSection.append(String.format("\tj end_%s\n", label));
         
         textSection.append(String.format("not_equal_%s:\n", label));
-        textSection.append(String.format("\tli Temp_%d,0\n", d));
+        textSection.append(String.format("\tli %s, 0\n", d));
         
         textSection.append(String.format("end_%s:\n", label));
     }
