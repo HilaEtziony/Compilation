@@ -61,6 +61,6 @@ public class IrCommandStore extends IrCommand
 	/***************/
 	public void mipsMe()
 	{
-		MipsGenerator.getInstance().store(varName,src);
+		MipsGenerator.getInstance().store(varName, src, offset, isGlobal);	
 	}
 }

@@ -102,14 +102,22 @@ public class MipsGenerator
 		dataSection.append(String.format("\tglobal_%s: .word 721\n", varName));
 	}
 
-	public void load(Temp dst, String varName) {
+	public void load(Temp dst, String varName, int offset, boolean isGlobal) {
 		String d = codegen.RegisterAllocator.getRegister(dst);
-    	textSection.append(String.format("\tlw %s, global_%s\n", d, varName));
+		if (isGlobal) {
+			textSection.append(String.format("\tlw %s, global_%s\n", d, varName));
+		} else {
+			textSection.append(String.format("\tlw %s, %d($fp)\n", d, offset));
+		}
 	}
 
-	public void store(String varName, Temp src) {
+	public void store(String varName, Temp src, int offset, boolean isGlobal) {
 		String s = codegen.RegisterAllocator.getRegister(src);
-    	textSection.append(String.format("\tsw %s, global_%s\n", s, varName));
+		if (isGlobal) {
+			textSection.append(String.format("\tsw %s, global_%s\n", s, varName));
+		} else {
+			textSection.append(String.format("\tsw %s, %d($fp)\n", s, offset));
+		}
 	}
 
 	public void li(Temp t, int value) {
