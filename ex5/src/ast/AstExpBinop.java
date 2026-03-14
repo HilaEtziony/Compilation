@@ -21,6 +21,7 @@ public class AstExpBinop extends AstExp
 	int op;
 	public AstExp left;
 	public AstExp right;
+	private Type leftType;
 	
 	/******************/
 	/* CONSTRUCTOR(S) */
@@ -101,6 +102,8 @@ public class AstExpBinop extends AstExp
 		// if class variables, extract their types
 		if(t1 != null && t1 instanceof TypeClassVarDec) t1 = ((TypeClassVarDec)t1).t;
 		if(t2 != null && t2 instanceof TypeClassVarDec) t2 = ((TypeClassVarDec)t2).t;
+
+		this.leftType = t1;
 
 		// + is allowed in TypeInt, TypeString
 		// *, -, /, <, >, == are allowed in TypeInt only
@@ -188,7 +191,11 @@ public class AstExpBinop extends AstExp
 
 		if (op == 0) // PLUS
         {
-            addIrCommand(new IrCommandBinopAddIntegers(dst, t1, t2));
+			if (leftType == TypeString.getInstance()) {
+				addIrCommand(new IrCommandStringConcat(dst, t1, t2));
+			} else {
+				addIrCommand(new IrCommandBinopAddIntegers(dst, t1, t2));
+			}
         }
         else if (op == 1) // MINUS
         {
@@ -212,7 +219,11 @@ public class AstExpBinop extends AstExp
         }
         else if (op == 6) // EQ (==)
         {
-            addIrCommand(new IrCommandBinopEqIntegers(dst, t1, t2));
+			if (leftType == TypeString.getInstance()) {
+                addIrCommand(new IrCommandStringEq(dst, t1, t2));
+            } else {
+                addIrCommand(new IrCommandBinopEqIntegers(dst, t1, t2));
+            }
         }
 
 		return dst;

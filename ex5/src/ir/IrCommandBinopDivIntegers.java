@@ -29,6 +29,6 @@ public class IrCommandBinopDivIntegers extends IrCommandBinop
 
 	@Override
 	public void mipsMe() {
-		MipsGenerator.getInstance().divIntegers(dst, t1, t2);
+		MipsGenerator.getInstance().div(dst, t1, t2);
 	}
 }

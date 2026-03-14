@@ -71,12 +71,41 @@ public class MipsGenerator {
 		fileWriter.format("\tli Temp_%d,%d\n", idx, value);
 	}
 
+	private void applySaturation(int dstidx) {
+		String labelLower = "label_lower_" + dstidx + "_" + System.nanoTime();
+		String labelEnd = "label_end_" + dstidx + "_" + System.nanoTime();
+
+		// Check if result is greater than 32767 = 2^15 - 1
+		fileWriter.format("\tli $s0,32767\n");
+		fileWriter.format("\tble Temp_%d,$s0,%s\n", dstidx, labelLower);
+		fileWriter.format("\tmove Temp_%d,$s0\n", dstidx);
+		fileWriter.format("\tj %s\n", labelEnd);
+
+		// Check if result is less than -32768 = -(2^15)
+		fileWriter.format("%s:\n", labelLower);
+		fileWriter.format("\tli $s0,-32768\n");
+		fileWriter.format("\tbge Temp_%d,$s0,%s\n", dstidx, labelEnd);
+		fileWriter.format("\tmove Temp_%d,$s0\n", dstidx);
+
+		fileWriter.format("%s:\n", labelEnd);
+	}
+
 	public void add(Temp dst, Temp oprnd1, Temp oprnd2) {
 		int i1 = oprnd1.getSerialNumber();
 		int i2 = oprnd2.getSerialNumber();
 		int dstidx = dst.getSerialNumber();
 
 		fileWriter.format("\tadd Temp_%d,Temp_%d,Temp_%d\n", dstidx, i1, i2);
+		applySaturation(dstidx);
+	}
+
+	public void sub(Temp dst, Temp oprnd1, Temp oprnd2) {
+		int i1 = oprnd1.getSerialNumber();
+		int i2 = oprnd2.getSerialNumber();
+		int dstidx = dst.getSerialNumber();
+
+		fileWriter.format("\tsub Temp_%d,Temp_%d,Temp_%d\n", dstidx, i1, i2);
+		applySaturation(dstidx);
 	}
 
 	public void mul(Temp dst, Temp oprnd1, Temp oprnd2) {
@@ -85,6 +114,7 @@ public class MipsGenerator {
 		int dstidx = dst.getSerialNumber();
 
 		fileWriter.format("\tmul Temp_%d,Temp_%d,Temp_%d\n", dstidx, i1, i2);
+		applySaturation(dstidx);
 	}
 
 	public void label(String inlabel) {
@@ -293,10 +323,102 @@ public class MipsGenerator {
 		}
 	}
 
+	/**************************************/
+    /* String Concatenation 			  */
+    /**************************************/
+	public void stringConcat(Temp dst, Temp t1, Temp t2) {
+        int idx1 = t1.getSerialNumber();
+        int idx2 = t2.getSerialNumber();
+        int idxDst = dst.getSerialNumber();
+        String label = "str_concat_" + System.nanoTime();
+
+        // 1. Calculate length of t1
+        fileWriter.format("\tmove $a0,$zero\n");
+        fileWriter.format("len1_%s:\n", label);
+        fileWriter.format("\tadd $s0,Temp_%d,$a0\n", idx1);
+        fileWriter.format("\tlb $s1,0($s0)\n");
+        fileWriter.format("\tbeqz $s1,len2_start_%s\n", label);
+        fileWriter.format("\taddi $a0,$a0,1\n");
+        fileWriter.format("\tj len1_%s\n", label);
+
+        // 2. Add length of t2
+        fileWriter.format("len2_start_%s:\n", label);
+        fileWriter.format("\tmove $s2,$a0\n"); // Keep len1 in $s2
+        fileWriter.format("\tmove $t0,$zero\n");
+        fileWriter.format("len2_%s:\n", label);
+        fileWriter.format("\tadd $s0,Temp_%d,$t0\n", idx2);
+        fileWriter.format("\tlb $s1,0($s0)\n");
+        fileWriter.format("\tbeqz $s1,alloc_%s\n", label);
+        fileWriter.format("\taddi $t0,$t0,1\n");
+        fileWriter.format("\tj len2_%s\n", label);
+
+        // 3. Malloc (len1 + len2 + 1) 
+        fileWriter.format("alloc_%s:\n", label);
+        fileWriter.format("\tadd $a0,$a0,$t0\n"); // a0 = len1 + len2
+        fileWriter.format("\taddi $a0,$a0,1\n");  // a0 = len1 + len2 + 1 
+        fileWriter.format("\tli $v0,9\n");        
+        fileWriter.format("\tsyscall\n");         
+        fileWriter.format("\tmove Temp_%d,$v0\n", idxDst);
+
+		// 5. Set $s0 to point to the start of the new string (dst)
+		fileWriter.format("\tli $s0, 0\n");
+        // 4. Copy t1
+        copyString("copy1_" + label, idx1, idxDst);
+
+		// Write t2 on null terminator of t1 (the -1 means "move back one character")
+        fileWriter.format("\taddi $s0,$s0,-1\n"); 
+        
+        // 6. Copy t2 (-1 flag means "start copying from the null terminator of t1")
+        copyString("copy2_" + label, idx2, idxDst);
+    }
+
+	private void copyString(String label, int srcIdx, int dstIdx) {
+		fileWriter.format("\tmove $s1,$zero\n"); 
+		fileWriter.format("%s:\n", label);
+		fileWriter.format("\tadd $t0,Temp_%d,$s1\n", srcIdx);
+		fileWriter.format("\tlb $t1,0($t0)\n");
+		fileWriter.format("\tadd $t2,Temp_%d,$s0\n", dstIdx); 
+		fileWriter.format("\tbeqz $t1,end_%s\n", label);
+		fileWriter.format("\taddi $s1,$s1,1\n");
+		fileWriter.format("\taddi $s0,$s0,1\n");
+		fileWriter.format("\tj %s\n", label);
+		fileWriter.format("end_%s:\n", label);
+	}
+
+    /**************************************/
+    /* String Equality				      */
+    /**************************************/
+    public void stringEq(Temp dst, Temp t1, Temp t2) {
+        int idx1 = t1.getSerialNumber();
+        int idx2 = t2.getSerialNumber();
+        int idxDst = dst.getSerialNumber();
+        String label = "str_eq_" + System.nanoTime();
+
+        fileWriter.format("\tmove $s0,$zero\n");
+        fileWriter.format("loop_%s:\n", label);
+        fileWriter.format("\tadd $t0,Temp_%d,$s0\n", idx1);
+        fileWriter.format("\tadd $t1,Temp_%d,$s0\n", idx2);
+        fileWriter.format("\tlb $t2,0($t0)\n");
+        fileWriter.format("\tlb $t3,0($t1)\n");
+        fileWriter.format("\tbne $t2,$t3,not_equal_%s\n", label);
+        fileWriter.format("\tbeqz $t2,equal_%s\n", label);
+        fileWriter.format("\taddi $s0,$s0,1\n");
+        fileWriter.format("\tj loop_%s\n", label);
+        
+        fileWriter.format("equal_%s:\n", label);
+        fileWriter.format("\tli Temp_%d,1\n", idxDst);
+        fileWriter.format("\tj end_%s\n", label);
+        
+        fileWriter.format("not_equal_%s:\n", label);
+        fileWriter.format("\tli Temp_%d,0\n", idxDst);
+        
+        fileWriter.format("end_%s:\n", label);
+    }
+
 	/*******************************/
 	/* Division with zero check    */
 	/*******************************/
-	public void divIntegers(Temp dst, Temp t1, Temp t2) {
+	public void div(Temp dst, Temp t1, Temp t2) {
 		int idxDst = dst.getSerialNumber();
 		int idx1 = t1.getSerialNumber();
 		int idx2 = t2.getSerialNumber();
@@ -304,6 +426,8 @@ public class MipsGenerator {
 		// Division by zero check (section 2.5: Illegal Division By Zero)
 		fileWriter.format("\tbeq Temp_%d,$zero,illegal_div_by_0_handler\n", idx2);
 		fileWriter.format("\tdiv Temp_%d,Temp_%d,Temp_%d\n", idxDst, idx1, idx2);
+	
+		applySaturation(idxDst);
 	}
 
 	/***************************************/
