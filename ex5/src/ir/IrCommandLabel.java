@@ -29,6 +29,6 @@ public class IrCommandLabel extends IrCommand
 	@Override
 	public void mipsMe()
 	{
-		// TODO
+		mips.MipsGenerator.getInstance().label(labelName);
 	}
 }
