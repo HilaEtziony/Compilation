@@ -116,7 +116,8 @@ public class Main {
 			/***********************/
 			/* [9] MIPS the Ir ... */
 			/***********************/
-			Ir.getInstance().mipsMe();
+			ir.Ir.getInstance().mipsMeData();
+			ir.Ir.getInstance().mipsMeText();
 
 			/**************************************/
 			/* [10] Finalize AST GRAPHIZ DOT file */

@@ -15,6 +15,6 @@ public class IrCommandEpilogue extends IrCommand {
     @Override
     public void mipsMe() 
     {
-        mips.MipsGenerator.getInstance().epilogue();    
+        mips.MipsGenerator.getInstance().epilogue(funcName);    
     }
 }

@@ -27,20 +27,31 @@ public class MipsGenerator
 	/***********************/
 	/* Create Segments... */
 	/***********************/
-	private StringBuilder dataSection = new StringBuilder(".data\n");
-    private StringBuilder textSection = new StringBuilder(".text\n");
+	private StringBuilder dataSection = new StringBuilder("");
+    private StringBuilder textSection = new StringBuilder("");
+
+	private List<String> globalVars = new ArrayList<>();	
 
 	/***********************/
 	/* The file writer ... */
 	/***********************/
 	public void finalizeFile() {
+		fileWriter.println(".data");
 		fileWriter.print(dataSection.toString());
+
+		for (String var : globalVars) {
+            if (var.startsWith("global_")) {
+                fileWriter.format("%s: .word 0\n", var);
+            } else {
+                fileWriter.format("global_%s: .word 0\n", var);
+            }
+        }
+
 		fileWriter.print("\n.text\n");
 		fileWriter.print(".globl main\n"); 
 		fileWriter.print(textSection.toString());
 
-		fileWriter.print("\tli $v0, 10\n");
-		fileWriter.print("\tsyscall\n");
+		emitErrorHandlers();
 		fileWriter.close();
 	}
 
@@ -98,9 +109,11 @@ public class MipsGenerator
     	textSection.append(String.format("\tla %s, %s\n", d, label));
 	}
 
-	public void allocate(String varName) {
-		dataSection.append(String.format("\tglobal_%s: .word 721\n", varName));
-	}
+    public void allocate(String varName) {
+        if (!globalVars.contains(varName)) {
+            globalVars.add(varName);
+        }
+    }
 
 	public void load(Temp dst, String varName, int offset, boolean isGlobal) {
 		String d = codegen.RegisterAllocator.getRegister(dst);
@@ -378,7 +391,7 @@ public class MipsGenerator
 		}
 	}
 
-	public void epilogue() {
+	public void epilogue(String funcName) {
 		// 1. Restore stack pointer to frame pointer (deallocates local variables)
 		textSection.append("\tmove $sp, $fp\n");
 		
@@ -390,7 +403,12 @@ public class MipsGenerator
 		textSection.append("\taddu $sp, $sp, 8\n");
 		
 		// 4. Return to caller
-		textSection.append("\tjr $ra\n");
+		if (funcName.equals("main")) {
+			textSection.append("\tli $v0, 10\n");
+			textSection.append("\tsyscall\n");
+		} else {
+			textSection.append("\tjr $ra\n");
+		}
 	}
 
 	public void functionCall(Temp res, String funcName, TempList args) {
@@ -601,7 +619,6 @@ public class MipsGenerator
 			/*****************************************************/
 			/* [3] Print data section with error message strings */
 			/*****************************************************/
-			instance.dataSection.append(".data\n");
 			instance.dataSection.append("string_access_violation: .asciiz \"Access Violation\"\n");
 			instance.dataSection.append("string_illegal_div_by_0: .asciiz \"Illegal Division By Zero\"\n");
 			instance.dataSection.append("string_invalid_ptr_dref: .asciiz \"Invalid Pointer Dereference\"\n");

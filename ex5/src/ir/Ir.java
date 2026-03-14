@@ -86,9 +86,27 @@ public class Ir {
 		return instance;
 	}
 
-	public void mipsMe() {
+	public void mipsMeData() {
 		for (IrCommand cmd : getCommands()) {
-			cmd.mipsMe();
+			if (cmd.isDataCommand()) {
+				cmd.mipsMe();
+			}
 		}
 	}
+
+public void mipsMeText() {
+        List<IrCommand> commands = getCommands();
+        
+        mips.MipsGenerator.getInstance().label("main");
+
+        for (IrCommand cmd : commands) {
+            if (!cmd.isDataCommand()) {
+                if (cmd instanceof IrCommandLabel) { 
+                     if (((IrCommandLabel)cmd).labelName.equals("main")) continue;
+                }
+                
+                cmd.mipsMe();
+            }
+        }
+    }
 }

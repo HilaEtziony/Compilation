@@ -35,4 +35,6 @@ public abstract class IrCommand
 	/* their mipsMe() implementations are added (done in MIPS branch) */
 	/*******************************************************************/
 	public void mipsMe() {}
+
+	public boolean isDataCommand() { return false; }
 }
