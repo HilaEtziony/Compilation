@@ -29,6 +29,9 @@ public class MipsGenerator {
 		fileWriter.close();
 	}
 
+	/**************************************/
+    /* Library Function & System Calls    */
+    /**************************************/
 	public void printInt(Temp t) {
 		int idx = t.getSerialNumber();
 		// fileWriter.format("\taddi $a0,Temp_%d,0\n",idx);
@@ -50,6 +53,39 @@ public class MipsGenerator {
 	//
 	// return t;
 	// }
+
+	public void printString(Temp t) {
+		int idx = t.getSerialNumber();
+		fileWriter.format("\tmove $a0,Temp_%d\n", idx);
+		fileWriter.format("\tli $v0,4\n");
+		fileWriter.format("\tsyscall\n");
+	}
+
+    public void malloc(Temp dst, Temp size) {
+        int idxDst = dst.getSerialNumber();
+        int idxSize = size.getSerialNumber();
+
+        fileWriter.format("\tmove $a0,Temp_%d\n", idxSize); // size in bytes
+        fileWriter.format("\tli $v0,9\n"); // syscall 9 = malloc
+        fileWriter.format("\tsyscall\n");
+        fileWriter.format("\tmove Temp_%d,$v0\n", idxDst);
+    }
+
+	public void exit() {
+		fileWriter.format("\tli $v0,10\n");
+		fileWriter.format("\tsyscall\n");
+	}
+
+	public void addStringLiteral(String label, String value) {
+		fileWriter.format(".data\n");
+		fileWriter.format("%s: .asciiz %s\n", label, value);
+		fileWriter.format(".text\n"); 
+	}
+
+	public void la(Temp dst, String label) {
+		int idx = dst.getSerialNumber();
+		fileWriter.format("\tla Temp_%d,%s\n", idx, label);
+	}
 
 	public void allocate(String varName) {
 		fileWriter.format(".data\n");

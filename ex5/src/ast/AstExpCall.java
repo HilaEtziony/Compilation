@@ -182,18 +182,31 @@ public class AstExpCall extends AstExp
 			tempArgsList = new TempList(varTemp, tempArgsList);
 		}
 
-		/*******************************************/
-		/* Special case: call to PrintInt          */
-		/*******************************************/
-		if (id.equals("PrintInt")) {
-			// expecting one argument
-			Temp arg = (tempArgsList != null) ? tempArgsList.head : null;
-			// TODO Hila if expectation fails, throw err?
-			addIrCommand(new IrCommandPrintInt(arg));
-
-			// PrintInt returns void
-			return null;
-		}
+		/********************************************************************************/
+        /* [1.5] Special cases: Library functions (PrintInt, PrintString, Malloc, Exit) */
+        /********************************************************************************/
+        if (var == null) {
+            if (id.equals("PrintInt")) {
+                Temp arg = (tempArgsList != null) ? tempArgsList.head : null;
+                addIrCommand(new IrCommandPrintInt(arg));
+                return null; // PrintInt returns void
+            }
+            if (id.equals("PrintString")) {
+                Temp arg = (tempArgsList != null) ? tempArgsList.head : null;
+                addIrCommand(new IrCommandPrintString(arg));
+                return null; // PrintString returns void
+            }
+            if (id.equals("Exit")) {
+                addIrCommand(new IrCommandExit());
+                return null; // Exit terminates program
+            }
+            if (id.equals("Malloc")) {
+                Temp sizeArg = (tempArgsList != null) ? tempArgsList.head : null;
+                Temp res = TempFactory.getInstance().getFreshTemp();
+                addIrCommand(new IrCommandMalloc(res, sizeArg));
+                return res;
+            }
+        }
 
         /*******************************************************************/
         /* [2] Allocate a result Temp                                      */
