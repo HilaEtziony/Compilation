@@ -199,8 +199,8 @@ public class AstDecClass extends AstDec
 
         ir.Ir.getInstance().currentObjectPtr = null;
 
-        addIrCommand(new IrCommandEpilogue(initLabel));
         addIrCommand(new IrCommandReturn(null));
+        addIrCommand(new IrCommandEpilogue(initLabel));
 
         if (tc != null) {
             addIrCommand(new IrCommandDefineVTable(this.name, tc.methods));

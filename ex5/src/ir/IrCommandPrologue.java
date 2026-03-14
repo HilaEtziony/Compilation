@@ -17,6 +17,6 @@ public class IrCommandPrologue extends IrCommand {
     @Override
     public void mipsMe()
     {
-        // TODO
+        mips.MipsGenerator.getInstance().prologue(this.frameSize);    
     }
 }

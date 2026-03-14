@@ -7,6 +7,8 @@ package mips;
 /* GENERAL IMPORTS */
 /*******************/
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import ir.IrCommand;
 /*******************/
@@ -350,6 +352,74 @@ public class MipsGenerator
 		if (dst != null) {
 			String d = codegen.RegisterAllocator.getRegister(dst);
 			textSection.append(String.format("\tmove %s, $v0\n", d));
+		}
+	}
+
+	public void prologue(int frameSize) {
+		// 1. Save old return address and old frame pointer (8 bytes total)
+		textSection.append("\tsubu $sp, $sp, 8\n");
+		textSection.append("\tsw $ra, 4($sp)\n");
+		textSection.append("\tsw $fp, 0($sp)\n");
+		
+		// 2. Set the new frame pointer to the current stack pointer
+		textSection.append("\tmove $fp, $sp\n");
+		
+		// 3. Allocate space for local variables on the stack
+		if (frameSize > 0) {
+			textSection.append(String.format("\tsubu $sp, $sp, %d\n", frameSize));
+		}
+	}
+
+	public void epilogue() {
+		// 1. Restore stack pointer to frame pointer (deallocates local variables)
+		textSection.append("\tmove $sp, $fp\n");
+		
+		// 2. Restore the old frame pointer and return address
+		textSection.append("\tlw $fp, 0($sp)\n");
+		textSection.append("\tlw $ra, 4($sp)\n");
+		
+		// 3. Pop the saved fp/ra from stack
+		textSection.append("\taddu $sp, $sp, 8\n");
+		
+		// 4. Return to caller
+		textSection.append("\tjr $ra\n");
+	}
+
+	public void functionCall(Temp res, String funcName, TempList args) {
+		// 1. Push arguments to stack in reverse order
+		int argCount = 0;
+		List<Temp> tempArgs = new ArrayList<>();
+		for (TempList tl = args; tl != null; tl = tl.tail) { 
+			tempArgs.add(tl.head); 
+		}
+		
+		// Iterate backwards to push the first argument last (so it's at the top of $sp)
+		for (int i = tempArgs.size() - 1; i >= 0; i--) {
+			String reg = codegen.RegisterAllocator.getRegister(tempArgs.get(i));
+			textSection.append("\tsubu $sp, $sp, 4\n");
+			textSection.append(String.format("\tsw %s, 0($sp)\n", reg));
+			argCount++;
+		}
+
+		// 2. Execute Jump and Link
+		textSection.append(String.format("\tjal %s\n", funcName));
+
+		// 3. Clean up arguments from stack (caller responsibility)
+		if (argCount > 0) {
+			textSection.append(String.format("\taddu $sp, $sp, %d\n", argCount * 4));
+		}
+
+		// 4. Move return value from $v0 to the destination temporary
+		if (res != null) {
+			String dstReg = codegen.RegisterAllocator.getRegister(res);
+			textSection.append(String.format("\tmove %s, $v0\n", dstReg));
+		}
+	}
+
+	public void returnCommand(Temp res) {
+		if (res != null) {
+			String reg = codegen.RegisterAllocator.getRegister(res);
+			textSection.append(String.format("\tmove $v0, %s\n", reg));
 		}
 	}
 

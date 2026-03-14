@@ -66,8 +66,7 @@ public class IrCommandCall extends IrCommand {
     }
 
     @Override
-    public void mipsMe()
-    {
-        // TODO
+    public void mipsMe() {
+        mips.MipsGenerator.getInstance().functionCall(res, id, args);
     }
 }

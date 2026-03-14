@@ -307,8 +307,8 @@ public class AstDecFunc extends AstDec
 			addIrCommand(new IrCommandLoad(resTemp, "return_val", returnValOffset, false));
 		}
 
-		addIrCommand(new IrCommandEpilogue(labelName));
 		addIrCommand(new IrCommandReturn(resTemp));
+		addIrCommand(new IrCommandEpilogue(labelName));
 
 		return null;
 	}
