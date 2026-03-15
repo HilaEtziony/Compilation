@@ -24,4 +24,6 @@ public class TypeVoid extends Type
 		}
 		return instance;
 	}
+
+	public boolean isVoid() { return true; }
 }

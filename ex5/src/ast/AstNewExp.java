@@ -132,7 +132,6 @@ public class AstNewExp extends AstExp
 		else { // like "new int[x]"
 			Temp sizeTemp = exp.irMe();
 			addIrCommand(new IrCommandNewArray(dst, sizeTemp));
-			// TODO Hila why not handle like in "if" block, but just multiply by 4?
 		}
 
 		return dst;

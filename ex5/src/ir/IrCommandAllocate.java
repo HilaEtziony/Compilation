@@ -28,6 +28,11 @@ public class IrCommandAllocate extends IrCommand
 		return String.format("alloc %s", varName);
 	}
 
+	@Override
+    public boolean isDataCommand() {
+        return true; // This command is a data command, so we return true
+    }
+
 	/***************/
 	/* MIPS me !!! */
 	/***************/

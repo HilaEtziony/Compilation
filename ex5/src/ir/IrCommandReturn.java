@@ -24,6 +24,6 @@ public class IrCommandReturn extends IrCommand {
     @Override
     public void mipsMe()
     {
-        // TODO
+        mips.MipsGenerator.getInstance().returnCommand(res);    
     }
 }

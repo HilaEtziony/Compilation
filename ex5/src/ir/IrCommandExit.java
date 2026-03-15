@@ -8,29 +8,34 @@ import mips.MipsGenerator;
 /*******************/
 /* GENERAL IMPORTS */
 /*******************/
+import java.util.*;
 
 /*******************/
 /* PROJECT IMPORTS */
 /*******************/
 import temp.*;
 
-public class IrCommandBinopSubIntegers extends IrCommandBinop
+public class IrCommandExit extends IrCommand
 {
-
-	public IrCommandBinopSubIntegers(Temp dst, Temp t1, Temp t2)
+	
+	public IrCommandExit()
 	{
-		super(dst, t1, t2);
 	}
+
+	@Override
+	public Set<Temp> use() { return Collections.emptySet(); }
 
 	@Override
 	public String toString()
 	{
-		return String.format("%s := %s - %s", dst, t1, t2);
+		return String.format("Exit()");
 	}
 
-	@Override
+	/***************/
+	/* MIPS me !!! */
+	/***************/
 	public void mipsMe()
 	{
-		MipsGenerator.getInstance().sub(dst,t1,t2);
+		MipsGenerator.getInstance().exit();
 	}
 }

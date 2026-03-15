@@ -93,7 +93,7 @@ public class Main {
 			}
 
 			/********************************************/
-			/* [8.6] Liveness analysis → file output */
+			/* [8.6] Liveness analysis -> file output */
 			/********************************************/
 			LivenessAnalysis liveness = new LivenessAnalysis(cfg);
 			PrintWriter livenessWriter = new PrintWriter("./output/liveness.txt");
@@ -116,7 +116,8 @@ public class Main {
 			/***********************/
 			/* [9] MIPS the Ir ... */
 			/***********************/
-			Ir.getInstance().mipsMe();
+			ir.Ir.getInstance().mipsMeData();
+			ir.Ir.getInstance().mipsMeText();
 
 			/**************************************/
 			/* [10] Finalize AST GRAPHIZ DOT file */

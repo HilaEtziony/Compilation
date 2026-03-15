@@ -13,6 +13,7 @@ public class SymbolTable
 	private int localCount = 0;
 	private String currentFunctionExitLabel = null;
 	private int currentFunctionReturnOffset;
+	private int paramOffsetCounter = 8;
 	
 	public static final String SCOPE_BOUNDARY = "SCOPE-BOUNDARY";
 
@@ -205,6 +206,7 @@ public class SymbolTable
 		if (scopeLevel == 1) {
 			localOffsetCounter = 0;
 			localCount = 0;
+			paramOffsetCounter = 8; // Start parameters at offset 8 (after return address and old frame pointer)
 		}
 
 		// this.printStackTopDown(7);
@@ -224,6 +226,11 @@ public class SymbolTable
 		/*********************************************/
 		printMe();
 		// this.printStackTopDown(7);
+	}
+
+	public void enterParameter(String name, Type t) {
+		enter(name, t, paramOffsetCounter, false);
+		paramOffsetCounter += 4;
 	}
 
 	/********************************************************************************/

@@ -30,6 +30,10 @@ public class IrCommandConstString extends IrCommand
     @Override
     public void mipsMe()
     {
-        // TODO
+        String label = getFreshLabel("string_literal");
+        
+        mips.MipsGenerator.getInstance().addStringLiteral(label, strValue);
+        
+        mips.MipsGenerator.getInstance().la(dst, label);
     }
 }

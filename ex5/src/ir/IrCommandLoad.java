@@ -58,6 +58,6 @@ public class IrCommandLoad extends IrCommand
 	/***************/
 	public void mipsMe()
 	{
-		MipsGenerator.getInstance().load(dst, varName);
+		MipsGenerator.getInstance().load(dst, varName, offset, isGlobal);	
 	}
 }

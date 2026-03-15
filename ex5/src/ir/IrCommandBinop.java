@@ -42,8 +42,5 @@ public class IrCommandBinop extends IrCommand
 	}
 
 	@Override
-	public void mipsMe()
-	{
-		// TODO
-	}
+	public void mipsMe(){}
 }

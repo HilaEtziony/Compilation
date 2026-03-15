@@ -88,7 +88,7 @@ public class RegisterAllocator
      * Select phase:
      * Pop nodes off the stack and assign the lowest available colour
      * ($t0-$t9) that no already-coloured neighbour uses.
-     * If no colour is available → actual spill → throw RuntimeException.
+     * If no colour is available -> actual spill -> throw RuntimeException.
      */
     private static void colorGraph()
     {

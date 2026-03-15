@@ -22,6 +22,7 @@ public class AstExpCall extends AstExp
 
 	private TypeClass cachedClassType; 
     private boolean isVirtualCall = false;
+	private boolean isVoid = false;
 
     public AstExpCall(AstVar var, String id, AstExpList expList, int lineNumber)
     {
@@ -140,7 +141,14 @@ public class AstExpCall extends AstExp
 		/***********************************************/
 		/* [4] Return function return type            */
 		/***********************************************/
-		return funcType.getReturnType(); 
+		Type returnType = funcType.getReturnType();
+		
+		if (returnType == null || returnType.isVoid()) 
+		{
+			this.isVoid = true;
+		}
+		
+		return returnType;
 	}
 
 	public Temp irMe()
@@ -182,23 +190,39 @@ public class AstExpCall extends AstExp
 			tempArgsList = new TempList(varTemp, tempArgsList);
 		}
 
-		/*******************************************/
-		/* Special case: call to PrintInt          */
-		/*******************************************/
-		if (id.equals("PrintInt")) {
-			// expecting one argument
-			Temp arg = (tempArgsList != null) ? tempArgsList.head : null;
-			// TODO Hila if expectation fails, throw err?
-			addIrCommand(new IrCommandPrintInt(arg));
-
-			// PrintInt returns void
-			return null;
-		}
+		/********************************************************************************/
+        /* [1.5] Special cases: Library functions (PrintInt, PrintString, Malloc, Exit) */
+        /********************************************************************************/
+        if (var == null) {
+            if (id.equals("PrintInt")) {
+                Temp arg = (tempArgsList != null) ? tempArgsList.head : null;
+                addIrCommand(new IrCommandPrintInt(arg));
+                return null; // PrintInt returns void
+            }
+            if (id.equals("PrintString")) {
+                Temp arg = (tempArgsList != null) ? tempArgsList.head : null;
+                addIrCommand(new IrCommandPrintString(arg));
+                return null; // PrintString returns void
+            }
+            if (id.equals("Exit")) {
+                addIrCommand(new IrCommandExit());
+                return null; // Exit terminates program
+            }
+            if (id.equals("Malloc")) {
+                Temp sizeArg = (tempArgsList != null) ? tempArgsList.head : null;
+                Temp res = TempFactory.getInstance().getFreshTemp();
+                addIrCommand(new IrCommandMalloc(res, sizeArg));
+                return res;
+            }
+        }
 
         /*******************************************************************/
         /* [2] Allocate a result Temp                                      */
         /*******************************************************************/
-        Temp resultTemp = TempFactory.getInstance().getFreshTemp();
+        Temp resultTemp = null;
+		if (!this.isVoid) {
+			resultTemp = TempFactory.getInstance().getFreshTemp();
+		}
 
 		/*******************************************************************/
         /* [3] Create the IR Call command and add it to the IR list.       */

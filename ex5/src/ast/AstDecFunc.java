@@ -110,9 +110,7 @@ public class AstDecFunc extends AstDec
 			else
 			{
 				type_list = new TypeList(t,type_list);
-				getSymbolTable().enter(it.identifier, t, paramOffset, false);
-        
-        		paramOffset += 4; // assuming each parameter takes 4 bytes
+				getSymbolTable().enterParameter(it.identifier, t);
 			}
 		}
 		// reverse type_list to maintain order
@@ -307,8 +305,8 @@ public class AstDecFunc extends AstDec
 			addIrCommand(new IrCommandLoad(resTemp, "return_val", returnValOffset, false));
 		}
 
-		addIrCommand(new IrCommandEpilogue(labelName));
 		addIrCommand(new IrCommandReturn(resTemp));
+		addIrCommand(new IrCommandEpilogue(labelName));
 
 		return null;
 	}
