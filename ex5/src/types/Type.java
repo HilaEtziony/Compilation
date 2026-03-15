@@ -17,6 +17,7 @@ public abstract class Type
 	public boolean isClass(){ return false;}
 	public boolean isArray(){ return false;}
 	public boolean isNil() { return false; }
+	public boolean isVoid() { return false; }
 
 	/***************/
     /* isCompatible(Type other) */
