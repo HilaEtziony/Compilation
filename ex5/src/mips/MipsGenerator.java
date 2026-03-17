@@ -49,9 +49,8 @@ public class MipsGenerator
 
 		fileWriter.print("\n.text\n");
 		fileWriter.print(".globl main\n"); 
-		fileWriter.print(textSection.toString());
-
 		emitErrorHandlers();
+		fileWriter.print(textSection.toString());
 		fileWriter.close();
 	}
 
@@ -142,20 +141,20 @@ public class MipsGenerator
 		String labelEnd   = IrCommand.getFreshLabel("label_end");
 
 		// Check upper bound (2^15 - 1) 
-		textSection.append(String.format("\tli $s9, 32767\n")); 
-		textSection.append(String.format("\tble %s, $s9, %s\n", regName, labelLower));
+		textSection.append(String.format("\tli $s7, 32767\n")); 
+		textSection.append(String.format("\tble %s, $s7, %s\n", regName, labelLower));
 		
 		// Clamp to max value 
-		textSection.append(String.format("\tmove %s, $s9\n", regName));
+		textSection.append(String.format("\tmove %s, $s7\n", regName));
 		textSection.append(String.format("\tj %s\n", labelEnd));
 
 		textSection.append(String.format("%s:\n", labelLower));
 		// Check lower bound (-2^15) 
-		textSection.append(String.format("\tli $s9, -32768\n"));
-		textSection.append(String.format("\tbge %s, $s9, %s\n", regName, labelEnd));
+		textSection.append(String.format("\tli $s7, -32768\n"));
+		textSection.append(String.format("\tbge %s, $s7, %s\n", regName, labelEnd));
 		
 		// Clamp to min value
-		textSection.append(String.format("\tmove %s, $s9\n", regName));
+		textSection.append(String.format("\tmove %s, $s7\n", regName));
 
 		textSection.append(String.format("%s:\n", labelEnd));
 	}
@@ -246,9 +245,9 @@ public class MipsGenerator
 		String s = codegen.RegisterAllocator.getRegister(size);
 
 		// Calculate bytes needed: (size + 1) * 4
-		textSection.append(String.format("\taddi $s8, %s, 1\n", s));
-		textSection.append(String.format("\tsll $s8, $s8, 2\n"));
-		textSection.append(String.format("\tmove $a0, $s8\n"));
+		textSection.append(String.format("\taddi $s6, %s, 1\n", s));
+		textSection.append(String.format("\tsll $s6, $s6, 2\n"));
+		textSection.append(String.format("\tmove $a0, $s6\n"));
 		textSection.append(String.format("\tli $v0, 9\n"));
 		textSection.append(String.format("\tsyscall\n"));
 		textSection.append(String.format("\tsw %s, 0($v0)\n", s));
@@ -264,16 +263,16 @@ public class MipsGenerator
 		// 1. Null pointer check (section 2.5: Invalid Pointer Dereference)
 		textSection.append(String.format("\tbeq %s, $zero, invalid_ptr_dref_handler\n", b));
 		// 2. Load array length from offset 0
-		textSection.append(String.format("\tlw $s8, 0(%s)\n", b));
+		textSection.append(String.format("\tlw $s6, 0(%s)\n", b));
 		// 3. Bounds check: index < 0 (section 2.5: Access Violation)
 		textSection.append(String.format("\tbltz %s, access_violation_handler\n", i));
 		// 4. Bounds check: index >= length
-		textSection.append(String.format("\tbge %s, $s8, access_violation_handler\n", i));
+		textSection.append(String.format("\tbge %s, $s6, access_violation_handler\n", i));
 		// 5. Calculate address: base + (index + 1) * 4
-		textSection.append(String.format("\taddi $s8, %s, 1\n", i));
-		textSection.append(String.format("\tsll $s8, $s8, 2\n"));
-		textSection.append(String.format("\tadd $s8, %s, $s8\n", b));
-		textSection.append(String.format("\tlw %s, 0($s8)\n", d));
+		textSection.append(String.format("\taddi $s6, %s, 1\n", i));
+		textSection.append(String.format("\tsll $s6, $s6, 2\n"));
+		textSection.append(String.format("\tadd $s6, %s, $s6\n", b));
+		textSection.append(String.format("\tlw %s, 0($s6)\n", d));
 	}
 
 	public void arrayStore(Temp base, Temp index, Temp src) {
@@ -284,16 +283,16 @@ public class MipsGenerator
 		// 1. Null pointer check (section 2.5: Invalid Pointer Dereference)
 		textSection.append(String.format("\tbeq %s, $zero, invalid_ptr_dref_handler\n", regBase));
 		// 2. Load array length from offset 0
-		textSection.append(String.format("\tlw $s8, 0(%s)\n", regBase));
+		textSection.append(String.format("\tlw $s6, 0(%s)\n", regBase));
 		// 3. Bounds check: index < 0 (section 2.5: Access Violation)
 		textSection.append(String.format("\tbltz %s, access_violation_handler\n", regIndex));
 		// 4. Bounds check: index >= length
-		textSection.append(String.format("\tbge %s, $s8, access_violation_handler\n", regIndex));
+		textSection.append(String.format("\tbge %s, $s6, access_violation_handler\n", regIndex));
 		// 5. Calculate address and store
-		textSection.append(String.format("\taddi $s8, %s, 1\n", regIndex));
-        textSection.append("\tsll $s8, $s8, 2\n");
-        textSection.append(String.format("\tadd $s8, %s, $s8\n", regBase));
-        textSection.append(String.format("\tsw %s, 0($s8)\n", regSrc));
+		textSection.append(String.format("\taddi $s6, %s, 1\n", regIndex));
+	        textSection.append("\tsll $s6, $s6, 2\n");
+	        textSection.append(String.format("\tadd $s6, %s, $s6\n", regBase));
+	        textSection.append(String.format("\tsw %s, 0($s6)\n", regSrc));
 	}
 
 	/*******************************/
@@ -351,15 +350,19 @@ public class MipsGenerator
 		String objReg = codegen.RegisterAllocator.getRegister(obj);
 		textSection.append(String.format("\tbeq %s, $zero, invalid_ptr_dref_handler\n", objReg));
 
-		// Push args
+		// Push args right-to-left so arg0 (receiver/this) is closest to $fp
+		List<Temp> argTemps = new ArrayList<>();
 		TempList it = args;
-		int argCount = 0;
 		while (it != null) {
-			String argReg = codegen.RegisterAllocator.getRegister(it.head);
+			argTemps.add(it.head);
+			it = it.tail;
+		}
+
+		int argCount = argTemps.size();
+		for (int i = argTemps.size() - 1; i >= 0; i--) {
+			String argReg = codegen.RegisterAllocator.getRegister(argTemps.get(i));
 			textSection.append("\tsubu $sp, $sp, 4\n");
 			textSection.append(String.format("\tsw %s, 0($sp)\n", argReg));
-			it = it.tail;
-			argCount++;
 		}
 
 		textSection.append(String.format("\tlw $s0, 0(%s)\n", objReg));

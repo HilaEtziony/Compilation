@@ -9,8 +9,8 @@ import temp.*;
  *
  * Each BasicBlock wraps exactly one IrCommand.
  * For every block we compute:
- *   live_in[B]  = use[B] V (live_out[B] \ def[B])
- *   live_out[B] = V { live_in[S] | S E successors(B) }
+ *   live_in[B]  = use[B] U (live_out[B] \ def[B])
+ *   live_out[B] = U { live_in[S] | S ∈ successors(B) }
  *
  * Iterates until a fixed point is reached.
  */
