@@ -214,8 +214,8 @@ public class AstVarDec extends AstDec
 			return null;
 		}
 		else{
-			// Not generate allocate command for global variable 
-			if (!this.isGlobal) {
+			// Generate allocate command for global variables (locals use stack frame).
+			if (this.isGlobal) {
 				addIrCommand(new IrCommandAllocate(id.name));
 			}
 
