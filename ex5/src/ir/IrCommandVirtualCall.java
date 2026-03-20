@@ -1,5 +1,6 @@
 package ir;
 
+import java.util.*;
 import mips.MipsGenerator;
 import temp.Temp;
 import temp.TempList;
@@ -15,6 +16,21 @@ public class IrCommandVirtualCall extends IrCommand {
         this.obj = obj;
         this.offset = offset;
         this.args = args;
+    }
+
+    @Override
+    public Set<Temp> def() { return dst != null ? Collections.singleton(dst) : Collections.emptySet(); }
+
+    @Override
+    public Set<Temp> use()
+    {
+        Set<Temp> s = new HashSet<>();
+        if (obj != null) s.add(obj);
+        for (TempList tl = args; tl != null; tl = tl.tail)
+        {
+            if (tl.head != null) s.add(tl.head);
+        }
+        return s;
     }
 
     @Override
