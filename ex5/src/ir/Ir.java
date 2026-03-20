@@ -94,19 +94,56 @@ public class Ir {
 		}
 	}
 
-public void mipsMeText() {
-        List<IrCommand> commands = getCommands();
-        
-        mips.MipsGenerator.getInstance().label("main");
+	/**
+	 * Emit MIPS .text section.
+	 *
+	 * IR layout is: [global var inits] [func defs (A, B, ...)] [main body]
+	 * 
+	 * Problem: after executing global inits, MIPS falls through into the
+	 * first function definition instead of jumping to main's body.
+	 *
+	 * Solution (2-phase emit):
+	 *   Phase 1 – emit global init code (everything before the first IrCommandLabel)
+	 *   Then emit "j main_body" to skip over function definitions
+	 *   Phase 2 – emit all remaining code (function defs + main body)
+	 *             When we hit IR's "main" label, replace it with "main_body"
+	 *             (since SPIM's entry point "main:" was already emitted above)
+	 */
+	public void mipsMeText() {
+		List<IrCommand> commands = getCommands();
 
-        for (IrCommand cmd : commands) {
-            if (!cmd.isDataCommand()) {
-                if (cmd instanceof IrCommandLabel) { 
-                     if (((IrCommandLabel)cmd).labelName.equals("main")) continue;
-                }
-                
-                cmd.mipsMe();
-            }
-        }
-    }
+		// SPIM entry point — execution starts here
+		mips.MipsGenerator.getInstance().label("main");
+
+		// Phase 1: emit global variable initialization code
+		// (all IR commands before the first function label)
+		int firstFuncIdx = 0;
+		for (int i = 0; i < commands.size(); i++) {
+			IrCommand cmd = commands.get(i);
+			if (cmd instanceof IrCommandLabel) {
+				// Found first function definition — stop emitting global inits
+				firstFuncIdx = i;
+				break;
+			}
+			if (!cmd.isDataCommand()) {
+				cmd.mipsMe();
+			}
+		}
+
+		// After global inits, jump past all function definitions to main's body
+		mips.MipsGenerator.getInstance().jump("main_body");
+
+		// Phase 2: emit function definitions and main body
+		for (int i = firstFuncIdx; i < commands.size(); i++) {
+			IrCommand cmd = commands.get(i);
+			if (!cmd.isDataCommand()) {
+				// Replace IR's "main" label with "main_body" (the jump target from above)
+				if (cmd instanceof IrCommandLabel && ((IrCommandLabel) cmd).labelName.equals("main")) {
+					mips.MipsGenerator.getInstance().label("main_body");
+					continue;
+				}
+				cmd.mipsMe();
+			}
+		}
+	}
 }
