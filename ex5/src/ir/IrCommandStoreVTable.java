@@ -1,5 +1,6 @@
 package ir;
 
+import java.util.*;
 import mips.MipsGenerator;
 import temp.Temp;
 
@@ -11,6 +12,9 @@ public class IrCommandStoreVTable extends IrCommand {
         this.dstObj = dstObj;
         this.vtableName = vtableName;
     }
+
+    @Override
+    public Set<Temp> use() { return dstObj != null ? Collections.singleton(dstObj) : Collections.emptySet(); }
 
     @Override
     public String toString() {
