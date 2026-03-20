@@ -497,10 +497,7 @@ public class MipsGenerator
         textSection.append(String.format("\tmove $s0, $zero\n"));
         copyString("copy1_" + label, "$s4", regDst);
 
-        // 5. Copy s2 to dst (starting from s1's null terminator)
-        // We decrement $s0 by 1 because copy1 finishes at the null terminator, 
-        // and we want to overwrite it with the first char of s2.
-        textSection.append(String.format("\taddi $s0, $s0, -1\n"));
+        // 5. Copy s2 to dst (starting from s1's null terminator position)
         copyString("copy2_" + label, "$s5", regDst);
     }
 
