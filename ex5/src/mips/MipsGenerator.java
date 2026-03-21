@@ -49,7 +49,6 @@ public class MipsGenerator
 
 		fileWriter.print("\n.text\n");
 		fileWriter.print(".globl main\n"); 
-		emitErrorHandlers();
 		fileWriter.print(textSection.toString());
 		fileWriter.close();
 	}
