@@ -103,16 +103,16 @@ public class Ir {
 	 * first function definition instead of jumping to main's body.
 	 *
 	 * Solution (2-phase emit):
-	 *   Phase 1 – emit global init code (everything before the first IrCommandLabel)
+	 *   Phase 1 - emit global init code (everything before the first IrCommandLabel)
 	 *   Then emit "j main_body" to skip over function definitions
-	 *   Phase 2 – emit all remaining code (function defs + main body)
+	 *   Phase 2 - emit all remaining code (function defs + main body)
 	 *             When we hit IR's "main" label, replace it with "main_body"
 	 *             (since SPIM's entry point "main:" was already emitted above)
 	 */
 	public void mipsMeText() {
 		List<IrCommand> commands = getCommands();
 
-		// SPIM entry point — execution starts here
+		// SPIM entry point - execution starts here
 		mips.MipsGenerator.getInstance().label("main");
 
 		// Phase 1: emit global variable initialization code
@@ -121,7 +121,7 @@ public class Ir {
 		for (int i = 0; i < commands.size(); i++) {
 			IrCommand cmd = commands.get(i);
 			if (cmd instanceof IrCommandLabel) {
-				// Found first function definition — stop emitting global inits
+				// Found first function definition - stop emitting global inits
 				firstFuncIdx = i;
 				break;
 			}
