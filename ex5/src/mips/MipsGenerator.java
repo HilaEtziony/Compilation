@@ -425,14 +425,22 @@ public class MipsGenerator
 	}
 
 	public void functionCall(Temp res, String funcName, TempList args) {
-		// 1. Push arguments to stack in reverse order
+		String[] callerSavedRegs = {"$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "$t9"};
+		
+		// 1. Save caller-saved registers before the call (since callee may overwrite them)
+		textSection.append(String.format("\tsubu $sp, $sp, %d\n", callerSavedRegs.length * 4));
+		for (int i = 0; i < callerSavedRegs.length; i++) {
+			textSection.append(String.format("\tsw %s, %d($sp)\n", callerSavedRegs[i], i * 4));
+		}
+
+		// 2. Push arguments to stack in reverse order
 		int argCount = 0;
 		List<Temp> tempArgs = new ArrayList<>();
 		for (TempList tl = args; tl != null; tl = tl.tail) { 
 			tempArgs.add(tl.head); 
 		}
 		
-		// Iterate backwards to push the first argument last (so it's at the top of $sp)
+		// 3. Iterate backwards to push the first argument last (so it's at the top of $sp)
 		for (int i = tempArgs.size() - 1; i >= 0; i--) {
 			String reg = codegen.RegisterAllocator.getRegister(tempArgs.get(i));
 			textSection.append("\tsubu $sp, $sp, 4\n");
@@ -440,21 +448,27 @@ public class MipsGenerator
 			argCount++;
 		}
 
-		// 2. Execute Jump and Link
+		// 4. Execute Jump and Link
 		textSection.append(String.format("\tjal %s\n", funcName));
 
-		// 3. Reload argument registers from stack (they may have been clobbered by callee)
+		// 5. Reload argument registers from stack (they may have been clobbered by callee)
 		for (int i = 0; i < tempArgs.size(); i++) {
 			String reg = codegen.RegisterAllocator.getRegister(tempArgs.get(i));
 			textSection.append(String.format("\tlw %s, %d($sp)\n", reg, i * 4));
 		}
 
-		// 4. Clean up arguments from stack (caller responsibility)
+		// 6. Clean up arguments from stack (caller responsibility)
 		if (argCount > 0) {
 			textSection.append(String.format("\taddu $sp, $sp, %d\n", argCount * 4));
 		}
 
-		// 5. Move return value from $v0 to the destination temporary
+		// 7. Restore caller-saved registers after the call
+		for (int i = 0; i < callerSavedRegs.length; i++) {
+			textSection.append(String.format("\tlw %s, %d($sp)\n", callerSavedRegs[i], i * 4));
+		}
+		textSection.append(String.format("\taddu $sp, $sp, %d\n", callerSavedRegs.length * 4));
+
+		// 8. Move return value from $v0 to the destination temporary
 		if (res != null) {
 			String dstReg = codegen.RegisterAllocator.getRegister(res);
 			textSection.append(String.format("\tmove %s, $v0\n", dstReg));
