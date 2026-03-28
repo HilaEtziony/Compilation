@@ -29,6 +29,8 @@ public class Main {
 			/********************************/
 			fileWriter = new PrintWriter(outputFileName);
 
+			MipsGenerator.getInstance().setPrintWriter(fileWriter);
+
 			/******************************/
 			/* [3] Initialize a new lexer */
 			/******************************/
@@ -47,7 +49,7 @@ public class Main {
 			/*************************/
 			/* [6] Print the AST ... */
 			/*************************/
-			ast.printMe();
+			// ast.printMe();
 
 			// This try and 2 next catches handle error as in ex3 - as necessary for ex5
 			try {
@@ -77,6 +79,7 @@ public class Main {
 			/* [8.5] Build and print IR control-flow CFG */
 			/********************************************/
 			Graph cfg = Graph.fromIr(Ir.getInstance());
+			/*
 			System.out.println("CFG blocks (index: command -> successors)");
 			for (BasicBlock block : cfg.getBlocks()) {
 				StringBuilder successors = new StringBuilder();
@@ -91,11 +94,13 @@ public class Main {
 						block.getCommand(),
 						successors.toString());
 			}
+			*/
 
 			/********************************************/
 			/* [8.6] Liveness analysis -> file output */
 			/********************************************/
 			LivenessAnalysis liveness = new LivenessAnalysis(cfg);
+			/*
 			PrintWriter livenessWriter = new PrintWriter("./output/liveness.txt");
 			livenessWriter.println("Liveness analysis results:");
 			for (BasicBlock block : cfg.getBlocks()) {
@@ -106,12 +111,13 @@ public class Main {
 						liveness.getLiveOut(block));
 			}
 			livenessWriter.close();
+			*/
 
 			/********************************************/
 			/* [8.7] Register allocation */
 			/********************************************/
 			RegisterAllocator.allocateRegisters(liveness, cfg);
-			RegisterAllocator.printInterferenceGraph();
+			//RegisterAllocator.printInterferenceGraph();
 
 			/***********************/
 			/* [9] MIPS the Ir ... */
@@ -122,7 +128,7 @@ public class Main {
 			/**************************************/
 			/* [10] Finalize AST GRAPHIZ DOT file */
 			/**************************************/
-			AstGraphviz.getInstance().finalizeFile();
+			//AstGraphviz.getInstance().finalizeFile();
 
 			/***************************/
 			/* [11] Finalize MIPS file */
@@ -134,7 +140,7 @@ public class Main {
 			/**************************/
 			/* [12] Close output file */
 			/**************************/
-			fileWriter.close();
+			//fileWriter.close();
 		}
 
 		// All next catches handle errors as ex3 - ERROR(line number) for syntax or

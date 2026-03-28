@@ -36,6 +36,10 @@ public class MipsGenerator
 	/* The file writer ... */
 	/***********************/
 	public void finalizeFile() {
+		if (fileWriter == null) {
+			System.err.println("FATAL ERROR: fileWriter is null in MipsGenerator!");
+			return;
+		}
 		fileWriter.println(".data");
 		fileWriter.print(dataSection.toString());
 
@@ -50,6 +54,7 @@ public class MipsGenerator
 		fileWriter.print("\n.text\n");
 		fileWriter.print(".globl main\n"); 
 		fileWriter.print(textSection.toString());
+		fileWriter.flush();
 		fileWriter.close();
 	}
 
@@ -608,6 +613,13 @@ public class MipsGenerator
 	protected MipsGenerator() {
 	}
 
+	/************************/
+	/* SET PRINT WRITER ... */
+	/************************/
+	public void setPrintWriter(PrintWriter pw) {
+		this.fileWriter = pw;
+	}
+
 	/******************************/
 	/* GET SINGLETON INSTANCE ... */
 	/******************************/
@@ -618,25 +630,8 @@ public class MipsGenerator
 			/*******************************/
 			instance = new MipsGenerator();
 
-			try {
-				/*********************************************************************************/
-				/*
-				 * [1] Open the MIPS text file and write data section with error message strings
-				 */
-				/*********************************************************************************/
-				String dirname = "./output/";
-				String filename = String.format("MIPS.txt");
-
-				/***************************************/
-				/* [2] Open MIPS text file for writing */
-				/***************************************/
-				instance.fileWriter = new PrintWriter(dirname + filename);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
 			/*****************************************************/
-			/* [3] Print data section with error message strings */
+			/* [1] Print data section with error message strings */
 			/*****************************************************/
 			instance.dataSection.append("string_access_violation: .asciiz \"Access Violation\"\n");
 			instance.dataSection.append("string_illegal_div_by_0: .asciiz \"Illegal Division By Zero\"\n");
