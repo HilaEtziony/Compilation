@@ -156,7 +156,21 @@ public class Main {
 			} catch (FileNotFoundException ex) {
 				ex.printStackTrace();
 			}
+		}
 
+		catch (RuntimeException e) {
+			// Write to output file and print to console the message of the exception
+			// Relevant for printing "Register Allocation Failed" in case of register allocation failure
+			System.out.println("RunTime Exception: " + e.getMessage());
+			try {
+				fileWriter = new PrintWriter(outputFileName);
+				String message = e.getMessage();
+				fileWriter.print(message);
+				System.out.print(message);
+				fileWriter.close();
+			} catch (FileNotFoundException ex) {
+				ex.printStackTrace();
+			}
 		}
 
 		catch (Exception e) {
