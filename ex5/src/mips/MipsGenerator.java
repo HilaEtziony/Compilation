@@ -354,6 +354,14 @@ public class MipsGenerator
 		String objReg = codegen.RegisterAllocator.getRegister(obj);
 		textSection.append(String.format("\tbeq %s, $zero, invalid_ptr_dref_handler\n", objReg));
 
+		String[] callerSavedRegs = {"$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "$t9"};
+
+		// Save caller-saved registers before the call
+		textSection.append(String.format("\tsubu $sp, $sp, %d\n", callerSavedRegs.length * 4));
+		for (int i = 0; i < callerSavedRegs.length; i++) {
+			textSection.append(String.format("\tsw %s, %d($sp)\n", callerSavedRegs[i], i * 4));
+		}
+
 		// Push args right-to-left so arg0 (receiver/this) is closest to $fp
 		List<Temp> argTemps = new ArrayList<>();
 		TempList it = args;
@@ -373,15 +381,16 @@ public class MipsGenerator
 		textSection.append(String.format("\tlw $s0, %d($s0)\n", methodOffset));
 		textSection.append("\tjalr $s0\n");
 
-		// Reload argument registers from stack (clobbered by callee)
-		for (int i = 0; i < argTemps.size(); i++) {
-			String argReg = codegen.RegisterAllocator.getRegister(argTemps.get(i));
-			textSection.append(String.format("\tlw %s, %d($sp)\n", argReg, i * 4));
-		}
-
+		// Clean up arguments from stack
 		if (argCount > 0) {
 			textSection.append(String.format("\taddu $sp, $sp, %d\n", argCount * 4));
 		}
+
+		// Restore caller-saved registers after the call
+		for (int i = 0; i < callerSavedRegs.length; i++) {
+			textSection.append(String.format("\tlw %s, %d($sp)\n", callerSavedRegs[i], i * 4));
+		}
+		textSection.append(String.format("\taddu $sp, $sp, %d\n", callerSavedRegs.length * 4));
 
 		if (dst != null) {
 			String d = codegen.RegisterAllocator.getRegister(dst);
@@ -451,13 +460,7 @@ public class MipsGenerator
 		// 4. Execute Jump and Link
 		textSection.append(String.format("\tjal %s\n", funcName));
 
-		// 5. Reload argument registers from stack (they may have been clobbered by callee)
-		for (int i = 0; i < tempArgs.size(); i++) {
-			String reg = codegen.RegisterAllocator.getRegister(tempArgs.get(i));
-			textSection.append(String.format("\tlw %s, %d($sp)\n", reg, i * 4));
-		}
-
-		// 6. Clean up arguments from stack (caller responsibility)
+		// 5. Clean up arguments from stack (caller responsibility)
 		if (argCount > 0) {
 			textSection.append(String.format("\taddu $sp, $sp, %d\n", argCount * 4));
 		}
