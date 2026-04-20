@@ -1,5 +1,6 @@
 package ast;
 
+import symboltable.SymbolTable;
 import temp.*;
 import types.*;
 
@@ -66,6 +67,53 @@ public class AstDecList extends AstStmt {
 	}
 
 	public Type semantMe() {
+		// Predeclare global function signatures first so global initializers can
+		// reference functions that appear later in the source.
+		for (AstDecList it = this; it != null; it = it.tail) {
+			if (it.head instanceof AstDecFunc) {
+				AstDecFunc f = (AstDecFunc) it.head;
+
+				Type existing = SymbolTable.getInstance().findInCurrentScope(f.identifier);
+				if (existing != null && !existing.isFunction()) {
+					throw new semanticError.SemanticErrorException("ERROR(" + f.lineNumber + ")");
+				}
+
+				Type returnType = SymbolTable.getInstance().find(f.return_type.type);
+				if (returnType == null) {
+					// Type is not available yet (e.g., class/array declared later).
+					// We'll semant this function in the regular pass.
+					continue;
+				}
+
+				TypeList params = null;
+				boolean canPredeclare = true;
+				for (AstTypeIdList p = f.func_input; p != null; p = p.tail) {
+					Type pt = SymbolTable.getInstance().find(p.head.type);
+					if (pt == null || pt == TypeVoid.getInstance()) {
+						canPredeclare = false;
+						break;
+					}
+					params = new TypeList(pt, params);
+				}
+
+				if (!canPredeclare) {
+					continue;
+				}
+
+				TypeList reversed = null;
+				while (params != null) {
+					reversed = new TypeList(params.head, reversed);
+					params = params.tail;
+				}
+
+				if (existing == null) {
+					SymbolTable.getInstance().enter(
+						f.identifier,
+						new TypeFunction(returnType, f.identifier, reversed));
+				}
+			}
+		}
+
 		// First pass: definitions (classes, arrays, global variables) - in order of
 		// appearance
 		for (AstDecList it = this; it != null; it = it.tail) {

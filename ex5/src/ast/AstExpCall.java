@@ -82,11 +82,13 @@ public class AstExpCall extends AstExp
 			// Method call on object
 			Type varType = var.semantMe();
 
-			this.cachedClassType = (TypeClass) varType;
-			this.isVirtualCall = true;
-
+			// Class fields can be wrapped in TypeClassVarDec; unwrap to the actual
+			// class type before resolving the method.
 			// if varType is class variable, extract the type
 			if(varType instanceof TypeClassVarDec) varType = ((TypeClassVarDec)varType).t;
+
+			this.cachedClassType = (TypeClass) varType;
+			this.isVirtualCall = true;
 
 			if (!varType.isClass()) {
 				System.out.format(">> ERROR: variable is not a class for method call %s\n", id);
@@ -230,7 +232,6 @@ public class AstExpCall extends AstExp
 		// VTable Call 
 		if (varTemp != null) {
 			Type varType = this.cachedClassType;
-			if (varType instanceof TypeClassVarDec) varType = ((TypeClassVarDec)varType).t;
 			
 			TypeClass tc = (TypeClass) varType;
 			int methodOffset = tc.getMethodOffset(id); 

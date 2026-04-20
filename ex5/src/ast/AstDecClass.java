@@ -126,7 +126,13 @@ public class AstDecClass extends AstDec
                     if (SymbolTable.getInstance().findInCurrentScope(memberName) == null &&
                         !isRedefinedInCurrentClass(memberName)) 
                     {
-                        SymbolTable.getInstance().enter(memberName, it.head);
+                        // Preserve the inherited field offset so field accesses keep using
+                        // the same layout as the parent class.
+						int inheritedOffset = 0;
+						if (it.head instanceof TypeClassVarDec) {
+							inheritedOffset = ((TypeClassVarDec) it.head).offset;
+						}
+						SymbolTable.getInstance().enter(memberName, it.head, inheritedOffset, false);
                     }
                 }
                 curr = curr.father;

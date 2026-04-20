@@ -425,7 +425,9 @@ public class MipsGenerator
 		textSection.append("\taddu $sp, $sp, 8\n");
 		
 		// 4. Return to caller
-		if (funcName.equals("main")) {
+		// The entry-point function is emitted as func_main, so it still needs a
+		// program exit instead of a normal return.
+		if (funcName.equals("main") || funcName.equals("func_main")) {
 			textSection.append("\tli $v0, 10\n");
 			textSection.append("\tsyscall\n");
 		} else {
@@ -435,6 +437,9 @@ public class MipsGenerator
 
 	public void functionCall(Temp res, String funcName, TempList args) {
 		String[] callerSavedRegs = {"$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "$t9"};
+		// Global functions are emitted with a func_ prefix; class init routines
+		// keep their original *_Init labels so the call target stays stable.
+		String targetLabel = funcName.endsWith("_Init") ? funcName : "func_" + funcName;
 		
 		// 1. Save caller-saved registers before the call (since callee may overwrite them)
 		textSection.append(String.format("\tsubu $sp, $sp, %d\n", callerSavedRegs.length * 4));
@@ -458,7 +463,7 @@ public class MipsGenerator
 		}
 
 		// 4. Execute Jump and Link
-		textSection.append(String.format("\tjal %s\n", funcName));
+		textSection.append(String.format("\tjal %s\n", targetLabel));
 
 		// 5. Clean up arguments from stack (caller responsibility)
 		if (argCount > 0) {
