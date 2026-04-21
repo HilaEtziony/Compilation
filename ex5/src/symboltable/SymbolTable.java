@@ -224,7 +224,7 @@ public class SymbolTable
 		/*********************************************/
 		/* Print the symbol table after every change */
 		/*********************************************/
-		printMe();
+		//printMe();
 		// this.printStackTopDown(7);
 	}
 
@@ -264,7 +264,7 @@ public class SymbolTable
 		/* Print the symbol table after every change */		
 		/*********************************************/
 		scopeLevel--; // update scope level
-		printMe();
+		//printMe();
 		// this.printStackTopDown(5);
 		// System.out.println("SCOPE ENDED" );
 	}

@@ -78,7 +78,7 @@ public class AstVarSimple extends AstVar
 		if (currentClass != null) {
 			Type member = currentClass.getDataMemberInClass(name);
 			
-			if (member != null && !member.isFunction() && entry.offset >= 8) {
+			if (member != null && !member.isFunction() && entry.offset >= 4) {
 				this.cachedIsClassField = true;
 			} else {
 				this.cachedIsClassField = false;

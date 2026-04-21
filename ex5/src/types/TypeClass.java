@@ -157,9 +157,11 @@ public class TypeClass extends Type
 			this.methods = copyTypeList(this.father.methods);
 		}
 
+		// Rebuild the method table in declaration order so inherited offsets stay
+		// stable and overriding replaces the parent slot instead of shifting it.
 		TypeList orderedMembers = reverseTypeList(localMembers);
 
-		for (TypeList it = localMembers; it != null; it = it.tail) {
+		for (TypeList it = orderedMembers; it != null; it = it.tail) {
 			if (it.head.isFunction()) {
 				updateOrAddMethod(it.head);
 			}

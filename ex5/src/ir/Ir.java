@@ -94,19 +94,75 @@ public class Ir {
 		}
 	}
 
-public void mipsMeText() {
-        List<IrCommand> commands = getCommands();
-        
-        mips.MipsGenerator.getInstance().label("main");
+	/**
+	 * Emit MIPS .text section.
+	 *
+	 * IR layout is: [global var inits] [func defs (A, B, ...)] [main body]
+	 * 
+	 * Problem: after executing global inits, MIPS falls through into the
+	 * first function definition instead of jumping to main's body.
+	 *
+	 * Solution (2-phase emit):
+	 *   Phase 1 - emit global init code (everything before the first IrCommandLabel)
+	 *   Then emit "j main_body" to skip over function definitions
+	 *   Phase 2 - emit all remaining code (function defs + main body)
+	 *             When we hit IR's "main" label, replace it with "main_body"
+	 *             (since SPIM's entry point "main:" was already emitted above)
+	 */
+	public void mipsMeText() {
+		List<IrCommand> commands = getCommands();
+		java.util.Set<Integer> globalInitIndices = new java.util.HashSet<>();
 
-        for (IrCommand cmd : commands) {
-            if (!cmd.isDataCommand()) {
-                if (cmd instanceof IrCommandLabel) { 
-                     if (((IrCommandLabel)cmd).labelName.equals("main")) continue;
-                }
-                
-                cmd.mipsMe();
-            }
-        }
-    }
+		// Scan once so we can separate global initializers from function bodies
+		// even when function labels appear earlier in the IR list.
+		boolean inFunction = false;
+		for (int i = 0; i < commands.size(); i++) {
+			IrCommand cmd = commands.get(i);
+
+			if (cmd instanceof IrCommandLabel) {
+				boolean isFunctionEntry = (i + 1 < commands.size()) && (commands.get(i + 1) instanceof IrCommandPrologue);
+				if (isFunctionEntry) {
+					inFunction = true;
+				}
+			}
+
+			if (!cmd.isDataCommand() && !inFunction && !(cmd instanceof IrCommandLabel)) {
+				globalInitIndices.add(i);
+			}
+
+			if (inFunction && cmd instanceof IrCommandEpilogue) {
+				inFunction = false;
+			}
+		}
+
+		// SPIM entry point - execution starts here
+		mips.MipsGenerator.getInstance().label("main");
+
+		// Phase 1: emit all global initialization instructions before the jump
+		// over the function section.
+		for (int i = 0; i < commands.size(); i++) {
+			if (globalInitIndices.contains(i)) {
+				commands.get(i).mipsMe();
+			}
+		}
+
+		// After global inits, jump past all function definitions to main's body
+		mips.MipsGenerator.getInstance().jump("main_body");
+
+		// Phase 2: emit function/class-init definitions and main body
+		for (int i = 0; i < commands.size(); i++) {
+			IrCommand cmd = commands.get(i);
+			if (cmd.isDataCommand() || globalInitIndices.contains(i)) {
+				continue;
+			}
+
+			// Replace IR's main function label with main_body (jump target from above)
+			if (cmd instanceof IrCommandLabel && ((IrCommandLabel) cmd).labelName.equals("func_main")) {
+				mips.MipsGenerator.getInstance().label("main_body");
+				continue;
+			}
+
+			cmd.mipsMe();
+		}
+	}
 }

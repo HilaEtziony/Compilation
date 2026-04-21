@@ -36,6 +36,10 @@ public class RegisterAllocator
         regTable.clear();
 
         buildInterferenceGraph(liveness, cfg);
+
+        // debug: print the interference graph
+        printInterferenceGraph();
+
         colorGraph();
     }
 
@@ -195,7 +199,7 @@ public class RegisterAllocator
         System.out.println("=== Interference Graph ===");
         for (Map.Entry<Temp, Set<Temp>> entry : interferenceGraph.entrySet())
         {
-            System.out.println(entry.getKey() + " interferes with: " + entry.getValue());
+            System.out.println(entry.getKey() + " interferes with(" + entry.getValue().size() + "): " + entry.getValue());
         }
         System.out.println("==========================");
     }

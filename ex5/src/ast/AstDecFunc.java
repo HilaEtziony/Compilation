@@ -76,8 +76,13 @@ public class AstDecFunc extends AstDec
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");				
 		}
 
-		// check if function name already exists in current scope
-		if (getSymbolTable().findInCurrentScope(identifier) != null)
+		Type existingDecl = getSymbolTable().findInCurrentScope(identifier);
+		boolean wasPredeclared = existingDecl != null && existingDecl.isFunction();
+
+		// If the function was predeclared in the first pass, reuse that symbol-table
+		// slot instead of inserting a duplicate declaration.
+		// check if function name already exists in current scope as a non-function
+		if (existingDecl != null && !existingDecl.isFunction())
 		{
 			System.out.format(">> ERROR: function name %s already exists in current scope\n",identifier);
 			throw new SemanticErrorException("ERROR(" + this.lineNumber + ")");
@@ -140,7 +145,9 @@ public class AstDecFunc extends AstDec
 		/* [5] Enter the Function Type to the Symbol Table */
 		/***************************************************/
 		TypeFunction funcType = new TypeFunction(returnType,identifier,type_list);
-		getSymbolTable().enter(identifier, funcType);
+		if (!wasPredeclared) {
+			getSymbolTable().enter(identifier, funcType);
+		}
 
 		/************************************************************/
 		/* [6] Return value is irrelevant for function declarations */
@@ -274,6 +281,8 @@ public class AstDecFunc extends AstDec
 		
 		if (currentClass != null) {
 			labelName = currentClass.name + "_" + identifier;
+		} else {
+			labelName = "func_" + identifier;
 		}
 
 		addIrCommand(new IrCommandLabel(labelName));
