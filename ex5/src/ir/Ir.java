@@ -147,18 +147,12 @@ public class Ir {
 		}
 
 		// After global inits, jump past all function definitions to main's body
-		mips.MipsGenerator.getInstance().jump("main_body");
+		mips.MipsGenerator.getInstance().jump("func_main");
 
 		// Phase 2: emit function/class-init definitions and main body
 		for (int i = 0; i < commands.size(); i++) {
 			IrCommand cmd = commands.get(i);
 			if (cmd.isDataCommand() || globalInitIndices.contains(i)) {
-				continue;
-			}
-
-			// Replace IR's main function label with main_body (jump target from above)
-			if (cmd instanceof IrCommandLabel && ((IrCommandLabel) cmd).labelName.equals("func_main")) {
-				mips.MipsGenerator.getInstance().label("main_body");
 				continue;
 			}
 
